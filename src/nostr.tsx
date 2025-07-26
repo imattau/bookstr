@@ -17,6 +17,7 @@ import {
 import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
+import { buildCommentTags } from './commentUtils';
 
 const DEFAULT_RELAYS = [
   'wss://relay.damus.io',
@@ -97,7 +98,12 @@ interface NostrContextValue {
   saveContacts: (list: string[]) => Promise<void>;
   saveRelays: (list: string[]) => Promise<void>;
   toggleBookmark: (id: string) => Promise<void>;
-  publishComment: (bookId: string, text: string) => Promise<void>;
+  publishComment: (
+    bookId: string,
+    text: string,
+    parentEventId?: string,
+    parentPubkey?: string,
+  ) => Promise<void>;
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -358,8 +364,14 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  const publishComment = async (bookId: string, text: string) => {
-    await publish({ kind: 1, content: text, tags: [['e', bookId]] });
+  const publishComment = async (
+    bookId: string,
+    text: string,
+    parentEventId?: string,
+    parentPubkey?: string,
+  ) => {
+    const tags = buildCommentTags(bookId, parentEventId, parentPubkey);
+    await publish({ kind: 1, content: text, tags });
   };
 
   return (
