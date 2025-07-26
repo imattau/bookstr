@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNostr, verifyNip05 } from '../nostr';
+import { useWallet } from '../WalletConnect';
 import { ContactsManager } from './ContactsManager';
 import { RelayListManager } from './RelayListManager';
 import { DelegationManager } from './DelegationManager';
@@ -15,6 +16,7 @@ interface ProfileMeta {
 
 export const ProfileSettings: React.FC = () => {
   const { metadata, saveProfile, pubkey } = useNostr();
+  const { connected, connect } = useWallet();
   const [form, setForm] = React.useState<ProfileMeta>(() => ({
     name: (metadata as ProfileMeta | null)?.name ?? '',
     about: (metadata as ProfileMeta | null)?.about ?? '',
@@ -93,6 +95,12 @@ export const ProfileSettings: React.FC = () => {
         className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Save
+      </button>
+      <button
+        onClick={connect}
+        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+      >
+        {connected ? 'Wallet Connected' : 'Connect Wallet'}
       </button>
       <div className="pt-4">
         <h2 className="mb-2 text-sm font-medium">Following</h2>

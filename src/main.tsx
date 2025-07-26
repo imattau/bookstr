@@ -4,12 +4,15 @@ import './index.css';
 import { App } from './index';
 import { registerServiceWorker } from './registerSw';
 import { NostrProvider } from './nostr';
+import { WalletProvider } from './WalletConnect';
 
 const rootEl = document.getElementById('root');
 if (rootEl) {
   createRoot(rootEl).render(
     <NostrProvider>
-      <App />
+      <WalletProvider>
+        <App />
+      </WalletProvider>
     </NostrProvider>,
   );
 }
