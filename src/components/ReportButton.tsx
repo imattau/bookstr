@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaFlag } from 'react-icons/fa';
 import { useNostr } from '../nostr';
 
 export interface ReportButtonProps {
@@ -6,7 +7,10 @@ export interface ReportButtonProps {
   className?: string;
 }
 
-export const ReportButton: React.FC<ReportButtonProps> = ({ target, className }) => {
+export const ReportButton: React.FC<ReportButtonProps> = ({
+  target,
+  className,
+}) => {
   const { publish } = useNostr();
 
   const handleClick = async () => {
@@ -26,7 +30,7 @@ export const ReportButton: React.FC<ReportButtonProps> = ({ target, className })
       aria-label="Report"
       className={`rounded border px-2 py-1 ${className ?? ''}`}
     >
-      🚩
+      <FaFlag aria-hidden="true" />
     </button>
   );
 };
