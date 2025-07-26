@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { Event as NostrEvent } from 'nostr-tools';
+import { hexToBytes } from '@noble/hashes/utils';
 import { useNostr, sendGroupDM, getPrivKey } from '../nostr';
 
 interface Message {
@@ -29,45 +30,20 @@ export const GroupChatModal: React.FC<GroupChatModalProps> = ({
 
   useEffect(() => {
     if (!pubkey) return;
-    const others = members.filter((m) => m !== pubkey);
     const off = subscribe(
-      [
-        { kinds: [4], authors: [pubkey], '#p': others, limit: 20 },
-        { kinds: [4], authors: others, '#p': [pubkey], limit: 20 },
-      ],
+      [{ kinds: [1059], authors: members, '#p': [pubkey], limit: 20 }],
       (evt: NostrEvent) => {
         (async () => {
           const priv = getPrivKey();
           if (!priv) return;
-          const all = [...others, pubkey];
-          if (!hasAllRecipients(evt.tags as string[][], all)) return;
-          let plain: string | null = null;
-          if (evt.pubkey === pubkey) {
-            for (const p of others) {
-              try {
-                plain = await (
-                  await import('nostr-tools')
-                ).nip04.decrypt(priv, p, evt.content);
-                break;
-              } catch {
-                /* ignore */
-              }
-            }
-          } else {
-            try {
-              plain = await (
-                await import('nostr-tools')
-              ).nip04.decrypt(priv, evt.pubkey, evt.content);
-            } catch {
-              /* ignore */
-            }
-          }
-          if (plain) {
-            setMsgs((m) => [
-              ...m,
-              { id: evt.id, from: evt.pubkey, text: plain! },
-            ]);
-          }
+          const inner = await (
+            await import('nostr-tools')
+          ).nip17.unwrapEvent(evt, hexToBytes(priv));
+          if (!hasAllRecipients(inner.tags as string[][], members)) return;
+          setMsgs((m) => [
+            ...m,
+            { id: evt.id, from: evt.pubkey, text: inner.content },
+          ]);
         })();
       },
     );
