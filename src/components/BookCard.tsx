@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNostr, zap } from '../nostr';
 import { ReactionButton } from './ReactionButton';
 import { RepostButton } from './RepostButton';
@@ -18,7 +18,18 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   const cover = event.tags.find((t) => t[0] === 'image')?.[1];
   const ctx = useNostr();
   const [status, setStatus] = useState<'idle' | 'zapping' | 'done'>('idle');
-  const { toggleBookmark, bookmarks, pubkey } = ctx;
+  const { toggleBookmark, bookmarks, pubkey, subscribe } = ctx;
+  const [attachments, setAttachments] = useState<{ id: string; mime: string; url: string }[]>([]);
+
+  useEffect(() => {
+    const off = subscribe([{ kinds: [1064], '#e': [event.id] }], (evt) => {
+      const mime = evt.tags.find((t) => t[0] === 'mime')?.[1];
+      const url = evt.tags.find((t) => t[0] === 'url')?.[1];
+      if (!mime || !url) return;
+      setAttachments((a) => (a.find((x) => x.id === evt.id) ? a : [...a, { id: evt.id, mime, url }]));
+    });
+    return off;
+  }, [subscribe, event.id]);
 
   const handleZap = async () => {
     setStatus('zapping');
@@ -52,6 +63,17 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
       )}
       <h3 className="font-semibold">{title}</h3>
       {summary && <p className="text-sm text-gray-500">{summary}</p>}
+      {attachments.map((a) => (
+        <a
+          key={a.id}
+          href={a.url}
+          target="_blank"
+          rel="noreferrer"
+          className="block text-sm text-blue-600 underline"
+        >
+          Attachment ({a.mime})
+        </a>
+      ))}
       <div className="pt-2 flex gap-2">
         <button
           onClick={handleZap}

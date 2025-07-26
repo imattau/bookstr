@@ -327,6 +327,18 @@ export async function publishRepost(ctx: NostrContextValue, target: string) {
   return ctx.publish({ kind: 6, content: '', tags: [['e', target]] });
 }
 
+export async function publishAttachment(
+  ctx: NostrContextValue,
+  data: { mime: string; url: string; bookId?: string },
+) {
+  const tags: string[][] = [
+    ['mime', data.mime],
+    ['url', data.url],
+  ];
+  if (data.bookId) tags.push(['e', data.bookId]);
+  return ctx.publish({ kind: 1064, content: '', tags });
+}
+
 export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
   const priv = localStorage.getItem('privKey');
   if (!priv) throw new Error('not logged in');
