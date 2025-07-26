@@ -38,7 +38,7 @@ export const ProfileSettings: React.FC = () => {
   }));
   const [verified, setVerified] = React.useState<boolean | null>(null);
 
-  const { books } = useReadingStore();
+  const { books, yearlyGoal, setYearlyGoal } = useReadingStore();
   const offlineMaxBooks = useSettings((s) => s.offlineMaxBooks);
   const setOfflineMaxBooks = useSettings((s) => s.setOfflineMaxBooks);
   const [offlineBooks, setOfflineBooks] = React.useState<OfflineBook[]>([]);
@@ -89,6 +89,11 @@ export const ProfileSettings: React.FC = () => {
         type: 'refresh-offline',
       });
     }
+  };
+
+  const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+    setYearlyGoal(val);
   };
 
   if (!pubkey) {
@@ -166,6 +171,16 @@ export const ProfileSettings: React.FC = () => {
       <div>
         <label className="block text-sm font-medium">Theme</label>
         <ThemeSwitcher />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Yearly reading goal</label>
+        <input
+          type="number"
+          min={1}
+          value={yearlyGoal}
+          onChange={handleGoalChange}
+          className="w-full rounded border p-2"
+        />
       </div>
       <div className="pt-4">
         <h2 className="mb-2 text-sm font-medium">Offline content</h2>
