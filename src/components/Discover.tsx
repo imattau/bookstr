@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
+import { useSearchParams } from 'react-router-dom';
 import { BookCard } from './BookCard';
 import { BookCardSkeleton } from './BookCardSkeleton';
 import { OnboardingTooltip } from './OnboardingTooltip';
@@ -11,13 +12,27 @@ const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
 export const Discover: React.FC = () => {
   const { subscribe, contacts } = useNostr();
+  const [params, setParams] = useSearchParams();
   const [events, setEvents] = useState<
     (NostrEvent & { repostedBy?: string })[]
   >([]);
   const [votes, setVotes] = useState<Record<string, number>>({});
   const voteIds = useRef(new Set<string>());
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(params.get('q') || '');
   const [tag, setTag] = useState('All');
+
+  useEffect(() => {
+    const q = params.get('q') || '';
+    setSearch(q);
+  }, [params]);
+
+  const updateSearch = (val: string) => {
+    setSearch(val);
+    const next = new URLSearchParams(params);
+    if (val) next.set('q', val);
+    else next.delete('q');
+    setParams(next);
+  };
 
   useEffect(() => {
     logEvent('view_discover');
@@ -122,7 +137,7 @@ export const Discover: React.FC = () => {
       <div className="p-4">
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => updateSearch(e.target.value)}
           placeholder="Search"
           className="w-full rounded border border-border p-2 focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)]"
         />
