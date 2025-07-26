@@ -84,7 +84,11 @@ export const BookDetailScreen: React.FC = () => {
       {meta && (
         <div className="space-y-2">
           {meta.cover && (
-            <img src={meta.cover} alt="" className="h-32 w-auto" />
+            <img
+              src={meta.cover}
+              alt={`Cover image for ${meta.title}`}
+              className="h-32 w-auto"
+            />
           )}
           <h2 className="text-xl font-semibold">{meta.title}</h2>
           {meta.summary && <p>{meta.summary}</p>}

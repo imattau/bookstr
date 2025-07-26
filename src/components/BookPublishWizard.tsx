@@ -134,7 +134,13 @@ export const BookPublishWizard: React.FC = () => {
       {step === 4 && (
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">{title}</h2>
-          {cover && <img src={cover} alt="" className="max-h-40 w-auto" />}
+          {cover && (
+            <img
+              src={cover}
+              alt={title ? `Cover image for ${title}` : 'Book cover'}
+              className="max-h-40 w-auto"
+            />
+          )}
           <p>{summary}</p>
           <div className="flex flex-wrap gap-1">
             {tags

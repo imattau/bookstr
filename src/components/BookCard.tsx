@@ -59,7 +59,11 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         </p>
       )}
       {cover && (
-        <img src={cover} alt="" className="mb-2 h-32 w-24 object-cover" />
+        <img
+          src={cover}
+          alt={`Cover image for ${title}`}
+          className="mb-2 h-32 w-24 object-cover"
+        />
       )}
       <h3 className="font-semibold">{title}</h3>
       {summary && <p className="text-sm text-gray-500">{summary}</p>}
