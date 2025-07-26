@@ -1,0 +1,8 @@
+@import './designTokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-family: theme('fontFamily.sans');
+}
