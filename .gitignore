@@ -1,0 +1,34 @@
+# Python caches and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Editor swap files
+*~
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+
+# Archives
+*.tar
+*.gz
+*.zip
+
+# Logs
+*.log
+
+# Python virtual environments
+env/
+venv/
+.venv/
+
+# Distribution / build directories
+build/
+dist/
+
+# Coverage reports
+htmlcov/
+.coverage
+
