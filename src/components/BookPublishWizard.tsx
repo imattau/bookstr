@@ -3,7 +3,13 @@ import { marked } from 'marked';
 import { useNostr, publishLongPost } from '../nostr';
 import DOMPurify from 'dompurify';
 
-export const BookPublishWizard: React.FC = () => {
+export interface BookPublishWizardProps {
+  onPublish?: (id: string) => void;
+}
+
+export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
+  onPublish,
+}) => {
   const ctx = useNostr();
   const [step, setStep] = useState(0);
   const [title, setTitle] = useState('');
@@ -21,7 +27,7 @@ export const BookPublishWizard: React.FC = () => {
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const handlePublish = async () => {
-    await publishLongPost(
+    const evt = await publishLongPost(
       ctx,
       {
         title,
@@ -42,6 +48,7 @@ export const BookPublishWizard: React.FC = () => {
     setTags('');
     setContent('');
     setPow(false);
+    if (onPublish) onPublish(evt.id);
   };
 
   return (
