@@ -10,7 +10,10 @@ export const BookFeed: React.FC = () => {
 
   useEffect(() => {
     const off = subscribe([{ kinds: [30023], limit: 20 }], (evt) =>
-      setEvents((e) => [...e, evt]),
+      setEvents((e) => {
+        if (e.find((x) => x.id === evt.id)) return e;
+        return [...e, evt];
+      }),
     );
     return off;
   }, [subscribe]);
