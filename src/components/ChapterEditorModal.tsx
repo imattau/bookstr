@@ -84,8 +84,8 @@ export const ChapterEditorModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="space-y-2 rounded bg-[color:var(--clr-surface)] p-4 w-full max-w-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-2 sm:p-4">
+      <div className="space-y-2 w-full max-w-sm max-h-screen overflow-y-auto rounded bg-[color:var(--clr-surface)] p-4">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
