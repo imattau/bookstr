@@ -6,7 +6,6 @@ import { ThemeProvider } from './ThemeProvider';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { ProfileSettings } from './components/ProfileSettings';
 
-
 export const App: React.FC = () => {
   const [active, setActive] = React.useState<
     'discover' | 'library' | 'write' | 'activity' | 'profile'
@@ -18,7 +17,6 @@ export const App: React.FC = () => {
           <Header onSearch={() => {}}>
             <ThemeSwitcher />
           </Header>
-
             {active === 'write' && <BookForm />}
             {active === 'profile' && (
               <div className="space-y-4">

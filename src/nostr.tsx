@@ -27,6 +27,7 @@ interface NostrContextValue {
   saveContacts: (list: string[]) => Promise<void>;
   toggleBookmark: (id: string) => Promise<void>;
   publishComment: (bookId: string, text: string) => Promise<void>;
+
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -143,6 +144,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     await publish({ kind: 1, content: text, tags: [['e', bookId]] });
   };
 
+
   return (
     <NostrContext.Provider
       value={{
@@ -158,6 +160,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         saveContacts,
         toggleBookmark,
         publishComment,
+
       }}
     >
       {children}
