@@ -101,3 +101,36 @@ registerRoute(
     }
   },
 );
+
+self.addEventListener('push', (event) => {
+  const data = (() => {
+    try {
+      return event.data?.json();
+    } catch {
+      return { title: 'Bookstr', body: event.data?.text() } as any;
+    }
+  })() as { title?: string; body?: string; url?: string };
+  const title = data.title || 'Bookstr';
+  const options: NotificationOptions = {
+    body: data.body,
+    data: { url: data.url || '/' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  const url = (event.notification.data as any)?.url || '/';
+  event.notification.close();
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        for (const client of clients) {
+          if (client.url.includes(url)) {
+            return (client as WindowClient).focus();
+          }
+        }
+        return self.clients.openWindow(url);
+      }),
+  );
+});

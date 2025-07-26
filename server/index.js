@@ -17,6 +17,16 @@ app.post(`${API_BASE}/event`, (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.post(`${API_BASE}/subscribe`, (req, res) => {
+  console.log('subscribe', req.body);
+  res.json({ status: 'ok' });
+});
+
+app.delete(`${API_BASE}/subscribe`, (req, res) => {
+  console.log('unsubscribe', req.body);
+  res.json({ status: 'ok' });
+});
+
 const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));
 
