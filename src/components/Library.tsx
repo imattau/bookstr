@@ -70,7 +70,7 @@ export const Library: React.FC = () => {
             >
               <img
                 src={item.cover}
-                alt=""
+                alt={`Cover image for ${item.title}`}
                 className="h-[84px] w-[56px] rounded-[4px] object-cover"
               />
               <div className="flex-1 space-y-1">

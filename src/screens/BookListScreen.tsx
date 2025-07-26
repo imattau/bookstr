@@ -78,7 +78,13 @@ export const BookListScreen: React.FC = () => {
             className="rounded border p-2 cursor-pointer"
             onClick={() => navigate(`/book/${b.id}`)}
           >
-            {b.cover && <img src={b.cover} alt="" className="h-24 w-auto" />}
+            {b.cover && (
+              <img
+                src={b.cover}
+                alt={`Cover image for ${b.title}`}
+                className="h-24 w-auto"
+              />
+            )}
             <h3 className="font-semibold">{b.title}</h3>
             {b.summary && <p className="text-sm">{b.summary}</p>}
           </div>
