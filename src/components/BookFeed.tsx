@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
+import { BookCardSkeleton } from './BookCardSkeleton';
 import type { Event as NostrEvent } from 'nostr-tools';
 
 export const BookFeed: React.FC = () => {
@@ -16,9 +17,9 @@ export const BookFeed: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {events.map((e) => (
-        <BookCard key={e.id} event={e} />
-      ))}
+      {events.length === 0
+        ? Array.from({ length: 3 }).map((_, i) => <BookCardSkeleton key={i} />)
+        : events.map((e) => <BookCard key={e.id} event={e} />)}
     </div>
   );
 };
