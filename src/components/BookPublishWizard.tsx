@@ -10,27 +10,33 @@ export const BookPublishWizard: React.FC = () => {
   const [cover, setCover] = useState('');
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
+  const [pow, setPow] = useState(false);
 
   const next = () => setStep((s) => Math.min(4, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const handlePublish = async () => {
-    await publishLongPost(ctx, {
-      title,
-      summary,
-      content,
-      cover: cover || undefined,
-      tags: tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
-    });
+    await publishLongPost(
+      ctx,
+      {
+        title,
+        summary,
+        content,
+        cover: cover || undefined,
+        tags: tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
+      },
+      pow ? 20 : 0,
+    );
     setStep(0);
     setTitle('');
     setSummary('');
     setCover('');
     setTags('');
     setContent('');
+    setPow(false);
   };
 
   return (
@@ -143,6 +149,14 @@ export const BookPublishWizard: React.FC = () => {
             className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: marked.parse(content) }}
           />
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={pow}
+              onChange={(e) => setPow(e.target.checked)}
+            />
+            Enable proof-of-work
+          </label>
           <div className="flex justify-between gap-2">
             <button onClick={back} className="rounded border px-4 py-2">
               Back
