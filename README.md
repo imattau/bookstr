@@ -73,6 +73,20 @@ docker run -p 3000:3000 bookstr:latest
 
 The application will be available at <http://localhost:3000>.
 
+### API Server Configuration
+
+The Docker image includes a Node server that serves the static frontend and
+handles `POST /api/action` and `POST /api/event` requests. The server listens on
+port `3000` by default. Set the `PORT` environment variable to run on a
+different port:
+
+```bash
+docker run -e PORT=8080 -p 8080:8080 bookstr:latest
+```
+
+This starts the API server on port 8080 while still serving the compiled web
+app.
+
 ### Zap Flow (NIP-57)
 
 Bookstr implements lightning zaps following [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md). The flow is:
