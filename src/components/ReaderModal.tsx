@@ -3,6 +3,7 @@ import { ReaderView } from './ReaderView';
 import { useTheme } from '../ThemeProvider';
 import { useReadingStore } from '../store';
 import { Notes } from './Notes';
+import { queueAction } from '../actions';
 
 interface ReaderModalProps {
   bookId: string;
@@ -71,10 +72,12 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           style={{ fontFamily: 'Georgia,serif', fontSize, lineHeight: '24px' }}
         >
           <ReaderView
+            bookId={bookId}
             html={html}
             onPercentChange={(p) => {
               setPercent(p);
               updateProgress(bookId, p);
+              queueAction({ type: 'progress', id: bookId, percent: p });
             }}
           />
           <Notes bookId={bookId} />
@@ -83,6 +86,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           <button
             onClick={() => {
               finishBook(bookId);
+              queueAction({ type: 'finish', id: bookId });
               onClose();
             }}
             className="rounded-[6px] bg-[#E6E6EC] px-4 py-2 text-[14px] text-[#111214] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50 dark:bg-[#262B33] dark:text-[#F3F4F6]"

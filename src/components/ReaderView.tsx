@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { cacheBookHtml, getCachedBookHtml } from '../htmlCache';
 
 export interface ReaderViewProps {
   bookId: string;
@@ -19,6 +20,7 @@ function calcPercent(el: HTMLElement) {
 }
 
 export const ReaderView: React.FC<ReaderViewProps> = ({
+  bookId,
   html,
   scrollSync = true,
   initialPercent = 0,
@@ -29,6 +31,22 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   'data-testid': dataTestId,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [content, setContent] = useState(html);
+
+  useEffect(() => {
+    setContent(html);
+    if (html) {
+      cacheBookHtml(bookId, html);
+    }
+  }, [bookId, html]);
+
+  useEffect(() => {
+    if (!navigator.onLine && !html) {
+      getCachedBookHtml(bookId).then((cached) => {
+        if (cached) setContent(cached);
+      });
+    }
+  }, [bookId, html]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -61,7 +79,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       ref={ref}
       className={`overflow-y-auto p-4 ${className ?? ''}`}
       style={style}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: content }}
       data-testid={dataTestId}
     />
   );
