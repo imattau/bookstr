@@ -195,10 +195,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       const okCond = checkDelegationConditions(cond, tpl.kind, now);
       if (!okSig || !okCond) throw new Error('invalid delegation');
     }
-    const event = finalizeEvent(
-      { ...tpl, created_at: now },
-      hexToBytes(priv),
-    );
+    const event = finalizeEvent({ ...tpl, created_at: now }, hexToBytes(priv));
     const targets = relaysOverride ?? relaysRef.current;
     await poolRef.current.publish(targets, event);
     return event;
@@ -337,6 +334,25 @@ export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
     await import('nostr-tools')
   ).nip04.encrypt(priv, to, text);
   return ctx.publish({ kind: 4, content: cipher, tags: [['p', to]] });
+}
+
+export async function sendGroupDM(
+  ctx: NostrContextValue,
+  to: string[],
+  text: string,
+) {
+  const priv = localStorage.getItem('privKey');
+  if (!priv) throw new Error('not logged in');
+  const tags = to.map((p) => ['p', p] as string[]);
+  const events: NostrEvent[] = [];
+  for (const pk of to) {
+    const cipher = await (
+      await import('nostr-tools')
+    ).nip04.encrypt(priv, pk, text);
+    const evt = await ctx.publish({ kind: 4, content: cipher, tags });
+    events.push(evt);
+  }
+  return events;
 }
 
 export async function verifyNip05(handle: string, pubkey: string) {
