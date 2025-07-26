@@ -27,10 +27,7 @@ interface NostrContextValue {
   saveContacts: (list: string[]) => Promise<void>;
   toggleBookmark: (id: string) => Promise<void>;
   publishComment: (bookId: string, text: string) => Promise<void>;
-  repost: (target: string, text?: string) => Promise<void>;
-  deleteEvent: (target: string) => Promise<void>;
-  zap: (target: string, amount: number) => Promise<void>;
-  saveRelays: (list: string[]) => Promise<void>;
+
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -147,29 +144,6 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     await publish({ kind: 1, content: text, tags: [['e', bookId]] });
   };
 
-  const repost = async (target: string, text?: string) => {
-    await publish({ kind: 6, content: text ?? '', tags: [['e', target]] });
-  };
-
-  const deleteEvent = async (target: string) => {
-    await publish({ kind: 5, content: '', tags: [['e', target]] });
-  };
-
-  const zap = async (target: string, amount: number) => {
-    await publish({
-      kind: 9734,
-      content: amount.toString(),
-      tags: [['e', target]],
-    });
-  };
-
-  const saveRelays = async (list: string[]) => {
-    await publish({
-      kind: 10002,
-      content: '',
-      tags: list.map((r) => ['r', r]),
-    });
-  };
 
   return (
     <NostrContext.Provider
@@ -186,10 +160,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         saveContacts,
         toggleBookmark,
         publishComment,
-        repost,
-        deleteEvent,
-        zap,
-        saveRelays,
+
       }}
     >
       {children}
