@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNostr } from '../nostr';
+import { AuthorCard } from './AuthorCard';
 
 /**
  * Manage the list of followed pubkeys. Allows adding new contacts
@@ -21,22 +22,12 @@ export const ContactsManager: React.FC = () => {
     setInput('');
   };
 
-  const handleRemove = (pk: string) => {
-    saveContacts(contacts.filter((p) => p !== pk));
-  };
-
   return (
     <div className="space-y-2">
       <ul className="space-y-1">
         {contacts.map((pk) => (
-          <li key={pk} className="flex items-center gap-2">
-            <span className="flex-1 break-all text-sm">{pk}</span>
-            <button
-              onClick={() => handleRemove(pk)}
-              className="text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-600/50"
-            >
-              Unfollow
-            </button>
+          <li key={pk}>
+            <AuthorCard pubkey={pk} />
           </li>
         ))}
       </ul>
