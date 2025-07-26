@@ -17,11 +17,16 @@ const DEFAULT_RELAYS = [
 interface NostrContextValue {
   pubkey: string | null;
   metadata: Record<string, unknown> | null;
+  contacts: string[];
+  bookmarks: string[];
   login: (priv: string) => void;
   logout: () => void;
   publish: (event: EventTemplate) => Promise<NostrEvent>;
   subscribe: (filters: Filter[], cb: (event: NostrEvent) => void) => () => void;
   saveProfile: (data: Record<string, unknown>) => Promise<void>;
+  saveContacts: (list: string[]) => Promise<void>;
+  toggleBookmark: (id: string) => Promise<void>;
+  publishComment: (bookId: string, text: string) => Promise<void>;
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -34,6 +39,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   const [metadata, setMetadata] = useState<Record<string, unknown> | null>(
     null,
   );
+  const [contacts, setContacts] = useState<string[]>([]);
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
 
   useEffect(() => {
     const pool = poolRef.current;
@@ -45,6 +52,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!pubkey) {
       setMetadata(null);
+      setContacts([]);
+      setBookmarks([]);
       return;
     }
     poolRef.current
@@ -56,6 +65,24 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
           } catch {
             setMetadata(null);
           }
+        }
+      });
+    poolRef.current
+      .list(DEFAULT_RELAYS, [{ kinds: [3], authors: [pubkey], limit: 1 }])
+      .then((events) => {
+        if (events[0]) {
+          const p = events[0].tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+          setContacts(p);
+        }
+      });
+    poolRef.current
+      .list(DEFAULT_RELAYS, [
+        { kinds: [30001], authors: [pubkey], '#d': ['bookmarks'], limit: 1 },
+      ])
+      .then((events) => {
+        if (events[0]) {
+          const e = events[0].tags.filter((t) => t[0] === 'e').map((t) => t[1]);
+          setBookmarks(e);
         }
       });
   }, [pubkey]);
@@ -93,16 +120,44 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setMetadata(data);
   };
 
+  const saveContacts = async (list: string[]) => {
+    const tags = list.map((p) => ['p', p]);
+    await publish({ kind: 3, content: '', tags });
+    setContacts(list);
+  };
+
+  const toggleBookmark = async (id: string) => {
+    setBookmarks((b) => {
+      const idx = b.indexOf(id);
+      const next = idx === -1 ? [...b, id] : b.filter((e) => e !== id);
+      publish({
+        kind: 30001,
+        content: '',
+        tags: [['d', 'bookmarks'], ...next.map((e) => ['e', e])],
+      });
+      return next;
+    });
+  };
+
+  const publishComment = async (bookId: string, text: string) => {
+    await publish({ kind: 1, content: text, tags: [['e', bookId]] });
+  };
+
   return (
     <NostrContext.Provider
       value={{
         pubkey,
         metadata,
+        contacts,
+        bookmarks,
         login,
         logout,
         publish,
         subscribe,
         saveProfile,
+        saveContacts,
+        toggleBookmark,
+        publishComment,
       }}
     >
       {children}
