@@ -1,0 +1,32 @@
+import React, { useEffect, useState } from 'react';
+import { useNostr } from '../nostr';
+import type { Event as NostrEvent } from 'nostr-tools';
+
+export const CommunityFeed: React.FC = () => {
+  const { subscribe } = useNostr();
+  const [events, setEvents] = useState<NostrEvent[]>([]);
+
+  useEffect(() => {
+    const off = subscribe([{ kinds: [172], limit: 20 }], (evt) =>
+      setEvents((e) => {
+        if (e.find((x) => x.id === evt.id)) return e;
+        return [...e, evt];
+      }),
+    );
+    return off;
+  }, [subscribe]);
+
+  return (
+    <div className="space-y-4">
+      {events.map((evt) => {
+        const name = evt.tags.find((t) => t[0] === 'name')?.[1] || 'Unnamed';
+        return (
+          <div key={evt.id} className="rounded border p-2">
+            <h3 className="font-semibold">{name}</h3>
+            <p className="text-sm whitespace-pre-wrap">{evt.content}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
