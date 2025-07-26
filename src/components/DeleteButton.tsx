@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaTrash } from 'react-icons/fa';
 import { useNostr } from '../nostr';
 
 export interface DeleteButtonProps {
@@ -29,7 +30,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
       aria-label="Delete"
       className={`rounded border px-2 py-1 ${className ?? ''}`}
     >
-      🗑
+      <FaTrash aria-hidden="true" />
     </button>
   );
 };

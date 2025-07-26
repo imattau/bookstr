@@ -1,4 +1,6 @@
 import React from 'react';
+import { FaCompass, FaBookOpen, FaPen, FaBell, FaUser } from 'react-icons/fa';
+import type { IconType } from 'react-icons';
 
 type NavKey = 'discover' | 'library' | 'write' | 'activity' | 'profile';
 
@@ -9,12 +11,12 @@ export interface BottomNavProps {
   'data-testid'?: string;
 }
 
-const items: Array<{ key: NavKey; label: string }> = [
-  { key: 'discover', label: 'Discover' },
-  { key: 'library', label: 'Library' },
-  { key: 'write', label: 'Write' },
-  { key: 'activity', label: 'Activity' },
-  { key: 'profile', label: 'Profile' },
+const items: Array<{ key: NavKey; label: string; Icon: IconType }> = [
+  { key: 'discover', label: 'Discover', Icon: FaCompass },
+  { key: 'library', label: 'Library', Icon: FaBookOpen },
+  { key: 'write', label: 'Write', Icon: FaPen },
+  { key: 'activity', label: 'Activity', Icon: FaBell },
+  { key: 'profile', label: 'Profile', Icon: FaUser },
 ];
 
 export const BottomNav: React.FC<BottomNavProps> = ({
@@ -27,14 +29,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     className={`flex justify-around border-t bg-[color:var(--clr-surface-alt)] ${className ?? ''}`}
     data-testid={dataTestId}
   >
-    {items.map((item) => (
+    {items.map(({ key, label, Icon }) => (
       <button
-        key={item.key}
-        onClick={() => onChange(item.key)}
-        aria-pressed={active === item.key}
+        key={key}
+        onClick={() => onChange(key)}
+        aria-pressed={active === key}
         className="flex flex-col items-center py-2 text-sm"
       >
-        {item.label}
+        <Icon className="text-xl" aria-hidden="true" />
+        <span>{label}</span>
       </button>
     ))}
   </nav>
