@@ -19,39 +19,13 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
   const isBookmarked = bookmarks.includes(event.id);
 
   return (
-    <div className="card-hover rounded-card border border-border shadow-1 overflow-hidden bg-[color:var(--clr-surface)]">
-      {cover && (
-        <img
-          src={cover}
-          alt={title}
-          className="h-[120px] w-full object-cover"
-        />
-      )}
-      <div className="p-4 space-y-1">
-        <h3 className="text-[14px] font-semibold">{title}</h3>
-        {summary && <p className="text-[12px] text-text-muted">{summary}</p>}
-      </div>
-      <div className="flex items-center justify-end gap-2 p-2 text-text-muted text-[12px]">
-        <button
-          onClick={() => publishVote(nostr, event.id)}
-          className="btn-tap px-1"
-        >
-          ♥
-        </button>
-        <button
-          onClick={() => publishFavourite(nostr, event.id)}
-          className="btn-tap px-1"
+
         >
           ★
         </button>
         <button
           onClick={() => toggleBookmark(event.id)}
-          className="btn-tap px-1"
-        >
-          {isBookmarked ? '🔖' : '📑'}
-        </button>
-        {event.pubkey === pubkey && (
-          <span className="ml-auto text-[10px]">by you</span>
+
         )}
       </div>
     </div>
