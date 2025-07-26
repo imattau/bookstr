@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNostr } from '../nostr';
 
 interface LibraryItem {
   id: string;
@@ -41,6 +42,7 @@ const ITEMS: LibraryItem[] = [
 ];
 
 export const Library: React.FC = () => {
+  const { contacts } = useNostr();
   const [tab, setTab] = React.useState<'want' | 'reading' | 'finished'>(
     'reading',
   );
@@ -76,7 +78,11 @@ export const Library: React.FC = () => {
         ))}
       </div>
       <div className="mt-4 space-y-2">
-        {ITEMS.filter((item) => item.status === tab).map((item) => (
+        {ITEMS.filter(
+          (item) =>
+            item.status === tab &&
+            (contacts.length === 0 || contacts.includes(item.author)),
+        ).map((item) => (
           <div
             key={item.id}
             className="mb-2 flex items-center gap-4 rounded-[8px] bg-[#262B33] p-3"

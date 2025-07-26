@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNostr, verifyNip05 } from '../nostr';
+import { FollowList } from './FollowList';
 
 interface ProfileMeta {
   name?: string;
@@ -90,6 +91,10 @@ export const ProfileSettings: React.FC = () => {
       >
         Save
       </button>
+      <div className="pt-4">
+        <h2 className="mb-2 text-sm font-medium">Following</h2>
+        <FollowList />
+      </div>
     </div>
   );
 };
