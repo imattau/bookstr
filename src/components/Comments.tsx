@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNostr } from '../nostr';
 import { DeleteButton } from './DeleteButton';
+import { ReportButton } from './ReportButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 
 interface CommentsProps {
@@ -52,6 +53,7 @@ export const Comments: React.FC<CommentsProps> = ({
         <div key={c.id} className="space-y-2">
           <div className="rounded border p-2 flex items-start gap-2">
             <span className="flex-1">{c.content}</span>
+            <ReportButton target={c.id} />
             {pubkey === c.pubkey && (
               <DeleteButton
                 target={c.id}
