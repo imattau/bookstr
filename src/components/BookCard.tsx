@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNostr, zap } from '../nostr';
 import { ReactionButton } from './ReactionButton';
+import { RepostButton } from './RepostButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 
 interface BookCardProps {
-  event: NostrEvent;
+  event: NostrEvent & { repostedBy?: string };
 }
 
 export const BookCard: React.FC<BookCardProps> = ({ event }) => {
@@ -38,6 +39,11 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
 
   return (
     <div className="rounded border p-2">
+      {event.repostedBy && (
+        <p className="mb-1 text-xs text-gray-500">
+          Reposted by {event.repostedBy}
+        </p>
+      )}
       {cover && (
         <img src={cover} alt="" className="mb-2 h-32 w-24 object-cover" />
       )}
@@ -55,6 +61,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
               : 'Zap'}
         </button>
         <ReactionButton target={event.id} type="vote" />
+        <RepostButton target={event.id} />
         <button
           onClick={handleFav}
           aria-label="Favorite"
