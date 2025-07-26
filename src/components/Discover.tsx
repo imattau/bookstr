@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
@@ -8,6 +8,8 @@ const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 export const Discover: React.FC = () => {
   const { subscribe, contacts } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>([]);
+  const [votes, setVotes] = useState<Record<string, number>>({});
+  const voteIds = useRef(new Set<string>());
   const [search, setSearch] = useState('');
   const [tag, setTag] = useState('All');
 
@@ -23,6 +25,21 @@ export const Discover: React.FC = () => {
     return off;
   }, [subscribe, contacts]);
 
+  // aggregate votes for known events
+  useEffect(() => {
+    if (!events.length) return;
+    const ids = events.map((e) => e.id);
+    const off = subscribe([{ kinds: [7], '#e': ids }], (evt) => {
+      if (voteIds.current.has(evt.id)) return;
+      voteIds.current.add(evt.id);
+      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
+      if (target) {
+        setVotes((v) => ({ ...v, [target]: (v[target] ?? 0) + 1 }));
+      }
+    });
+    return off;
+  }, [events, subscribe]);
+
   const filtered = events.filter((evt) => {
     let ok = true;
     if (contacts.length && !contacts.includes(evt.pubkey)) ok = false;
@@ -37,6 +54,16 @@ export const Discover: React.FC = () => {
     }
     return ok;
   });
+
+  const topRated = [...events]
+    .sort((a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0))
+    .slice(0, 6);
+
+  const newReleases = [...events]
+    .sort((a, b) => (b.created_at ?? 0) - (a.created_at ?? 0))
+    .slice(0, 6);
+
+  const recommended = filtered.slice(0, 6);
 
   return (
     <div className="pb-4">
@@ -72,11 +99,30 @@ export const Discover: React.FC = () => {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-4 p-4">
-        {filtered.map((e) => (
-          <BookCard key={e.id} event={e as NostrEvent} />
-        ))}
-      </div>
+      <section className="p-4">
+        <h2 className="mb-2 font-semibold">Top Rated</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {topRated.map((e) => (
+            <BookCard key={e.id} event={e as NostrEvent} />
+          ))}
+        </div>
+      </section>
+      <section className="p-4">
+        <h2 className="mb-2 font-semibold">New Releases</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {newReleases.map((e) => (
+            <BookCard key={e.id} event={e as NostrEvent} />
+          ))}
+        </div>
+      </section>
+      <section className="p-4">
+        <h2 className="mb-2 font-semibold">Recommended for You</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {recommended.map((e) => (
+            <BookCard key={e.id} event={e as NostrEvent} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
