@@ -6,7 +6,9 @@ import type { Event as NostrEvent } from 'nostr-tools';
 
 export const BookFeed: React.FC = () => {
   const { subscribe } = useNostr();
-  const [events, setEvents] = useState<(NostrEvent & { repostedBy?: string })[]>([]);
+  const [events, setEvents] = useState<
+    (NostrEvent & { repostedBy?: string })[]
+  >([]);
 
   useEffect(() => {
     const offMain = subscribe([{ kinds: [30023], limit: 20 }], (evt) =>
@@ -41,7 +43,15 @@ export const BookFeed: React.FC = () => {
     <div className="space-y-4">
       {events.length === 0
         ? Array.from({ length: 3 }).map((_, i) => <BookCardSkeleton key={i} />)
-        : events.map((e) => <BookCard key={e.id} event={e} />)}
+        : events.map((e) => (
+            <BookCard
+              key={e.id}
+              event={e}
+              onDelete={(id) =>
+                setEvents((evts) => evts.filter((x) => x.id !== id))
+              }
+            />
+          ))}
     </div>
   );
 };

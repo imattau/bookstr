@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNostr } from '../nostr';
+import { DeleteButton } from './DeleteButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 
 interface CommentsProps {
@@ -13,7 +14,7 @@ export const Comments: React.FC<CommentsProps> = ({
   parentEventId,
   events: initialEvents,
 }) => {
-  const { subscribe, publish } = useNostr();
+  const { subscribe, publish, pubkey } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>(initialEvents ?? []);
   const [text, setText] = useState('');
 
@@ -49,7 +50,17 @@ export const Comments: React.FC<CommentsProps> = ({
     <div className={`${parentEventId ? 'ml-4' : ''} space-y-2`}>
       {replies.map((c) => (
         <div key={c.id} className="space-y-2">
-          <div className="rounded border p-2">{c.content}</div>
+          <div className="rounded border p-2 flex items-start gap-2">
+            <span className="flex-1">{c.content}</span>
+            {pubkey === c.pubkey && (
+              <DeleteButton
+                target={c.id}
+                onDelete={() =>
+                  setEvents((evts) => evts.filter((e) => e.id !== c.id))
+                }
+              />
+            )}
+          </div>
           <Comments bookId={bookId} parentEventId={c.id} events={events} />
         </div>
       ))}

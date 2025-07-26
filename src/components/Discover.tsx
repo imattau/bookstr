@@ -10,7 +10,9 @@ const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
 export const Discover: React.FC = () => {
   const { subscribe, contacts } = useNostr();
-  const [events, setEvents] = useState<(NostrEvent & { repostedBy?: string })[]>([]);
+  const [events, setEvents] = useState<
+    (NostrEvent & { repostedBy?: string })[]
+  >([]);
   const [votes, setVotes] = useState<Record<string, number>>({});
   const voteIds = useRef(new Set<string>());
   const [search, setSearch] = useState('');
@@ -31,25 +33,22 @@ export const Discover: React.FC = () => {
     );
     const repostFilter: Filter = { kinds: [6], limit: 50 };
     if (contacts.length) repostFilter.authors = contacts;
-    const offReposts = subscribe(
-      [repostFilter],
-      (evt) => {
-        const target = evt.tags.find((t) => t[0] === 'e')?.[1];
-        if (!target) return;
-        const offTarget = subscribe([{ ids: [target] }], (orig) => {
-          setEvents((e) => {
-            const idx = e.findIndex((x) => x.id === orig.id);
-            if (idx !== -1) {
-              const copy = [...e];
-              copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
-              return copy;
-            }
-            return [...e, { ...orig, repostedBy: evt.pubkey }];
-          });
-          offTarget();
+    const offReposts = subscribe([repostFilter], (evt) => {
+      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
+      if (!target) return;
+      const offTarget = subscribe([{ ids: [target] }], (orig) => {
+        setEvents((e) => {
+          const idx = e.findIndex((x) => x.id === orig.id);
+          if (idx !== -1) {
+            const copy = [...e];
+            copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
+            return copy;
+          }
+          return [...e, { ...orig, repostedBy: evt.pubkey }];
         });
-      },
-    );
+        offTarget();
+      });
+    });
     return () => {
       offMain();
       offReposts();
@@ -146,7 +145,13 @@ export const Discover: React.FC = () => {
                 <BookCardSkeleton key={i} />
               ))
             : trending.map((e) => (
-                <BookCard key={e.id} event={e as NostrEvent} />
+                <BookCard
+                  key={e.id}
+                  event={e as NostrEvent}
+                  onDelete={(id) =>
+                    setEvents((evts) => evts.filter((x) => x.id !== id))
+                  }
+                />
               ))}
         </div>
       </section>
@@ -158,7 +163,13 @@ export const Discover: React.FC = () => {
                 <BookCardSkeleton key={i} />
               ))
             : newReleases.map((e) => (
-                <BookCard key={e.id} event={e as NostrEvent} />
+                <BookCard
+                  key={e.id}
+                  event={e as NostrEvent}
+                  onDelete={(id) =>
+                    setEvents((evts) => evts.filter((x) => x.id !== id))
+                  }
+                />
               ))}
         </div>
       </section>
@@ -170,7 +181,13 @@ export const Discover: React.FC = () => {
                 <BookCardSkeleton key={i} />
               ))
             : recommended.map((e) => (
-                <BookCard key={e.id} event={e as NostrEvent} />
+                <BookCard
+                  key={e.id}
+                  event={e as NostrEvent}
+                  onDelete={(id) =>
+                    setEvents((evts) => evts.filter((x) => x.id !== id))
+                  }
+                />
               ))}
         </div>
       </section>
