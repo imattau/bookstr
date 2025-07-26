@@ -43,9 +43,15 @@ specification but functionality is limited.
 4. If no NIP‑07 wallet is detected, you can still log in by pasting your
    private key into the login screen to sign events manually.
 
-This repository does not yet include a fully configured build system; it is
-just the beginning of an implementation, so feel free to use any bundler you
-like.
+The build setup is now complete and consists of the following steps:
+
+1. Run `npm test` to execute the unit tests.
+2. Build the production bundle with `npm run build`. During this step
+   `vite-plugin-pwa` injects the precache manifest and bundles `src/sw.ts`
+   as `dist/sw.js`.
+3. The Node API server in `server/index.js` serves the compiled files and
+   handles the `/api` routes. It is included in the Docker image described
+   below.
 
 ## Development Scripts
 
@@ -58,20 +64,33 @@ npm run format  # format files with Prettier
 
 ## Build and Deployment
 
-Run the helper script to install dependencies, execute tests, build the static
-site and create a Docker image:
+The application can be built and containerised with Docker.
+
+1. Install dependencies and run the tests:
+   ```bash
+   npm install
+   npm test
+   ```
+2. Create the production build (including the bundled service worker):
+   ```bash
+   npm run build
+   ```
+3. Build the Docker image which packages the API server and the compiled
+   assets:
+   ```bash
+   docker build -t bookstr:latest .
+   ```
+4. Start the container:
+   ```bash
+   docker run -p 3000:3000 bookstr:latest
+   ```
+   The application will be available at <http://localhost:3000>.
+
+All of the above steps are automated by the helper script:
 
 ```bash
 ./scripts/build_and_deploy.sh
 ```
-
-Once built, start the container with:
-
-```bash
-docker run -p 3000:3000 bookstr:latest
-```
-
-The application will be available at <http://localhost:3000>.
 
 ### API Server Configuration
 
