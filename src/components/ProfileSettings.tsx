@@ -86,7 +86,7 @@ export const ProfileSettings: React.FC = () => {
       </div>
       <button
         onClick={handleSave}
-        className="rounded bg-primary-600 px-4 py-2 text-white"
+        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Save
       </button>
