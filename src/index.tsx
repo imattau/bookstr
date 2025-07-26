@@ -79,7 +79,7 @@ const AppRoutes: React.FC = () => {
           💬
         </button>
       </Header>
-      <main className="p-4">
+      <main id="main" className="p-4">
         <Routes>
           <Route path="/discover" element={<Discover />} />
           <Route path="/library" element={<Library />} />

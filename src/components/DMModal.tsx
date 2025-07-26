@@ -82,11 +82,13 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="flex-1 rounded border p-2"
+            className="flex-1 rounded border p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
             placeholder="Message"
+            aria-label="Message"
           />
           <button
             onClick={handleSend}
+            aria-label="Send message"
             className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
           >
             Send
