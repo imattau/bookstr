@@ -19,33 +19,39 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
   const isBookmarked = bookmarks.includes(event.id);
 
   return (
-    <div className="rounded border p-4 space-y-2 bg-[color:var(--clr-surface-alt)]">
-      {cover && <img src={cover} alt={title} className="mb-2 rounded" />}
-      <h3 className="text-lg font-semibold">{title}</h3>
-      {summary && (
-        <p className="text-sm text-[color:var(--clr-text-muted)]">{summary}</p>
+    <div className="card-hover rounded-card border border-border shadow-1 overflow-hidden bg-[color:var(--clr-surface)]">
+      {cover && (
+        <img
+          src={cover}
+          alt={title}
+          className="h-[120px] w-full object-cover"
+        />
       )}
-      <div className="flex gap-2 pt-2">
+      <div className="p-4 space-y-1">
+        <h3 className="text-[14px] font-semibold">{title}</h3>
+        {summary && <p className="text-[12px] text-text-muted">{summary}</p>}
+      </div>
+      <div className="flex items-center justify-end gap-2 p-2 text-text-muted text-[12px]">
         <button
           onClick={() => publishVote(nostr, event.id)}
-          className="rounded bg-primary-600 px-2 py-1 text-white"
+          className="btn-tap px-1"
         >
-          +1
+          ♥
         </button>
         <button
           onClick={() => publishFavourite(nostr, event.id)}
-          className="rounded bg-primary-600 px-2 py-1 text-white"
+          className="btn-tap px-1"
         >
           ★
         </button>
         <button
           onClick={() => toggleBookmark(event.id)}
-          className={`rounded px-2 py-1 ${isBookmarked ? 'bg-primary-300' : 'bg-primary-600 text-white'}`}
+          className="btn-tap px-1"
         >
-          Bookmark
+          {isBookmarked ? '🔖' : '📑'}
         </button>
         {event.pubkey === pubkey && (
-          <span className="ml-auto text-xs">by you</span>
+          <span className="ml-auto text-[10px]">by you</span>
         )}
       </div>
     </div>
