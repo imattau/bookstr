@@ -9,7 +9,7 @@ export const Login: React.FC = () => {
     return (
       <button
         onClick={logout}
-        className="rounded bg-primary-600 px-4 py-2 text-white"
+        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Logout
       </button>
@@ -25,7 +25,7 @@ export const Login: React.FC = () => {
       />
       <button
         onClick={() => login(priv)}
-        className="rounded bg-primary-600 px-4 py-2 text-white"
+        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Login
       </button>
