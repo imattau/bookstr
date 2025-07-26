@@ -9,7 +9,7 @@ export const ThemeSwitcher: React.FC = () => {
     <select
       value={theme}
       onChange={(e) => setTheme(e.target.value as Theme)}
-      className="ml-2 rounded border p-1 text-sm"
+      className="ml-2 rounded border p-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       aria-label="Theme"
     >
       {themes.map((t) => (
