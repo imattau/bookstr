@@ -3,8 +3,9 @@ const assert = require('assert');
 const { registerServiceWorker } = require('../src/registerSw');
 
 (async () => {
+  if (!global.navigator) global.navigator = {};
   let called = null;
-  navigator.serviceWorker = { register: (url) => { called = url; } };
+  global.navigator.serviceWorker = { register: (url) => { called = url; } };
   global.window = { addEventListener: (ev, cb) => { if (ev === 'load') cb(); } };
   registerServiceWorker();
   assert.strictEqual(called, '/sw.js');
