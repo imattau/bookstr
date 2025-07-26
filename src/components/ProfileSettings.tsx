@@ -5,6 +5,7 @@ import { useWallet } from '../WalletConnect';
 import { ContactsManager } from './ContactsManager';
 import { RelayListManager } from './RelayListManager';
 import { DelegationManager } from './DelegationManager';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 interface ProfileMeta {
   [key: string]: unknown;
@@ -98,6 +99,10 @@ export const ProfileSettings: React.FC = () => {
           onChange={handleChange}
           className="w-full rounded border p-2"
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Theme</label>
+        <ThemeSwitcher />
       </div>
       <button
         onClick={handleSave}
