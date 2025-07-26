@@ -14,18 +14,20 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
 }) => {
   const { ref, show, dismiss, Tooltip } = useOnboarding(storageKey, text);
 
-  return React.cloneElement(children, {
+  const child = children as React.ReactElement<any, any>;
+
+  return React.cloneElement(child, {
     ref,
     onClick: (e: React.MouseEvent) => {
       dismiss();
-      children.props.onClick?.(e);
+      child.props.onClick?.(e);
     },
-    className: `${children.props.className ?? ''} ${
+    className: `${child.props.className ?? ''} ${
       show ? 'relative rounded ring-2 ring-primary-300' : ''
     }`,
     children: (
       <>
-        {children.props.children}
+        {child.props.children}
         {Tooltip}
       </>
     ),
