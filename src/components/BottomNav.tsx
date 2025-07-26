@@ -34,7 +34,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         key={key}
         onClick={() => onChange(key)}
         aria-pressed={active === key}
-        className="flex flex-col items-center py-2 text-sm"
+        aria-label={label}
+        className="flex flex-col items-center py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         <Icon className="text-xl" aria-hidden="true" />
         <span>{label}</span>
