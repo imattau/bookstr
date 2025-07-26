@@ -7,6 +7,7 @@ interface LibraryItem {
   cover: string;
   genre: string;
   percent: number;
+  status: 'want' | 'reading' | 'finished';
 }
 
 const ITEMS: LibraryItem[] = [
@@ -17,6 +18,25 @@ const ITEMS: LibraryItem[] = [
     cover: 'https://placehold.co/56x84',
     genre: 'Fiction',
     percent: 50,
+    status: 'reading',
+  },
+  {
+    id: '2',
+    title: 'Next Book',
+    author: 'Writer',
+    cover: 'https://placehold.co/56x84',
+    genre: 'Nonfiction',
+    percent: 0,
+    status: 'want',
+  },
+  {
+    id: '3',
+    title: 'Finished Book',
+    author: 'Old Author',
+    cover: 'https://placehold.co/56x84',
+    genre: 'History',
+    percent: 100,
+    status: 'finished',
   },
 ];
 
@@ -56,7 +76,7 @@ export const Library: React.FC = () => {
         ))}
       </div>
       <div className="mt-4 space-y-2">
-        {ITEMS.filter(() => tab === 'reading').map((item) => (
+        {ITEMS.filter((item) => item.status === tab).map((item) => (
           <div
             key={item.id}
             className="mb-2 flex items-center gap-4 rounded-[8px] bg-[#262B33] p-3"
