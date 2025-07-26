@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
-import { useOnboarding } from '../useOnboarding';
+import { BookCardSkeleton } from './BookCardSkeleton';
+import { OnboardingTooltip } from './OnboardingTooltip';
 import { logEvent } from '../analytics';
 
 const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
@@ -72,22 +73,17 @@ export const Discover: React.FC = () => {
 
   const recommended = filtered.slice(0, 6);
 
-  const searchOnboarding = useOnboarding('discover-search', 'Search for books');
-
   return (
     <div className="pb-4">
       <header className="relative bg-primary-600 py-3 text-center text-white">
-        <button
-          ref={searchOnboarding.ref as React.RefObject<HTMLButtonElement>}
-          onClick={searchOnboarding.dismiss}
-          aria-label="Search"
-          className={`relative absolute left-2 top-1/2 -translate-y-1/2 ${
-            searchOnboarding.show ? 'rounded ring-2 ring-primary-300' : ''
-          }`}
-        >
-          🔍
-          {searchOnboarding.Tooltip}
-        </button>
+        <OnboardingTooltip storageKey="discover-search" text="Search for books">
+          <button
+            aria-label="Search"
+            className="relative absolute left-2 top-1/2 -translate-y-1/2"
+          >
+            🔍
+          </button>
+        </OnboardingTooltip>
         <h1 className="text-[18px] font-semibold">Bookstr</h1>
       </header>
       <div className="p-4">
@@ -116,25 +112,37 @@ export const Discover: React.FC = () => {
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Trending Books</h2>
         <div className="grid grid-cols-2 gap-4">
-          {trending.map((e) => (
-            <BookCard key={e.id} event={e as NostrEvent} />
-          ))}
+          {trending.length === 0
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <BookCardSkeleton key={i} />
+              ))
+            : trending.map((e) => (
+                <BookCard key={e.id} event={e as NostrEvent} />
+              ))}
         </div>
       </section>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">New Releases</h2>
         <div className="grid grid-cols-2 gap-4">
-          {newReleases.map((e) => (
-            <BookCard key={e.id} event={e as NostrEvent} />
-          ))}
+          {newReleases.length === 0
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <BookCardSkeleton key={i} />
+              ))
+            : newReleases.map((e) => (
+                <BookCard key={e.id} event={e as NostrEvent} />
+              ))}
         </div>
       </section>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Recommended for You</h2>
         <div className="grid grid-cols-2 gap-4">
-          {recommended.map((e) => (
-            <BookCard key={e.id} event={e as NostrEvent} />
-          ))}
+          {recommended.length === 0
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <BookCardSkeleton key={i} />
+              ))
+            : recommended.map((e) => (
+                <BookCard key={e.id} event={e as NostrEvent} />
+              ))}
         </div>
       </section>
     </div>
