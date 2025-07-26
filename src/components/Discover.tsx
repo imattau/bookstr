@@ -10,7 +10,7 @@ const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
 export const Discover: React.FC = () => {
   const { subscribe, contacts } = useNostr();
-  const [events, setEvents] = useState<NostrEvent[]>([]);
+  const [events, setEvents] = useState<(NostrEvent & { repostedBy?: string })[]>([]);
   const [votes, setVotes] = useState<Record<string, number>>({});
   const voteIds = useRef(new Set<string>());
   const [search, setSearch] = useState('');
@@ -23,13 +23,37 @@ export const Discover: React.FC = () => {
   useEffect(() => {
     const filters: Filter[] = [{ kinds: [30023], limit: 50 }];
     if (contacts.length) filters[0].authors = contacts;
-    const off = subscribe(filters, (evt) =>
+    const offMain = subscribe(filters, (evt) =>
       setEvents((e) => {
         if (e.find((x) => x.id === evt.id)) return e;
         return [...e, evt];
       }),
     );
-    return off;
+    const repostFilter: Filter = { kinds: [6], limit: 50 };
+    if (contacts.length) repostFilter.authors = contacts;
+    const offReposts = subscribe(
+      [repostFilter],
+      (evt) => {
+        const target = evt.tags.find((t) => t[0] === 'e')?.[1];
+        if (!target) return;
+        const offTarget = subscribe([{ ids: [target] }], (orig) => {
+          setEvents((e) => {
+            const idx = e.findIndex((x) => x.id === orig.id);
+            if (idx !== -1) {
+              const copy = [...e];
+              copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
+              return copy;
+            }
+            return [...e, { ...orig, repostedBy: evt.pubkey }];
+          });
+          offTarget();
+        });
+      },
+    );
+    return () => {
+      offMain();
+      offReposts();
+    };
   }, [subscribe, contacts]);
 
   // aggregate votes for known events
@@ -50,7 +74,12 @@ export const Discover: React.FC = () => {
 
   const filtered = events.filter((evt) => {
     let ok = true;
-    if (contacts.length && !contacts.includes(evt.pubkey)) ok = false;
+    if (
+      contacts.length &&
+      !contacts.includes(evt.pubkey) &&
+      !contacts.includes(evt.repostedBy ?? '')
+    )
+      ok = false;
     if (tag !== 'All') {
       ok = evt.tags.some(
         (t) => t[0] === 't' && t[1].toLowerCase() === tag.toLowerCase(),

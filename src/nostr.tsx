@@ -242,6 +242,10 @@ export async function publishFavourite(ctx: NostrContextValue, target: string) {
   return ctx.publish({ kind: 7, content: '★', tags: [['e', target]] });
 }
 
+export async function publishRepost(ctx: NostrContextValue, target: string) {
+  return ctx.publish({ kind: 6, content: '', tags: [['e', target]] });
+}
+
 export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
   const priv = localStorage.getItem('privKey');
   if (!priv) throw new Error('not logged in');

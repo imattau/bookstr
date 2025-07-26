@@ -6,16 +6,35 @@ import type { Event as NostrEvent } from 'nostr-tools';
 
 export const BookFeed: React.FC = () => {
   const { subscribe } = useNostr();
-  const [events, setEvents] = useState<NostrEvent[]>([]);
+  const [events, setEvents] = useState<(NostrEvent & { repostedBy?: string })[]>([]);
 
   useEffect(() => {
-    const off = subscribe([{ kinds: [30023], limit: 20 }], (evt) =>
+    const offMain = subscribe([{ kinds: [30023], limit: 20 }], (evt) =>
       setEvents((e) => {
         if (e.find((x) => x.id === evt.id)) return e;
         return [...e, evt];
       }),
     );
-    return off;
+    const offRepost = subscribe([{ kinds: [6], limit: 20 }], (evt) => {
+      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
+      if (!target) return;
+      const offTarget = subscribe([{ ids: [target] }], (orig) => {
+        setEvents((e) => {
+          const idx = e.findIndex((x) => x.id === orig.id);
+          if (idx !== -1) {
+            const copy = [...e];
+            copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
+            return copy;
+          }
+          return [...e, { ...orig, repostedBy: evt.pubkey }];
+        });
+        offTarget();
+      });
+    });
+    return () => {
+      offMain();
+      offRepost();
+    };
   }, [subscribe]);
 
   return (
