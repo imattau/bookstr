@@ -77,3 +77,21 @@ registerRoute(
     }
   },
 );
+
+registerRoute(
+  ({ url }) => url.pathname === '/books',
+  async ({ request }) => {
+    const cache = await caches.open('offline-pages');
+    try {
+      const response = await fetch(request);
+      if (response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    } catch {
+      const cached = await cache.match(request);
+      if (cached) return cached;
+      throw new Error('Network error');
+    }
+  },
+);
