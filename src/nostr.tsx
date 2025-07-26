@@ -30,6 +30,9 @@ const encoder = new TextEncoder();
 const MAX_POW_TIME_MS = 5000;
 const MAX_POW_ITERATIONS = 500000;
 
+let sessionPrivKey: string | null = null;
+export const getPrivKey = () => sessionPrivKey;
+
 export function createDelegationTag(
   priv: string,
   delegate: string,
@@ -121,8 +124,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const pool = poolRef.current;
-    const stored = localStorage.getItem('privKey');
-    if (stored) setPubkey(getPublicKey(hexToBytes(stored)));
+    const storedPub = localStorage.getItem('pubKey');
+    if (storedPub) setPubkey(storedPub);
     return () => pool.close(relaysRef.current);
   }, []);
 
@@ -212,12 +215,15 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [pubkey, relays]);
 
   const login = (priv: string) => {
-    localStorage.setItem('privKey', priv);
-    setPubkey(getPublicKey(hexToBytes(priv)));
+    sessionPrivKey = priv;
+    const pub = getPublicKey(hexToBytes(priv));
+    localStorage.setItem('pubKey', pub);
+    setPubkey(pub);
   };
 
   const logout = () => {
-    localStorage.removeItem('privKey');
+    sessionPrivKey = null;
+    localStorage.removeItem('pubKey');
     setPubkey(null);
   };
 
@@ -226,7 +232,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     relaysOverride?: string[],
     pow = 0,
   ) => {
-    const priv = localStorage.getItem('privKey');
+    const priv = sessionPrivKey;
     if (!priv) throw new Error('not logged in');
     const now = Math.floor(Date.now() / 1000);
     const del = tpl.tags?.find((t) => t[0] === 'delegation');
@@ -434,7 +440,7 @@ export async function publishAttachment(
 }
 
 export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
-  const priv = localStorage.getItem('privKey');
+  const priv = sessionPrivKey;
   if (!priv) throw new Error('not logged in');
   const cipher = await (
     await import('nostr-tools')
@@ -447,7 +453,7 @@ export async function sendGroupDM(
   to: string[],
   text: string,
 ) {
-  const priv = localStorage.getItem('privKey');
+  const priv = sessionPrivKey;
   if (!priv) throw new Error('not logged in');
   const tags = to.map((p) => ['p', p] as string[]);
   const events: NostrEvent[] = [];

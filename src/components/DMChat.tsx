@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { Event as NostrEvent } from 'nostr-tools';
-import { useNostr, sendDM } from '../nostr';
+import { useNostr, sendDM, getPrivKey } from '../nostr';
 
 interface DM {
   id: string;
@@ -28,7 +28,7 @@ export const DMChat: React.FC<DMChatProps> = ({ to, onClose }) => {
       ],
       (evt: NostrEvent) => {
         (async () => {
-          const priv = localStorage.getItem('privKey');
+          const priv = getPrivKey();
           if (!priv) return;
           const other = evt.pubkey === pubkey ? to : evt.pubkey;
           const plain = await (

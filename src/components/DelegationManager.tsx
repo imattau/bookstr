@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createDelegationTag } from '../nostr';
+import { createDelegationTag, getPrivKey } from '../nostr';
 
 /**
  * Allow users to create delegation tags that authorize another
@@ -14,7 +14,7 @@ export const DelegationManager: React.FC = () => {
   const [result, setResult] = useState<string | null>(null);
 
   const handleCreate = () => {
-    const priv = localStorage.getItem('privKey');
+    const priv = getPrivKey();
     if (!priv || !pubkey) return;
     const now = Math.floor(Date.now() / 1000);
     const until = now + Number(days) * 86400;
