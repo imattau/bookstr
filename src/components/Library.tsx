@@ -18,19 +18,19 @@ export const Library: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0F1115] px-4 pb-4 text-white">
+    <div className="min-h-screen bg-[color:var(--clr-surface)] px-4 pb-4 text-[color:var(--clr-text)]">
       <header
         className="flex items-center justify-between"
         style={{ height: 56 }}
       >
-        <h1 className="text-[20px] font-bold text-[#5A3999]">Bookstr</h1>
+        <h1 className="text-[20px] font-bold text-primary-600">Bookstr</h1>
         <OnboardingTooltip
           storageKey="library-settings"
           text="Library settings"
         >
           <button
             aria-label="Settings"
-            className="text-[#B7BDC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            className="text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50"
           >
             ⚙
           </button>
@@ -41,13 +41,13 @@ export const Library: React.FC = () => {
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`pb-1 text-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50 ${tab === t.key ? 'border-b-2 border-[#5A3999] text-white' : 'text-[#B7BDC7]'}`}
+            className={`pb-1 text-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50 ${tab === t.key ? 'border-b-2 border-primary-600 text-[color:var(--clr-text)]' : 'text-text-muted'}`}
           >
             {t.label}
           </button>
         ))}
       </div>
-      <p className="mt-2 text-right text-[12px] text-[#B7BDC7]">
+      <p className="mt-2 text-right text-[12px] text-text-muted">
         {finishedCount}/{yearlyGoal} books finished this year
       </p>
       <ProgressBar
@@ -66,7 +66,7 @@ export const Library: React.FC = () => {
           .map((item) => (
             <div
               key={item.id}
-              className="mb-2 flex items-center gap-4 rounded-[8px] bg-[#262B33] p-3"
+              className="mb-2 flex items-center gap-4 rounded-[8px] bg-border p-3"
             >
               <img
                 src={item.cover}
@@ -77,23 +77,23 @@ export const Library: React.FC = () => {
                 <h3 className="text-[16px] font-semibold leading-[24px]">
                   {item.title}
                 </h3>
-                <p className="text-[14px] leading-[20px] text-[#B7BDC7]">
+                <p className="text-[14px] leading-[20px] text-text-muted">
                   {item.author}
                 </p>
-                <span className="inline-block rounded-[4px] bg-[#161A20] px-2 py-0.5 text-[12px] text-[#B7BDC7]">
+                <span className="inline-block rounded-[4px] bg-[color:var(--clr-surface-alt)] px-2 py-0.5 text-[12px] text-text-muted">
                   {item.genre}
                 </span>
-                <div className="mt-1 h-1 rounded bg-[#262B33]">
+                <div className="mt-1 h-1 rounded bg-border">
                   <div
-                    className="h-full rounded bg-[#5A3999]"
+                    className="h-full rounded bg-primary-600"
                     style={{ width: `${item.percent}%` }}
                   />
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-1 text-[12px] text-[#B7BDC7]">
+              <div className="flex flex-col items-end gap-1 text-[12px] text-text-muted">
                 <button
                   onClick={() => finishBook(item.id)}
-                  className="rounded-[6px] bg-[#1F2228] px-3 py-1 text-[14px] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+                  className="rounded-[6px] bg-[color:var(--clr-surface-alt)] px-3 py-1 text-[14px] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50"
                 >
                   Mark Finished
                 </button>
