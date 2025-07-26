@@ -7,7 +7,12 @@ import React, {
 } from 'react';
 import { useReadingStore, BookStatus } from './store';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
-import { SimplePool, getPublicKey, finalizeEvent } from 'nostr-tools';
+import {
+  SimplePool,
+  getPublicKey,
+  finalizeEvent,
+  getEventHash,
+} from 'nostr-tools';
 import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
@@ -50,6 +55,22 @@ function checkDelegationConditions(
   return true;
 }
 
+function leadingZeroBits(bytes: Uint8Array) {
+  let count = 0;
+  for (const b of bytes) {
+    if (b === 0) {
+      count += 8;
+      continue;
+    }
+    for (let i = 7; i >= 0; i--) {
+      if ((b >> i) & 1) return count;
+      count++;
+    }
+    break;
+  }
+  return count;
+}
+
 interface NostrContextValue {
   pubkey: string | null;
   metadata: Record<string, unknown> | null;
@@ -61,6 +82,7 @@ interface NostrContextValue {
   publish: (
     event: Omit<EventTemplate, 'created_at'>,
     relays?: string[],
+    pow?: number,
   ) => Promise<NostrEvent>;
   subscribe: (filters: Filter[], cb: (event: NostrEvent) => void) => () => void;
   saveProfile: (data: Record<string, unknown>) => Promise<void>;
@@ -182,6 +204,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   const publish = async (
     tpl: Omit<EventTemplate, 'created_at'>,
     relaysOverride?: string[],
+    pow = 0,
   ) => {
     const priv = localStorage.getItem('privKey');
     if (!priv) throw new Error('not logged in');
@@ -195,7 +218,31 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       const okCond = checkDelegationConditions(cond, tpl.kind, now);
       if (!okSig || !okCond) throw new Error('invalid delegation');
     }
-    const event = finalizeEvent({ ...tpl, created_at: now }, hexToBytes(priv));
+    const tags = tpl.tags ? [...tpl.tags] : [];
+    let nonceIndex = -1;
+    if (pow > 0) {
+      nonceIndex = tags.findIndex((t) => t[0] === 'nonce');
+      if (nonceIndex === -1) {
+        tags.push(['nonce', '0', pow.toString()]);
+        nonceIndex = tags.length - 1;
+      } else {
+        tags[nonceIndex][1] = '0';
+        tags[nonceIndex][2] = pow.toString();
+      }
+    }
+    let eventTemplate = { ...tpl, tags, created_at: now };
+    if (pow > 0) {
+      let nonce = 0;
+      while (true) {
+        tags[nonceIndex][1] = nonce.toString();
+        eventTemplate = { ...tpl, tags, created_at: now };
+        const id = getEventHash(eventTemplate);
+        const bits = leadingZeroBits(hexToBytes(id));
+        if (bits >= pow) break;
+        nonce += 1;
+      }
+    }
+    const event = finalizeEvent(eventTemplate, hexToBytes(priv));
     const targets = relaysOverride ?? relaysRef.current;
     await poolRef.current.publish(targets, event);
     return event;
@@ -306,13 +353,18 @@ export async function publishLongPost(
     tags?: string[];
     cover?: string;
   },
+  pow = 0,
 ) {
   const tags: string[][] = [];
   if (data.title) tags.push(['title', data.title]);
   if (data.summary) tags.push(['summary', data.summary]);
   if (data.cover) tags.push(['image', data.cover]);
   data.tags?.forEach((t) => tags.push(['t', t]));
-  return ctx.publish({ kind: 30023, content: data.content, tags });
+  return ctx.publish(
+    { kind: 30023, content: data.content, tags },
+    undefined,
+    pow,
+  );
 }
 
 export async function publishVote(ctx: NostrContextValue, target: string) {
