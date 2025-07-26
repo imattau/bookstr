@@ -54,6 +54,23 @@ npm run lint    # run ESLint on the source files
 npm run format  # format files with Prettier
 ```
 
+## Build and Deployment
+
+Run the helper script to install dependencies, execute tests, build the static
+site and create a Docker image:
+
+```bash
+./scripts/build_and_deploy.sh
+```
+
+Once built, start the container with:
+
+```bash
+docker run -p 3000:3000 bookstr:latest
+```
+
+The application will be available at <http://localhost:3000>.
+
 ### Zap Flow (NIP-57)
 
 Bookstr implements lightning zaps following [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md). The flow is:
