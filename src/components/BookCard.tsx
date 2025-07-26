@@ -2,20 +2,22 @@ import React, { useState } from 'react';
 import { useNostr, zap } from '../nostr';
 import { ReactionButton } from './ReactionButton';
 import { RepostButton } from './RepostButton';
+import { DeleteButton } from './DeleteButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 
 interface BookCardProps {
   event: NostrEvent & { repostedBy?: string };
+  onDelete?: (id: string) => void;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ event }) => {
+export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   const title = event.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled';
   const summary = event.tags.find((t) => t[0] === 'summary')?.[1] ?? '';
   const cover = event.tags.find((t) => t[0] === 'image')?.[1];
   const ctx = useNostr();
   const [status, setStatus] = useState<'idle' | 'zapping' | 'done'>('idle');
-  const { toggleBookmark, bookmarks } = ctx;
+  const { toggleBookmark, bookmarks, pubkey } = ctx;
 
   const handleZap = async () => {
     setStatus('zapping');
@@ -69,6 +71,12 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
         >
           ★
         </button>
+        {pubkey === event.pubkey && (
+          <DeleteButton
+            target={event.id}
+            onDelete={() => onDelete?.(event.id)}
+          />
+        )}
       </div>
     </div>
   );
