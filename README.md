@@ -12,6 +12,10 @@ specification but functionality is limited.
 
 - **Nostr integration** – the app can log in with a Nostr private key and uses
   it to load contacts, bookmarks and publish events.
+- **NIP‑07 wallet support** – connect to browser wallets to sign events without
+  exposing your keys.
+- **Remote signing** – optionally delegate signing to an external signer for
+  better key security.
 - **Theming** – choose between several preset palettes via `ThemeProvider` with
   support for `dark`, `earthy`, `vibrant` and `pastel` modes.
 - **Service worker** – `src/sw.ts` provides offline caching and background sync
@@ -28,12 +32,14 @@ specification but functionality is limited.
    ```bash
    npx vite
    ```
-   The entry point is `src/main.tsx`.
+ The entry point is `src/main.tsx`.
 3. Build the PWA for production. With Vite the build command is:
    ```bash
    npx vite build
    ```
    The generated files in `dist/` can be served with any static server.
+4. If no NIP‑07 wallet is detected, you can still log in by pasting your
+   private key into the login screen to sign events manually.
 
 This repository does not yet include a fully configured build system; it is
 just the beginning of an implementation, so feel free to use any bundler you
