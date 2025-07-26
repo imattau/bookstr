@@ -82,7 +82,7 @@ function leadingZeroBits(bytes: Uint8Array) {
   return count;
 }
 
-interface NostrContextValue {
+export interface NostrContextValue {
   pubkey: string | null;
   metadata: Record<string, unknown> | null;
   contacts: string[];
@@ -599,3 +599,5 @@ export async function zap(
     }, 30000);
   });
 }
+
+export { connectNostrWallet, nostrLogin } from './nostr/auth';
