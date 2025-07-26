@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   useNavigate,
+  useLocation,
 } from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { Header } from './components/Header';
@@ -22,14 +23,26 @@ import { ProfileSettings } from './components/ProfileSettings';
 
 const AppRoutes: React.FC = () => {
   const navigate = useNavigate();
-  const [active, setActive] = React.useState<
+  const location = useLocation();
+  const active = React.useMemo<
     'discover' | 'library' | 'write' | 'activity' | 'profile'
-  >('discover');
+  >(() => {
+    const key = location.pathname.split('/')[1];
+    if (
+      key === 'discover' ||
+      key === 'library' ||
+      key === 'write' ||
+      key === 'activity' ||
+      key === 'profile'
+    ) {
+      return key;
+    }
+    return 'discover';
+  }, [location.pathname]);
   const [chatOpen, setChatOpen] = React.useState(false);
   const { contacts } = useNostr();
 
   const handleChange = (key: typeof active) => {
-    setActive(key);
     navigate(`/${key}`);
   };
 
