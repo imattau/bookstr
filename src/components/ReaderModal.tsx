@@ -25,11 +25,11 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="flex h-full w-full flex-col bg-[#FFFFFF] dark:bg-[#161A20] sm:m-4 sm:max-w-[360px] sm:rounded-[8px]">
+      <div className="flex h-full w-full flex-col bg-[color:var(--clr-surface)] sm:m-4 sm:max-w-[360px] sm:rounded-[8px]">
         <div className="relative">
-          <div className="h-1 w-full bg-[#E6E6EC] dark:bg-[#262B33]">
+          <div className="h-1 w-full bg-border">
             <div
-              className="h-full bg-[#5A3999]"
+              className="h-full bg-primary-600"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -67,10 +67,10 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
             </button>
           </div>
         </div>
-        <div
-          className="flex-1 overflow-y-auto px-4 py-2 text-[#111214] dark:text-[#F3F4F6]"
-          style={{ fontFamily: 'Georgia,serif', fontSize, lineHeight: '24px' }}
-        >
+          <div
+            className="flex-1 overflow-y-auto px-4 py-2 text-[color:var(--clr-text)]"
+            style={{ fontFamily: 'Georgia,serif', fontSize, lineHeight: '24px' }}
+          >
           <ReaderView
             bookId={bookId}
             html={html}
@@ -89,13 +89,13 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               queueAction({ type: 'finish', id: bookId });
               onClose();
             }}
-            className="rounded-[6px] bg-[#E6E6EC] px-4 py-2 text-[14px] text-[#111214] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50 dark:bg-[#262B33] dark:text-[#F3F4F6]"
+            className="rounded-[6px] bg-border px-4 py-2 text-[14px] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
           >
             Mark as finished
           </button>
           <button
             aria-label="Home"
-            className="flex h-10 w-10 items-center justify-center rounded-[6px] bg-[#E6E6EC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50 dark:bg-[#262B33]"
+            className="flex h-10 w-10 items-center justify-center rounded-[6px] bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
           >
             🏠
           </button>
