@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { reportFinishedCount } from './achievements';
 
 export type BookStatus = 'want' | 'reading' | 'finished';
 
@@ -70,6 +71,7 @@ export const useReadingStore = create<ReadingState>()(
           const finishedCount = books.filter(
             (b) => b.status === 'finished',
           ).length;
+          reportFinishedCount(finishedCount);
           return { books, finishedCount };
         }),
       updateProgress: (id, percent) =>
@@ -87,6 +89,7 @@ export const useReadingStore = create<ReadingState>()(
           const finishedCount = books.filter(
             (b) => b.status === 'finished',
           ).length;
+          reportFinishedCount(finishedCount);
           return { books, finishedCount };
         }),
       setYearlyGoal: (goal) => set({ yearlyGoal: goal }),
@@ -105,6 +108,7 @@ export const useReadingStore = create<ReadingState>()(
           const finishedCount = books.filter(
             (b) => b.status === 'finished',
           ).length;
+          reportFinishedCount(finishedCount);
           return { books, finishedCount };
         }),
     }),
