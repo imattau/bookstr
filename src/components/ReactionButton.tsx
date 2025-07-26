@@ -16,6 +16,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
   const ctx = useNostr();
   const [count, setCount] = useState(0);
   const ids = useRef(new Set<string>());
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
     const symbol = type === 'vote' ? '+' : '★';
@@ -25,6 +26,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
         if (evt.content === symbol && !ids.current.has(evt.id)) {
           ids.current.add(evt.id);
           setCount((c) => c + 1);
+          if (evt.pubkey === ctx.pubkey) setActive(true);
         }
       },
     );
@@ -32,12 +34,14 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
   }, [ctx, target, type]);
 
   const handleClick = async () => {
+    if (active) return;
     try {
       if (type === 'vote') {
         await publishVote(ctx, target);
       } else {
         await publishFavourite(ctx, target);
       }
+      setActive(true);
     } catch {
       /* ignore publish errors */
     }
@@ -49,7 +53,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
     <button
       onClick={handleClick}
       aria-label={type === 'vote' ? 'Vote' : 'Favourite'}
-      className={`rounded border px-2 py-1 ${className ?? ''}`}
+      className={`rounded border px-2 py-1 ${active ? 'border-primary-600 bg-primary-600 text-white' : ''} ${className ?? ''}`}
     >
       {label} {count > 0 ? count : ''}
     </button>
