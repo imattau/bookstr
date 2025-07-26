@@ -54,8 +54,8 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="flex h-full w-full flex-col bg-[color:var(--clr-surface)] sm:m-4 sm:max-w-[360px] sm:rounded-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-2 sm:p-4">
+      <div className="flex w-full max-h-screen flex-col bg-[color:var(--clr-surface)] sm:max-w-[360px] sm:rounded-md">
         <div className="flex items-center justify-between border-b p-2">
           <h2 className="text-lg font-medium">Chat</h2>
           {onClose && (
