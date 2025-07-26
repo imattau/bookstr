@@ -4,6 +4,7 @@ import { ReactionButton } from './ReactionButton';
 import { RepostButton } from './RepostButton';
 import { DeleteButton } from './DeleteButton';
 import { ReportButton } from './ReportButton';
+import { FaHeart } from 'react-icons/fa';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 
@@ -97,7 +98,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
           aria-label="Favorite"
           className="rounded border px-2 py-1"
         >
-          ★
+          <FaHeart className="inline" />
         </button>
         {pubkey === event.pubkey && (
           <DeleteButton

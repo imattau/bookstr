@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { FaThumbsUp, FaStar } from 'react-icons/fa';
 import { useNostr, publishVote, publishFavourite } from '../nostr';
 import type { Event as NostrEvent } from 'nostr-tools';
 
@@ -47,7 +48,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
     }
   };
 
-  const label = type === 'vote' ? '+' : '★';
+  const icon = type === 'vote' ? <FaThumbsUp className="inline" /> : <FaStar className="inline" />;
 
   return (
     <button
@@ -55,7 +56,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
       aria-label={type === 'vote' ? 'Vote' : 'Favourite'}
       className={`rounded border px-2 py-1 ${active ? 'border-primary-600 bg-primary-600 text-white' : ''} ${className ?? ''}`}
     >
-      {label} {count > 0 ? count : ''}
+      {icon} {count > 0 ? count : ''}
     </button>
   );
 };
