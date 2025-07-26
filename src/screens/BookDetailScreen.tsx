@@ -25,7 +25,10 @@ export const BookDetailScreen: React.FC = () => {
   } | null>(null);
   const [chapterIds, setChapterIds] = useState<string[]>([]);
   const [chapters, setChapters] = useState<Record<string, ChapterEvent>>({});
-  const [show, setShow] = useState(false);
+  const [modalData, setModalData] = useState<{
+    id?: string;
+    number: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!bookId) return undefined;
@@ -96,7 +99,9 @@ export const BookDetailScreen: React.FC = () => {
       )}
       <div className="flex justify-end">
         <button
-          onClick={() => setShow(true)}
+          onClick={() =>
+            setModalData({ number: chapterIds.length + 1 })
+          }
           className="rounded bg-primary-600 px-3 py-1 text-white"
         >
           Add Chapter
@@ -119,7 +124,10 @@ export const BookDetailScreen: React.FC = () => {
                         ref={p.innerRef}
                         {...p.draggableProps}
                         {...p.dragHandleProps}
-                        className="rounded border p-2"
+                        className="rounded border p-2 cursor-pointer"
+                        onClick={() =>
+                          setModalData({ id, number: index + 1 })
+                        }
                       >
                         <h3 className="font-semibold">
                           {ch?.title || 'Chapter'}
@@ -135,11 +143,12 @@ export const BookDetailScreen: React.FC = () => {
           )}
         </Droppable>
       </DragDropContext>
-      {show && bookId && (
+      {modalData && bookId && (
         <ChapterEditorModal
           bookId={bookId}
-          chapterNumber={chapterIds.length + 1}
-          onClose={() => setShow(false)}
+          chapterNumber={modalData.number}
+          chapterId={modalData.id}
+          onClose={() => setModalData(null)}
         />
       )}
     </div>
