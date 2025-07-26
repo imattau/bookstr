@@ -15,7 +15,7 @@ export const Comments: React.FC<CommentsProps> = ({
   parentEventId,
   events: initialEvents,
 }) => {
-  const { subscribe, publish, pubkey } = useNostr();
+  const { subscribe, publishComment, pubkey } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>(initialEvents ?? []);
   const [text, setText] = useState('');
 
@@ -31,14 +31,10 @@ export const Comments: React.FC<CommentsProps> = ({
     const content = text.trim();
     if (!content) return;
 
-    const tags: string[][] = [['e', bookId, '', 'root']];
-    if (parentEventId) {
-      tags.push(['e', parentEventId, '', 'reply']);
-      const parent = events.find((e) => e.id === parentEventId);
-      if (parent) tags.push(['p', parent.pubkey]);
-    }
-
-    await publish({ kind: 1, content, tags });
+    const parent = parentEventId
+      ? events.find((e) => e.id === parentEventId)
+      : undefined;
+    await publishComment(bookId, content, parentEventId, parent?.pubkey);
     setText('');
   };
 
