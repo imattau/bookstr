@@ -71,6 +71,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
         window.requestAnimationFrame(() => {
           const pct = calcPercent(el);
           onPercentChange?.(pct);
+          logEvent('reader_percent_update', {
+            bookId,
+            percent: Math.round(pct),
+          });
           if (pct >= 100) {
             logEvent('reader_finish', { bookId });
             onFinish?.();

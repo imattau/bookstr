@@ -16,7 +16,7 @@ export const Discover: React.FC = () => {
   const [tag, setTag] = useState('All');
 
   useEffect(() => {
-    logEvent('discover_view');
+    logEvent('view_discover');
   }, []);
 
   useEffect(() => {
