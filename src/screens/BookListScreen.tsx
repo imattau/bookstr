@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNostr } from '../nostr';
+import { BookPublishWizard } from '../components/BookPublishWizard';
 
 interface BookMeta {
   id: string;
@@ -10,13 +11,9 @@ interface BookMeta {
 }
 
 export const BookListScreen: React.FC = () => {
-  const { subscribe, publish } = useNostr();
+  const { subscribe } = useNostr();
   const [books, setBooks] = useState<BookMeta[]>([]);
   const [show, setShow] = useState(false);
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [cover, setCover] = useState('');
-  const [tags, setTags] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,26 +36,9 @@ export const BookListScreen: React.FC = () => {
     return off;
   }, [subscribe]);
 
-  const handleSave = async () => {
-    const bookId = crypto.randomUUID();
-    const tgs: string[][] = [
-      ['d', bookId],
-      ['title', title],
-      ['summary', summary],
-    ];
-    if (cover) tgs.push(['image', cover]);
-    tags
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean)
-      .forEach((t) => tgs.push(['t', t]));
-    await publish({ kind: 41, content: '', tags: tgs });
+  const handlePublished = (id: string) => {
     setShow(false);
-    setTitle('');
-    setSummary('');
-    setCover('');
-    setTags('');
-    navigate(`/book/${bookId}`);
+    navigate(`/book/${id}`);
   };
 
   return (
@@ -93,42 +73,10 @@ export const BookListScreen: React.FC = () => {
       {show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="space-y-2 rounded bg-[color:var(--clr-surface)] p-4 w-full max-w-sm">
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Title"
-              className="w-full rounded border p-2"
-            />
-            <textarea
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder="Summary"
-              className="w-full rounded border p-2"
-            />
-            <input
-              value={cover}
-              onChange={(e) => setCover(e.target.value)}
-              placeholder="Cover URL"
-              className="w-full rounded border p-2"
-            />
-            <input
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="Tags comma separated"
-              className="w-full rounded border p-2"
-            />
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                onClick={() => setShow(false)}
-                className="rounded border px-3 py-1"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="rounded bg-primary-600 px-3 py-1 text-white"
-              >
-                Save
+            <BookPublishWizard onPublish={handlePublished} />
+            <div className="flex justify-end pt-2">
+              <button onClick={() => setShow(false)} className="rounded border px-3 py-1">
+                Close
               </button>
             </div>
           </div>
