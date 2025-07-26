@@ -84,11 +84,13 @@ function leadingZeroBits(bytes: Uint8Array) {
 
 export interface NostrContextValue {
   pubkey: string | null;
+  nip07: boolean;
   metadata: Record<string, unknown> | null;
   contacts: string[];
   bookmarks: string[];
   relays: string[];
   login: (priv: string) => void;
+  loginNip07: (pubkey: string) => void;
   logout: () => void;
   publish: (
     event: Omit<EventTemplate, 'created_at'>,
@@ -116,6 +118,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const poolRef = useRef(new SimplePool());
   const [pubkey, setPubkey] = useState<string | null>(null);
+  const [nip07, setNip07] = useState<boolean>(false);
   const [metadata, setMetadata] = useState<Record<string, unknown> | null>(
     null,
   );
@@ -138,6 +141,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     const pool = poolRef.current;
     const storedPub = localStorage.getItem('pubKey');
     if (storedPub) setPubkey(storedPub);
+    const nip07Flag = localStorage.getItem('nip07');
+    setNip07(nip07Flag === '1');
     return () => pool.close(relaysRef.current);
   }, []);
 
@@ -233,13 +238,25 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     sessionPrivKey = priv;
     const pub = getPublicKey(hexToBytes(priv));
     localStorage.setItem('pubKey', pub);
+    localStorage.setItem('nip07', '0');
     setPubkey(pub);
+    setNip07(false);
+  };
+
+  const loginNip07 = (pub: string) => {
+    sessionPrivKey = null;
+    setPubkey(pub);
+    setNip07(true);
+    localStorage.setItem('pubKey', pub);
+    localStorage.setItem('nip07', '1');
   };
 
   const logout = () => {
     sessionPrivKey = null;
     localStorage.removeItem('pubKey');
+    localStorage.removeItem('nip07');
     setPubkey(null);
+    setNip07(false);
   };
 
   const publish = async (
@@ -248,10 +265,13 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     pow = 0,
   ) => {
     const priv = sessionPrivKey;
-    if (!priv) throw new Error('not logged in');
+    const nostr = (window as any).nostr;
+    if (!priv && !(nostr && typeof nostr.signEvent === 'function')) {
+      throw new Error('not logged in');
+    }
     const now = Math.floor(Date.now() / 1000);
     const del = tpl.tags?.find((t) => t[0] === 'delegation');
-    if (del) {
+    if (del && priv) {
       const [, delegator, cond, sig] = del;
       const str = `nostr:delegation:${getPublicKey(hexToBytes(priv))}:${cond}`;
       const hash = sha256(encoder.encode(str));
@@ -284,13 +304,18 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         tags[nonceIndex][1] = nonce.toString();
         eventTemplate = { ...tpl, tags, created_at: now };
-        const id = getEventHash(eventTemplate);
+        const id = getEventHash(eventTemplate as any);
         const bits = leadingZeroBits(hexToBytes(id));
         if (bits >= pow) break;
         nonce += 1;
       }
     }
-    const event = finalizeEvent(eventTemplate, hexToBytes(priv));
+    let event: NostrEvent;
+    if (priv) {
+      event = finalizeEvent(eventTemplate as any, hexToBytes(priv));
+    } else {
+      event = await nostr.signEvent(eventTemplate as any);
+    }
     const targets = relaysOverride ?? relaysRef.current;
     await poolRef.current.publish(targets, event);
     return event;
@@ -403,11 +428,13 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     <NostrContext.Provider
       value={{
         pubkey,
+        nip07,
         metadata,
         contacts,
         bookmarks,
         relays,
         login,
+        loginNip07,
         logout,
         publish,
         subscribe,
@@ -479,10 +506,16 @@ export async function publishAttachment(
 
 export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
   const priv = sessionPrivKey;
-  if (!priv) throw new Error('not logged in');
-  const cipher = await (
-    await import('nostr-tools')
-  ).nip04.encrypt(priv, to, text);
+  let cipher: string;
+  if (priv) {
+    cipher = await (
+      await import('nostr-tools')
+    ).nip04.encrypt(priv, to, text);
+  } else {
+    const nostr = (window as any).nostr;
+    if (!nostr?.nip04?.encrypt) throw new Error('not logged in');
+    cipher = await nostr.nip04.encrypt(to, text);
+  }
   return ctx.publish({ kind: 4, content: cipher, tags: [['p', to]] });
 }
 
