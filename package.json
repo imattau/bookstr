@@ -32,7 +32,7 @@
     "marked": "^10.0.0",
     "nostr-tools": "^2.15.2",
     "react": "^19.1.0",
-    "react-beautiful-dnd": "^13.1.1",
+    "@hello-pangea/dnd": "^18.0.1",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.1",
     "workbox-background-sync": "^7.3.0",
