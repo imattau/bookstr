@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
 import { SimplePool, getPublicKey, finalizeEvent } from 'nostr-tools';
+import { hexToBytes } from '@noble/hashes/utils';
 
 const DEFAULT_RELAYS = [
   'wss://relay.damus.io',
@@ -21,7 +22,7 @@ interface NostrContextValue {
   bookmarks: string[];
   login: (priv: string) => void;
   logout: () => void;
-  publish: (event: EventTemplate) => Promise<NostrEvent>;
+  publish: (event: Omit<EventTemplate, 'created_at'>) => Promise<NostrEvent>;
   subscribe: (filters: Filter[], cb: (event: NostrEvent) => void) => () => void;
   saveProfile: (data: Record<string, unknown>) => Promise<void>;
   saveContacts: (list: string[]) => Promise<void>;
@@ -45,7 +46,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const pool = poolRef.current;
     const stored = localStorage.getItem('privKey');
-    if (stored) setPubkey(getPublicKey(stored));
+    if (stored) setPubkey(getPublicKey(hexToBytes(stored)));
     return () => pool.close(DEFAULT_RELAYS);
   }, []);
 
@@ -56,9 +57,9 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       setBookmarks([]);
       return;
     }
-    poolRef.current
+    (poolRef.current as any)
       .list(DEFAULT_RELAYS, [{ kinds: [0], authors: [pubkey], limit: 1 }])
-      .then((events) => {
+      .then((events: NostrEvent[]) => {
         if (events[0]) {
           try {
             setMetadata(JSON.parse(events[0].content));
@@ -67,21 +68,23 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
           }
         }
       });
-    poolRef.current
+    (poolRef.current as any)
       .list(DEFAULT_RELAYS, [{ kinds: [3], authors: [pubkey], limit: 1 }])
-      .then((events) => {
+      .then((events: NostrEvent[]) => {
         if (events[0]) {
           const p = events[0].tags.filter((t) => t[0] === 'p').map((t) => t[1]);
           setContacts(p);
         }
       });
-    poolRef.current
+    (poolRef.current as any)
       .list(DEFAULT_RELAYS, [
         { kinds: [30001], authors: [pubkey], '#d': ['bookmarks'], limit: 1 },
       ])
-      .then((events) => {
+      .then((events: NostrEvent[]) => {
         if (events[0]) {
-          const e = events[0].tags.filter((t) => t[0] === 'e').map((t) => t[1]);
+          const e = events[0].tags
+            .filter((t: string[]) => t[0] === 'e')
+            .map((t: string[]) => t[1]);
           setBookmarks(e);
         }
       });
@@ -89,7 +92,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = (priv: string) => {
     localStorage.setItem('privKey', priv);
-    setPubkey(getPublicKey(priv));
+    setPubkey(getPublicKey(hexToBytes(priv)));
   };
 
   const logout = () => {
@@ -97,12 +100,12 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setPubkey(null);
   };
 
-  const publish = async (tpl: EventTemplate) => {
+  const publish = async (tpl: Omit<EventTemplate, 'created_at'>) => {
     const priv = localStorage.getItem('privKey');
     if (!priv) throw new Error('not logged in');
     const event = finalizeEvent(
       { ...tpl, created_at: Math.floor(Date.now() / 1000) },
-      priv,
+      hexToBytes(priv),
     );
     await poolRef.current.publish(DEFAULT_RELAYS, event);
     return event;
@@ -112,7 +115,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     const sub = poolRef.current.subscribeMany(DEFAULT_RELAYS, filters, {
       onevent: cb,
     });
-    return () => sub.unsub();
+    return () => (sub as any).unsub();
   };
 
   const saveProfile = async (data: Record<string, unknown>) => {

@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { useNostr, zap } from '../nostr';
+import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 
 interface BookCardProps {
-  event: {
-    id: string;
-    pubkey: string;
-    content: string;
-    tags: string[][];
-  };
+  event: NostrEvent;
 }
 
 export const BookCard: React.FC<BookCardProps> = ({ event }) => {

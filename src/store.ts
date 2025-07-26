@@ -62,7 +62,9 @@ export const useReadingStore = create<ReadingState>()(
       finishBook: (id) =>
         set((state) => {
           const books = state.books.map((b) =>
-            b.id === id ? { ...b, status: 'finished', percent: 100 } : b,
+            b.id === id
+              ? { ...b, status: 'finished' as BookStatus, percent: 100 }
+              : b,
           );
           const finishedCount = books.filter(
             (b) => b.status === 'finished',
@@ -76,7 +78,8 @@ export const useReadingStore = create<ReadingState>()(
               ? {
                   ...b,
                   percent,
-                  status: percent >= 100 ? 'finished' : b.status,
+                  status:
+                    percent >= 100 ? ('finished' as BookStatus) : b.status,
                 }
               : b,
           );

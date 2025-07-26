@@ -3,6 +3,7 @@ import { useNostr, verifyNip05 } from '../nostr';
 import { FollowList } from './FollowList';
 
 interface ProfileMeta {
+  [key: string]: unknown;
   name?: string;
   about?: string;
   picture?: string;
