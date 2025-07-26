@@ -5,6 +5,7 @@ import { BottomNav } from './components/BottomNav';
 import { ThemeProvider } from './ThemeProvider';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { ReaderDemo } from './components/ReaderDemo';
+import { NostrProvider } from './nostr';
 
 export const App: React.FC = () => {
   const [active, setActive] = React.useState<
@@ -12,15 +13,17 @@ export const App: React.FC = () => {
   >('discover');
   return (
     <ThemeProvider>
-      <AppShell>
-        <Header onSearch={() => {}}>
-          <ThemeSwitcher />
-        </Header>
-        <main className="p-4">
-          {active === 'discover' ? <ReaderDemo /> : 'Hello, world!'}
-        </main>
-        <BottomNav active={active} onChange={setActive} />
-      </AppShell>
+      <NostrProvider>
+        <AppShell>
+          <Header onSearch={() => {}}>
+            <ThemeSwitcher />
+          </Header>
+          <main className="p-4">
+            {active === 'discover' ? <ReaderDemo /> : 'Hello, world!'}
+          </main>
+          <BottomNav active={active} onChange={setActive} />
+        </AppShell>
+      </NostrProvider>
     </ThemeProvider>
   );
 };
