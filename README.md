@@ -1,36 +1,21 @@
 # bookstr
 
-## Purpose
+This repository contains a small React + TypeScript playground implementing
+a few pieces of the **Bookstr PWA UI Specification**. It uses Tailwind CSS
+with design tokens defined in `src/designTokens.css`.
 
-bookstr is an open source project to create a lightweight platform for
-managing personal reading lists and sharing book recommendations. The
-goal is to provide a simple, self-hosted solution for tracking books you
-have read or want to read.
-
-## Contributing
-
-Contributions are welcome! If you'd like to help shape the project,
-please open an issue or submit a pull request on GitHub. Whether it's
-filing bugs, suggesting features, or improving documentation, your
-feedback is appreciated.
+Currently the project only provides a minimal `AppShell`, a `Header`, a
+`BottomNav`, and other basic components. The layout and theming follow the
+specification but functionality is limited.
 
 ## Getting Started
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourname/bookstr.git
-   cd bookstr
-   ```
-2. **Install dependencies**
-   Install the project dependencies using npm:
+1. Install dependencies
    ```bash
    npm install
    ```
-3. **Run the project**
-   A minimal React component lives in `src/index.tsx`. Integrate it with
-   your preferred build tooling or bundler to start experimenting.
+2. Run a development server with your preferred tooling (e.g. Vite or
+   another bundler) pointing to `src/main.tsx` as the entry.
 
-## Contact
-
-If you have questions or need support, open an issue on GitHub or reach
-out to <maintainer@example.com>.
+This repository does not yet include a fully configured build system; it is
+just the beginning of an implementation.
