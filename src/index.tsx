@@ -5,6 +5,7 @@ import { BottomNav } from './components/BottomNav';
 import { ThemeProvider } from './ThemeProvider';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { ReaderDemo } from './components/ReaderDemo';
+import { ProfileSettings } from './components/ProfileSettings';
 import { NostrProvider } from './nostr';
 
 export const App: React.FC = () => {
@@ -19,7 +20,8 @@ export const App: React.FC = () => {
             <ThemeSwitcher />
           </Header>
           <main className="p-4">
-            {active === 'discover' ? <ReaderDemo /> : 'Hello, world!'}
+            {active === 'discover' && <ReaderDemo />}
+            {active === 'profile' && <ProfileSettings />}
           </main>
           <BottomNav active={active} onChange={setActive} />
         </AppShell>

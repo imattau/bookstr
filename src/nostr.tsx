@@ -16,10 +16,12 @@ const DEFAULT_RELAYS = [
 
 interface NostrContextValue {
   pubkey: string | null;
+  metadata: Record<string, unknown> | null;
   login: (priv: string) => void;
   logout: () => void;
   publish: (event: EventTemplate) => Promise<NostrEvent>;
   subscribe: (filters: Filter[], cb: (event: NostrEvent) => void) => () => void;
+  saveProfile: (data: Record<string, unknown>) => Promise<void>;
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -29,6 +31,9 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const poolRef = useRef(new SimplePool());
   const [pubkey, setPubkey] = useState<string | null>(null);
+  const [metadata, setMetadata] = useState<Record<string, unknown> | null>(
+    null,
+  );
 
   useEffect(() => {
     const pool = poolRef.current;
@@ -36,6 +41,24 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     if (stored) setPubkey(getPublicKey(stored));
     return () => pool.close(DEFAULT_RELAYS);
   }, []);
+
+  useEffect(() => {
+    if (!pubkey) {
+      setMetadata(null);
+      return;
+    }
+    poolRef.current
+      .list(DEFAULT_RELAYS, [{ kinds: [0], authors: [pubkey], limit: 1 }])
+      .then((events) => {
+        if (events[0]) {
+          try {
+            setMetadata(JSON.parse(events[0].content));
+          } catch {
+            setMetadata(null);
+          }
+        }
+      });
+  }, [pubkey]);
 
   const login = (priv: string) => {
     localStorage.setItem('privKey', priv);
@@ -65,9 +88,22 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => sub.unsub();
   };
 
+  const saveProfile = async (data: Record<string, unknown>) => {
+    await publish({ kind: 0, content: JSON.stringify(data), tags: [] });
+    setMetadata(data);
+  };
+
   return (
     <NostrContext.Provider
-      value={{ pubkey, login, logout, publish, subscribe }}
+      value={{
+        pubkey,
+        metadata,
+        login,
+        logout,
+        publish,
+        subscribe,
+        saveProfile,
+      }}
     >
       {children}
     </NostrContext.Provider>
@@ -113,4 +149,18 @@ export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
     await import('nostr-tools')
   ).nip04.encrypt(priv, to, text);
   return ctx.publish({ kind: 4, content: cipher, tags: [['p', to]] });
+}
+
+export async function verifyNip05(handle: string, pubkey: string) {
+  const [name, domain] = handle.split('@');
+  if (!name || !domain) return false;
+  try {
+    const res = await fetch(
+      `https://${domain}/.well-known/nostr.json?name=${name}`,
+    );
+    const data = await res.json();
+    return data.names?.[name] === pubkey;
+  } catch {
+    return false;
+  }
 }
