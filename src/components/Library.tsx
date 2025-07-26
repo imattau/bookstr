@@ -6,13 +6,14 @@ import { useOnboarding } from '../useOnboarding';
 export const Library: React.FC = () => {
   const { contacts } = useNostr();
   const { books, finishBook, yearlyGoal, finishedCount } = useReadingStore();
-  const [tab, setTab] = React.useState<'want' | 'reading' | 'finished'>(
-    'reading',
-  );
+  const [tab, setTab] = React.useState<
+    'want' | 'reading' | 'finished' | 'following'
+  >('reading');
   const tabs: Array<{ key: typeof tab; label: string }> = [
     { key: 'want', label: 'Want to Read' },
     { key: 'reading', label: 'Reading' },
     { key: 'finished', label: 'Finished' },
+    { key: 'following', label: 'Following' },
   ];
 
   const settingsOnboarding = useOnboarding(
@@ -54,11 +55,12 @@ export const Library: React.FC = () => {
       </p>
       <div className="mt-4 space-y-2">
         {books
-          .filter(
-            (item) =>
-              item.status === tab &&
-              (contacts.length === 0 || contacts.includes(item.author)),
-          )
+          .filter((item) => {
+            if (tab === 'following') {
+              return contacts.includes(item.author);
+            }
+            return item.status === tab;
+          })
           .map((item) => (
             <div
               key={item.id}

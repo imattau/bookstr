@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNostr, verifyNip05 } from '../nostr';
-import { FollowList } from './FollowList';
+import { ContactsManager } from './ContactsManager';
 
 interface ProfileMeta {
   [key: string]: unknown;
@@ -94,7 +94,7 @@ export const ProfileSettings: React.FC = () => {
       </button>
       <div className="pt-4">
         <h2 className="mb-2 text-sm font-medium">Following</h2>
-        <FollowList />
+        <ContactsManager />
       </div>
     </div>
   );
