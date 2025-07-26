@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNostr } from '../nostr';
 import { useReadingStore } from '../store';
+import { useOnboarding } from '../useOnboarding';
 
 export const Library: React.FC = () => {
   const { contacts } = useNostr();
@@ -14,6 +15,11 @@ export const Library: React.FC = () => {
     { key: 'finished', label: 'Finished' },
   ];
 
+  const settingsOnboarding = useOnboarding(
+    'library-settings',
+    'Library settings',
+  );
+
   return (
     <div className="min-h-screen bg-[#0F1115] px-4 pb-4 text-white">
       <header
@@ -22,10 +28,14 @@ export const Library: React.FC = () => {
       >
         <h1 className="text-[20px] font-bold text-[#5A3999]">Bookstr</h1>
         <button
+          ref={settingsOnboarding.ref as React.RefObject<HTMLButtonElement>}
+          onClick={settingsOnboarding.dismiss}
           aria-label="Settings"
-          className="text-[#B7BDC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          className={`relative text-[#B7BDC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50 ${
+            settingsOnboarding.show ? 'rounded ring-2 ring-primary-300' : ''
+          }`}
         >
-          ⚙
+          ⚙{settingsOnboarding.Tooltip}
         </button>
       </header>
       <div className="flex items-end gap-6" style={{ height: 48 }}>

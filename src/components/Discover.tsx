@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
+import { useOnboarding } from '../useOnboarding';
 
 const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
@@ -65,14 +66,21 @@ export const Discover: React.FC = () => {
 
   const recommended = filtered.slice(0, 6);
 
+  const searchOnboarding = useOnboarding('discover-search', 'Search for books');
+
   return (
     <div className="pb-4">
       <header className="relative bg-primary-600 py-3 text-center text-white">
         <button
+          ref={searchOnboarding.ref as React.RefObject<HTMLButtonElement>}
+          onClick={searchOnboarding.dismiss}
           aria-label="Search"
-          className="absolute left-2 top-1/2 -translate-y-1/2"
+          className={`relative absolute left-2 top-1/2 -translate-y-1/2 ${
+            searchOnboarding.show ? 'rounded ring-2 ring-primary-300' : ''
+          }`}
         >
           🔍
+          {searchOnboarding.Tooltip}
         </button>
         <h1 className="text-[18px] font-semibold">Bookstr</h1>
       </header>
