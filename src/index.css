@@ -6,3 +6,48 @@
 html {
   font-family: theme('fontFamily.sans');
 }
+
+@keyframes shimmer {
+  0% {
+    background-position-y: 100%;
+  }
+  100% {
+    background-position-y: 0%;
+  }
+}
+
+.skeleton {
+  @apply relative overflow-hidden bg-[color:var(--clr-surface-alt)];
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    to top,
+    transparent,
+    rgba(0, 0, 0, 0.05),
+    transparent
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 200%;
+  animation: shimmer 0.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+  .btn-tap,
+  .card-hover {
+    transition: none;
+  }
+}
+
+.btn-tap {
+  @apply transition-transform duration-150 active:scale-95 focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)];
+}
+
+.card-hover {
+  @apply transition-transform duration-150 ease-in-out hover:-translate-y-0.5;
+}
