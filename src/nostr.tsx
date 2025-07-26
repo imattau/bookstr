@@ -104,6 +104,7 @@ interface NostrContextValue {
     parentEventId?: string,
     parentPubkey?: string,
   ) => Promise<void>;
+  sendEvent: (event: NostrEvent, relays?: string[]) => Promise<void>;
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -374,6 +375,11 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     await publish({ kind: 1, content: text, tags });
   };
 
+  const sendEvent = async (event: NostrEvent, relaysOverride?: string[]) => {
+    const targets = relaysOverride ?? relaysRef.current;
+    await poolRef.current.publish(targets, event);
+  };
+
   return (
     <NostrContext.Provider
       value={{
@@ -391,6 +397,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         saveRelays,
         toggleBookmark,
         publishComment,
+        sendEvent,
       }}
     >
       {children}
@@ -467,14 +474,13 @@ export async function sendGroupDM(
 ) {
   const priv = sessionPrivKey;
   if (!priv) throw new Error('not logged in');
-  const tags = to.map((p) => ['p', p] as string[]);
-  const events: NostrEvent[] = [];
-  for (const pk of to) {
-    const cipher = await (
-      await import('nostr-tools')
-    ).nip04.encrypt(priv, pk, text);
-    const evt = await ctx.publish({ kind: 4, content: cipher, tags });
-    events.push(evt);
+  const nt = await import('nostr-tools');
+  const privBytes = hexToBytes(priv);
+  const myPub = getPublicKey(privBytes);
+  const recipients = to.filter((p) => p !== myPub).map((p) => ({ publicKey: p }));
+  const events = nt.nip17.wrapManyEvents(privBytes, recipients, text);
+  for (const e of events) {
+    await ctx.sendEvent(e);
   }
   return events;
 }
