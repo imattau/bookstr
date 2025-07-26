@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { flushSync } from 'react-dom';
 import { useReadingStore, BookStatus } from './store';
 import { useSettings } from './useSettings';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
@@ -360,16 +361,27 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [settings.textSize, settings.density, pubkey]);
 
   const toggleBookmark = async (id: string) => {
-    setBookmarks((b) => {
-      const idx = b.indexOf(id);
-      const next = idx === -1 ? [...b, id] : b.filter((e) => e !== id);
-      publish({
+    const prev = bookmarks;
+    const next = prev.includes(id)
+      ? prev.filter((e) => e !== id)
+      : [...prev, id];
+
+    flushSync(() => {
+      setBookmarks(next);
+    });
+
+    try {
+      await publish({
         kind: 30001,
         content: '',
         tags: [['d', 'bookmarks'], ...next.map((e) => ['e', e])],
       });
-      return next;
-    });
+    } catch (err) {
+      flushSync(() => {
+        setBookmarks(prev);
+      });
+      throw err;
+    }
   };
 
   const publishComment = async (
