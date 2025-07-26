@@ -22,6 +22,11 @@ import {
   type OfflineBook,
 } from '../offlineStore';
 import { useSettings } from '../useSettings';
+import {
+  registerPushSubscription,
+  unregisterPushSubscription,
+  isPushSubscribed,
+} from '../push';
 
 interface ProfileMeta {
   [key: string]: unknown;
@@ -52,11 +57,19 @@ export const ProfileSettings: React.FC = () => {
   };
   const offlineMaxBooks = useSettings((s) => s.offlineMaxBooks);
   const setOfflineMaxBooks = useSettings((s) => s.setOfflineMaxBooks);
+  const pushEnabled = useSettings((s) => s.pushEnabled);
+  const setPushEnabled = useSettings((s) => s.setPushEnabled);
   const [offlineBooks, setOfflineBooks] = React.useState<OfflineBook[]>([]);
 
   React.useEffect(() => {
     getOfflineBooks().then(setOfflineBooks);
   }, []);
+
+  React.useEffect(() => {
+    isPushSubscribed()
+      .then(setPushEnabled)
+      .catch(() => {});
+  }, [setPushEnabled]);
 
   const toggleOffline = async (id: string) => {
     if (offlineBooks.find((b) => b.id === id)) {
@@ -100,6 +113,13 @@ export const ProfileSettings: React.FC = () => {
         type: 'refresh-offline',
       });
     }
+  };
+
+  const handlePushToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.checked;
+    if (val) await registerPushSubscription();
+    else await unregisterPushSubscription();
+    setPushEnabled(val);
   };
 
   const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,6 +212,16 @@ export const ProfileSettings: React.FC = () => {
           onChange={handleGoalChange}
           className="w-full rounded border p-2"
         />
+      </div>
+      <div>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={pushEnabled}
+            onChange={handlePushToggle}
+          />
+          Enable push notifications
+        </label>
       </div>
       {unlocked.length > 0 && (
         <div className="pt-4">
