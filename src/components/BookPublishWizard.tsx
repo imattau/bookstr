@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
 import { useNostr, publishLongPost } from '../nostr';
 import DOMPurify from 'dompurify';
+import { reportBookPublished } from '../achievements';
 
 export interface BookPublishWizardProps {
   onPublish?: (id: string) => void;
@@ -48,6 +49,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
     setTags('');
     setContent('');
     setPow(false);
+    reportBookPublished();
     if (onPublish) onPublish(evt.id);
   };
 

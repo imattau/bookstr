@@ -8,6 +8,12 @@ import { DelegationManager } from './DelegationManager';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useReadingStore } from '../store';
 import {
+  useAchievements,
+  ACHIEVEMENT_LABELS,
+  AchievementId,
+} from '../achievements';
+import { FaPen, FaTrophy } from 'react-icons/fa';
+import {
   getOfflineBooks,
   saveOfflineBook,
   removeOfflineBook,
@@ -39,6 +45,11 @@ export const ProfileSettings: React.FC = () => {
   const [verified, setVerified] = React.useState<boolean | null>(null);
 
   const { books, yearlyGoal, setYearlyGoal } = useReadingStore();
+  const { unlocked } = useAchievements();
+  const iconMap: Record<AchievementId, JSX.Element> = {
+    'first-publish': <FaPen />,
+    'five-finished': <FaTrophy />,
+  };
   const offlineMaxBooks = useSettings((s) => s.offlineMaxBooks);
   const setOfflineMaxBooks = useSettings((s) => s.setOfflineMaxBooks);
   const [offlineBooks, setOfflineBooks] = React.useState<OfflineBook[]>([]);
@@ -182,6 +193,22 @@ export const ProfileSettings: React.FC = () => {
           className="w-full rounded border p-2"
         />
       </div>
+      {unlocked.length > 0 && (
+        <div className="pt-4">
+          <h2 className="mb-2 text-sm font-medium">Achievements</h2>
+          <div className="flex gap-2">
+            {unlocked.map((id) => (
+              <span
+                key={id}
+                title={ACHIEVEMENT_LABELS[id]}
+                className="text-primary-600 text-lg"
+              >
+                {iconMap[id]}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="pt-4">
         <h2 className="mb-2 text-sm font-medium">Offline content</h2>
         <div className="mb-2">

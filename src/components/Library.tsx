@@ -3,10 +3,21 @@ import { useNostr } from '../nostr';
 import { useReadingStore } from '../store';
 import { ProgressBar } from './ProgressBar';
 import { OnboardingTooltip } from './OnboardingTooltip';
+import {
+  useAchievements,
+  ACHIEVEMENT_LABELS,
+  AchievementId,
+} from '../achievements';
+import { FaPen, FaTrophy } from 'react-icons/fa';
 
 export const Library: React.FC = () => {
   const { contacts } = useNostr();
   const { books, finishBook, yearlyGoal, finishedCount } = useReadingStore();
+  const { unlocked } = useAchievements();
+  const iconMap: Record<AchievementId, JSX.Element> = {
+    'first-publish': <FaPen />,
+    'five-finished': <FaTrophy />,
+  };
   const [tab, setTab] = React.useState<
     'want' | 'reading' | 'finished' | 'following'
   >('reading');
@@ -55,6 +66,19 @@ export const Library: React.FC = () => {
         aria-label="Yearly goal progress"
         className="my-2"
       />
+      {unlocked.length > 0 && (
+        <div className="mt-2 flex gap-2">
+          {unlocked.map((id) => (
+            <span
+              key={id}
+              title={ACHIEVEMENT_LABELS[id]}
+              className="text-primary-600 text-lg"
+            >
+              {iconMap[id]}
+            </span>
+          ))}
+        </div>
+      )}
       <div className="mt-4 space-y-2">
         {books
           .filter((item) => {
