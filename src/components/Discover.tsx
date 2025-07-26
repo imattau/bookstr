@@ -72,7 +72,11 @@ export const Discover: React.FC = () => {
     return off;
   }, [events, subscribe]);
 
-  const filtered = events.filter((evt) => {
+  const bookEvents = events.filter(
+    (evt) => !evt.tags.some((t) => t[0] === 'book'),
+  );
+
+  const filtered = bookEvents.filter((evt) => {
     let ok = true;
     if (
       contacts.length &&
@@ -92,11 +96,11 @@ export const Discover: React.FC = () => {
     return ok;
   });
 
-  const trending = [...events]
+  const trending = [...bookEvents]
     .sort((a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0))
     .slice(0, 6);
 
-  const newReleases = [...events]
+  const newReleases = [...bookEvents]
     .sort((a, b) => (b.created_at ?? 0) - (a.created_at ?? 0))
     .slice(0, 6);
 
