@@ -229,3 +229,69 @@ export async function verifyNip05(handle: string, pubkey: string) {
     return false;
   }
 }
+
+export async function zap(
+  ctx: NostrContextValue,
+  event: NostrEvent,
+  amount = 1,
+) {
+  const meta = await new Promise<Record<string, any> | null>((resolve) => {
+    let done = false;
+    const off = ctx.subscribe(
+      [{ kinds: [0], authors: [event.pubkey], limit: 1 }],
+      (evt) => {
+        if (done) return;
+        done = true;
+        off();
+        try {
+          resolve(JSON.parse(evt.content));
+        } catch {
+          resolve(null);
+        }
+      },
+    );
+    setTimeout(() => {
+      if (!done) {
+        off();
+        resolve(null);
+      }
+    }, 5000);
+  });
+
+  const address = meta?.lud16 as string | undefined;
+  if (!address) throw new Error('missing lightning address');
+  const [name, domain] = address.split('@');
+  const infoRes = await fetch(`https://${domain}/.well-known/lnurlp/${name}`);
+  const info = await infoRes.json();
+  const msats = Math.max(info.minSendable, amount * 1000);
+  const cb = `${info.callback}?amount=${msats}`;
+  const invRes = await fetch(cb);
+  const inv = await invRes.json();
+  const invoice: string = inv.pr;
+
+  const webln = (window as any).webln;
+  if (webln && webln.sendPayment) {
+    try {
+      await webln.enable();
+      await webln.sendPayment(invoice);
+    } catch {
+      window.open(`lightning:${invoice}`);
+    }
+  } else {
+    window.open(`lightning:${invoice}`);
+  }
+
+  await new Promise<void>((resolve) => {
+    const off = ctx.subscribe(
+      [{ kinds: [9735], '#bolt11': [invoice], limit: 1 }],
+      () => {
+        off();
+        resolve();
+      },
+    );
+    setTimeout(() => {
+      off();
+      resolve();
+    }, 30000);
+  });
+}
