@@ -37,7 +37,9 @@ specification but functionality is limited.
    ```bash
    npx vite build
    ```
-   The generated files in `dist/` can be served with any static server.
+   The generated files in `dist/` can be served with any static server. During
+   this step `vite-plugin-pwa` injects a precache manifest into `src/sw.ts` and
+   outputs the compiled service worker as `dist/sw.js`.
 4. If no NIP‑07 wallet is detected, you can still log in by pasting your
    private key into the login screen to sign events manually.
 
