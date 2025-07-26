@@ -7,6 +7,7 @@ export interface ReaderViewProps {
   initialPercent?: number;
   onPercentChange?: (pct: number) => void;
   onFinish?: () => void;
+  style?: React.CSSProperties;
   className?: string;
   'data-testid'?: string;
 }
@@ -23,6 +24,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   initialPercent = 0,
   onPercentChange,
   onFinish,
+  style,
   className,
   'data-testid': dataTestId,
 }) => {
@@ -58,6 +60,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     <div
       ref={ref}
       className={`overflow-y-auto p-4 ${className ?? ''}`}
+      style={style}
       dangerouslySetInnerHTML={{ __html: html }}
       data-testid={dataTestId}
     />

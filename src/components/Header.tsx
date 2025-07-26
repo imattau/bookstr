@@ -8,6 +8,7 @@ export interface HeaderProps {
     type: 'book' | 'author' | 'tag';
   }>;
   onSelectSuggestion?: (id: string, type: string) => void;
+  children?: React.ReactNode;
   className?: string;
   'data-testid'?: string;
 }
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSearch,
   suggestions,
   onSelectSuggestion,
+  children,
   className,
   'data-testid': dataTestId,
 }) => {
@@ -54,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
           ))}
         </ul>
       )}
+      {children}
     </header>
   );
 };
