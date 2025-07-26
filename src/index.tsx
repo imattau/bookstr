@@ -19,7 +19,7 @@ import { BookDetailScreen } from './screens/BookDetailScreen';
 import { Discover } from './components/Discover';
 import { Library } from './components/Library';
 import { BookPublishWizard } from './components/BookPublishWizard';
-import { CommunityFeed } from './components/CommunityFeed';
+import { NotificationFeed } from './components/NotificationFeed';
 import { ProfileSettings } from './components/ProfileSettings';
 
 const AppRoutes: React.FC = () => {
@@ -84,7 +84,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/discover" element={<Discover />} />
           <Route path="/library" element={<Library />} />
           <Route path="/write" element={<BookPublishWizard />} />
-          <Route path="/activity" element={<CommunityFeed />} />
+          <Route path="/activity" element={<NotificationFeed />} />
           <Route path="/profile" element={<ProfileSettings />} />
           <Route path="/books" element={<BookListScreen />} />
           <Route path="/book/:bookId" element={<BookDetailScreen />} />
