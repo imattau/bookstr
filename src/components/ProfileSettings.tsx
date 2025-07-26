@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNostr, verifyNip05 } from '../nostr';
+import { LoginButton } from './LoginButton';
 import { useWallet } from '../WalletConnect';
 import { ContactsManager } from './ContactsManager';
 import { RelayListManager } from './RelayListManager';
@@ -25,6 +26,14 @@ export const ProfileSettings: React.FC = () => {
     lud16: (metadata as ProfileMeta | null)?.lud16 ?? '',
   }));
   const [verified, setVerified] = React.useState<boolean | null>(null);
+
+  if (!pubkey) {
+    return (
+      <div className="p-4">
+        <LoginButton />
+      </div>
+    );
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
