@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useReadingStore, BookStatus } from './store';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
 import { SimplePool, getPublicKey, finalizeEvent } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
@@ -42,6 +43,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [contacts, setContacts] = useState<string[]>([]);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const books = useReadingStore((s) => s.books);
+  const loadStatuses = useReadingStore((s) => s.loadStatuses);
 
   useEffect(() => {
     const pool = poolRef.current;
@@ -86,6 +89,21 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
             .filter((t: string[]) => t[0] === 'e')
             .map((t: string[]) => t[1]);
           setBookmarks(e);
+        }
+      });
+    (poolRef.current as any)
+      .list(DEFAULT_RELAYS, [
+        { kinds: [30001], authors: [pubkey], '#d': ['library'], limit: 1 },
+      ])
+      .then((events: NostrEvent[]) => {
+        if (events[0]) {
+          const statuses = events[0].tags
+            .filter((t: string[]) => t[0] === 'e')
+            .map((t: string[]): [string, BookStatus] => [
+              t[1],
+              (t[2] as BookStatus) || 'want',
+            ]);
+          loadStatuses(statuses);
         }
       });
   }, [pubkey]);
@@ -138,6 +156,20 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     saveContacts(contacts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contacts]);
+
+  const libraryInit = useRef(true);
+  useEffect(() => {
+    if (libraryInit.current) {
+      libraryInit.current = false;
+      return;
+    }
+    if (!pubkey) return;
+    const tags = ([['d', 'library']] as string[][]).concat(
+      books.map((b) => ['e', b.id, b.status]),
+    );
+    publish({ kind: 30001, content: '', tags });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [books, pubkey]);
 
   const toggleBookmark = async (id: string) => {
     setBookmarks((b) => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNostr } from '../nostr';
 import { useReadingStore } from '../store';
+import { ProgressBar } from './ProgressBar';
 import { useOnboarding } from '../useOnboarding';
 
 export const Library: React.FC = () => {
@@ -53,6 +54,11 @@ export const Library: React.FC = () => {
       <p className="mt-2 text-right text-[12px] text-[#B7BDC7]">
         {finishedCount}/{yearlyGoal} books finished this year
       </p>
+      <ProgressBar
+        value={Math.min(100, (finishedCount / yearlyGoal) * 100)}
+        aria-label="Yearly goal progress"
+        className="my-2"
+      />
       <div className="mt-4 space-y-2">
         {books
           .filter((item) => {
