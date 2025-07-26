@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { cacheBookHtml, getCachedBookHtml } from '../htmlCache';
 import { saveOfflineBook } from '../offlineStore';
 import { logEvent } from '../analytics';
+import DOMPurify from 'dompurify';
 
 export interface ReaderViewProps {
   bookId: string;
@@ -34,6 +35,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState(html);
+  const sanitizedContent = useMemo(() => DOMPurify.sanitize(content), [content]);
 
   useEffect(() => {
     setContent(html);
@@ -93,7 +95,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       ref={ref}
       className={`overflow-y-auto p-4 ${className ?? ''}`}
       style={style}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       data-testid={dataTestId}
     />
   );

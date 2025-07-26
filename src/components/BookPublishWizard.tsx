@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
 import { useNostr, publishLongPost } from '../nostr';
+import DOMPurify from 'dompurify';
 
 export const BookPublishWizard: React.FC = () => {
   const ctx = useNostr();
@@ -11,6 +12,10 @@ export const BookPublishWizard: React.FC = () => {
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [pow, setPow] = useState(false);
+  const previewHtml = useMemo(
+    () => DOMPurify.sanitize(marked.parse(content)),
+    [content],
+  );
 
   const next = () => setStep((s) => Math.min(4, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
@@ -147,7 +152,7 @@ export const BookPublishWizard: React.FC = () => {
           </div>
           <div
             className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: marked.parse(content) }}
+            dangerouslySetInnerHTML={{ __html: previewHtml }}
           />
           <label className="flex items-center gap-2">
             <input
