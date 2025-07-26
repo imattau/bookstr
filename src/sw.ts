@@ -7,6 +7,7 @@ import {
 } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
+import { getOfflineBooks } from './offlineStore';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -38,4 +39,41 @@ registerRoute(
   ({ url }) => url.pathname.startsWith('/api/action'),
   new NetworkOnly({ plugins: [bgSync] }),
   'POST',
+);
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open('offline-books');
+      const books = await getOfflineBooks();
+      await Promise.all(
+        books.map((b) =>
+          cache.put(
+            `/book/${b.id}`,
+            new Response(b.html, {
+              headers: { 'Content-Type': 'text/html' },
+            }),
+          ),
+        ),
+      );
+    })(),
+  );
+});
+
+registerRoute(
+  ({ url }) => url.pathname.startsWith('/book/'),
+  async ({ request }) => {
+    const cache = await caches.open('offline-books');
+    try {
+      const response = await fetch(request);
+      if (response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    } catch {
+      const cached = await cache.match(request);
+      if (cached) return cached;
+      throw new Error('Network error');
+    }
+  },
 );
