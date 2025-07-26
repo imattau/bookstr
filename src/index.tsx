@@ -3,7 +3,7 @@ import { AppShell } from './AppShell';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { ThemeProvider } from './ThemeProvider';
-import { DMChat } from './components/DMChat';
+import { DMModal } from './components/DMModal';
 import { useNostr } from './nostr';
 
 export const App: React.FC = () => {
@@ -28,7 +28,7 @@ export const App: React.FC = () => {
         <main />
         <BottomNav active={active} onChange={setActive} />
         {chatOpen && contacts[0] && (
-          <DMChat to={contacts[0]} onClose={() => setChatOpen(false)} />
+          <DMModal to={contacts[0]} onClose={() => setChatOpen(false)} />
         )}
       </AppShell>
     </ThemeProvider>
