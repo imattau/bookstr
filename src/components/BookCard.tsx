@@ -3,6 +3,7 @@ import { useNostr, zap } from '../nostr';
 import { ReactionButton } from './ReactionButton';
 import { RepostButton } from './RepostButton';
 import { DeleteButton } from './DeleteButton';
+import { ReportButton } from './ReportButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 
@@ -64,6 +65,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         </button>
         <ReactionButton target={event.id} type="vote" />
         <RepostButton target={event.id} />
+        <ReportButton target={event.id} />
         <button
           onClick={handleFav}
           aria-label="Favorite"
