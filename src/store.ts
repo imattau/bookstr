@@ -20,6 +20,7 @@ interface ReadingState {
   finishBook: (id: string) => void;
   updateProgress: (id: string, percent: number) => void;
   setYearlyGoal: (goal: number) => void;
+  loadStatuses: (entries: [string, BookStatus][]) => void;
 }
 
 const DEFAULT_BOOKS: Book[] = [
@@ -89,6 +90,23 @@ export const useReadingStore = create<ReadingState>()(
           return { books, finishedCount };
         }),
       setYearlyGoal: (goal) => set({ yearlyGoal: goal }),
+      loadStatuses: (entries) =>
+        set((state) => {
+          const books = state.books.map((b) => {
+            const entry = entries.find((e) => e[0] === b.id);
+            if (!entry) return b;
+            const status = entry[1];
+            return {
+              ...b,
+              status,
+              percent: status === 'finished' ? 100 : b.percent,
+            };
+          });
+          const finishedCount = books.filter(
+            (b) => b.status === 'finished',
+          ).length;
+          return { books, finishedCount };
+        }),
     }),
     { name: 'reading-store' },
   ),
