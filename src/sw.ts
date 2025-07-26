@@ -37,6 +37,19 @@ const bgSync = new BackgroundSyncPlugin('actions', {
   maxRetentionTime: 24 * 60,
 });
 
+async function precacheOfflineBooks() {
+  const cache = await caches.open('offline-books');
+  const books = await getOfflineBooks();
+  await Promise.all(
+    books.map((b) =>
+      cache.put(
+        `/book/${b.id}`,
+        new Response(b.html, { headers: { 'Content-Type': 'text/html' } }),
+      ),
+    ),
+  );
+}
+
 registerRoute(
   ({ url }) => url.pathname.startsWith(`${API_BASE}/action`),
   new NetworkOnly({ plugins: [bgSync] }),
@@ -44,22 +57,13 @@ registerRoute(
 );
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open('offline-books');
-      const books = await getOfflineBooks();
-      await Promise.all(
-        books.map((b) =>
-          cache.put(
-            `/book/${b.id}`,
-            new Response(b.html, {
-              headers: { 'Content-Type': 'text/html' },
-            }),
-          ),
-        ),
-      );
-    })(),
-  );
+  event.waitUntil(precacheOfflineBooks());
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'refresh-offline') {
+    event.waitUntil(precacheOfflineBooks());
+  }
 });
 
 registerRoute(
