@@ -21,12 +21,17 @@ interface NostrContextValue {
   metadata: Record<string, unknown> | null;
   contacts: string[];
   bookmarks: string[];
+  relays: string[];
   login: (priv: string) => void;
   logout: () => void;
-  publish: (event: Omit<EventTemplate, 'created_at'>) => Promise<NostrEvent>;
+  publish: (
+    event: Omit<EventTemplate, 'created_at'>,
+    relays?: string[],
+  ) => Promise<NostrEvent>;
   subscribe: (filters: Filter[], cb: (event: NostrEvent) => void) => () => void;
   saveProfile: (data: Record<string, unknown>) => Promise<void>;
   saveContacts: (list: string[]) => Promise<void>;
+  saveRelays: (list: string[]) => Promise<void>;
   toggleBookmark: (id: string) => Promise<void>;
   publishComment: (bookId: string, text: string) => Promise<void>;
 }
@@ -43,6 +48,11 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [contacts, setContacts] = useState<string[]>([]);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [relays, setRelays] = useState<string[]>(DEFAULT_RELAYS);
+  const relaysRef = useRef<string[]>(DEFAULT_RELAYS);
+  useEffect(() => {
+    relaysRef.current = relays;
+  }, [relays]);
   const books = useReadingStore((s) => s.books);
   const loadStatuses = useReadingStore((s) => s.loadStatuses);
 
@@ -50,8 +60,25 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     const pool = poolRef.current;
     const stored = localStorage.getItem('privKey');
     if (stored) setPubkey(getPublicKey(hexToBytes(stored)));
-    return () => pool.close(DEFAULT_RELAYS);
+    return () => pool.close(relaysRef.current);
   }, []);
+
+  useEffect(() => {
+    if (!pubkey) {
+      setRelays(DEFAULT_RELAYS);
+      return;
+    }
+    (poolRef.current as any)
+      .list(DEFAULT_RELAYS, [{ kinds: [10002], authors: [pubkey], limit: 1 }])
+      .then((events: NostrEvent[]) => {
+        if (events[0]) {
+          const r = events[0].tags
+            .filter((t: string[]) => t[0] === 'r')
+            .map((t: string[]) => t[1]);
+          if (r.length) setRelays(r);
+        }
+      });
+  }, [pubkey]);
 
   useEffect(() => {
     if (!pubkey) {
@@ -61,7 +88,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
     (poolRef.current as any)
-      .list(DEFAULT_RELAYS, [{ kinds: [0], authors: [pubkey], limit: 1 }])
+      .list(relaysRef.current, [{ kinds: [0], authors: [pubkey], limit: 1 }])
       .then((events: NostrEvent[]) => {
         if (events[0]) {
           try {
@@ -72,7 +99,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       });
     (poolRef.current as any)
-      .list(DEFAULT_RELAYS, [{ kinds: [3], authors: [pubkey], limit: 1 }])
+      .list(relaysRef.current, [{ kinds: [3], authors: [pubkey], limit: 1 }])
       .then((events: NostrEvent[]) => {
         if (events[0]) {
           const p = events[0].tags.filter((t) => t[0] === 'p').map((t) => t[1]);
@@ -80,7 +107,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       });
     (poolRef.current as any)
-      .list(DEFAULT_RELAYS, [
+      .list(relaysRef.current, [
         { kinds: [30001], authors: [pubkey], '#d': ['bookmarks'], limit: 1 },
       ])
       .then((events: NostrEvent[]) => {
@@ -92,7 +119,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       });
     (poolRef.current as any)
-      .list(DEFAULT_RELAYS, [
+      .list(relaysRef.current, [
         { kinds: [30001], authors: [pubkey], '#d': ['library'], limit: 1 },
       ])
       .then((events: NostrEvent[]) => {
@@ -106,7 +133,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
           loadStatuses(statuses);
         }
       });
-  }, [pubkey]);
+  }, [pubkey, relays]);
 
   const login = (priv: string) => {
     localStorage.setItem('privKey', priv);
@@ -118,19 +145,23 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setPubkey(null);
   };
 
-  const publish = async (tpl: Omit<EventTemplate, 'created_at'>) => {
+  const publish = async (
+    tpl: Omit<EventTemplate, 'created_at'>,
+    relaysOverride?: string[],
+  ) => {
     const priv = localStorage.getItem('privKey');
     if (!priv) throw new Error('not logged in');
     const event = finalizeEvent(
       { ...tpl, created_at: Math.floor(Date.now() / 1000) },
       hexToBytes(priv),
     );
-    await poolRef.current.publish(DEFAULT_RELAYS, event);
+    const targets = relaysOverride ?? relaysRef.current;
+    await poolRef.current.publish(targets, event);
     return event;
   };
 
   const subscribe = (filters: Filter[], cb: (evt: NostrEvent) => void) => {
-    const sub = poolRef.current.subscribeMany(DEFAULT_RELAYS, filters, {
+    const sub = poolRef.current.subscribeMany(relaysRef.current, filters, {
       onevent: cb,
     });
     return () => (sub as any).unsub();
@@ -145,6 +176,13 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     const tags = list.map((p) => ['p', p]);
     await publish({ kind: 3, content: '', tags });
     setContacts(list);
+  };
+
+  const saveRelays = async (list: string[]) => {
+    const tags = list.map((r) => ['r', r]);
+    await publish({ kind: 10002, content: '', tags }, list);
+    relaysRef.current = list;
+    setRelays(list);
   };
 
   const contactsInit = useRef(true);
@@ -195,12 +233,14 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         metadata,
         contacts,
         bookmarks,
+        relays,
         login,
         logout,
         publish,
         subscribe,
         saveProfile,
         saveContacts,
+        saveRelays,
         toggleBookmark,
         publishComment,
       }}
