@@ -26,6 +26,10 @@ const DEFAULT_RELAYS = [
 
 const encoder = new TextEncoder();
 
+// Prevent endless proof-of-work loops from freezing the browser
+const MAX_POW_TIME_MS = 5000;
+const MAX_POW_ITERATIONS = 500000;
+
 export function createDelegationTag(
   priv: string,
   delegate: string,
@@ -249,7 +253,14 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     let eventTemplate = { ...tpl, tags, created_at: now };
     if (pow > 0) {
       let nonce = 0;
+      const start = Date.now();
       while (true) {
+        if (
+          nonce > MAX_POW_ITERATIONS ||
+          Date.now() - start > MAX_POW_TIME_MS
+        ) {
+          throw new Error('proof-of-work timed out');
+        }
         tags[nonceIndex][1] = nonce.toString();
         eventTemplate = { ...tpl, tags, created_at: now };
         const id = getEventHash(eventTemplate);
