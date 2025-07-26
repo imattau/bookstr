@@ -1,14 +1,17 @@
 import React from 'react';
 import { ReaderView } from './ReaderView';
 import { useTheme } from '../ThemeProvider';
+import { useReadingStore } from '../store';
 
 interface ReaderModalProps {
+  bookId: string;
   title: string;
   html: string;
   onClose: () => void;
 }
 
 export const ReaderModal: React.FC<ReaderModalProps> = ({
+  bookId,
   title,
   html,
   onClose,
@@ -16,6 +19,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
   const [fontSize, setFontSize] = React.useState(16);
   const [percent, setPercent] = React.useState(0);
   const { theme, setTheme } = useTheme();
+  const { updateProgress, finishBook } = useReadingStore();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -65,11 +69,20 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           className="flex-1 overflow-y-auto px-4 py-2 text-[#111214] dark:text-[#F3F4F6]"
           style={{ fontFamily: 'Georgia,serif', fontSize, lineHeight: '24px' }}
         >
-          <ReaderView html={html} onPercentChange={setPercent} />
+          <ReaderView
+            html={html}
+            onPercentChange={(p) => {
+              setPercent(p);
+              updateProgress(bookId, p);
+            }}
+          />
         </div>
         <div className="flex items-center justify-between px-4 py-3">
           <button
-            onClick={onClose}
+            onClick={() => {
+              finishBook(bookId);
+              onClose();
+            }}
             className="rounded-[6px] bg-[#E6E6EC] px-4 py-2 text-[14px] text-[#111214] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50 dark:bg-[#262B33] dark:text-[#F3F4F6]"
           >
             Mark as finished
