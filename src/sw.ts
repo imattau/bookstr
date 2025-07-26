@@ -11,6 +11,8 @@ import { getOfflineBooks } from './offlineStore';
 
 declare let self: ServiceWorkerGlobalScope;
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
+
 precacheAndRoute(self.__WB_MANIFEST || []);
 
 registerRoute(
@@ -27,7 +29,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }) => url.pathname.startsWith(`${API_BASE}/`),
   new StaleWhileRevalidate({ cacheName: 'api' }),
 );
 
@@ -36,7 +38,7 @@ const bgSync = new BackgroundSyncPlugin('actions', {
 });
 
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/action'),
+  ({ url }) => url.pathname.startsWith(`${API_BASE}/action`),
   new NetworkOnly({ plugins: [bgSync] }),
   'POST',
 );

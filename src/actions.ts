@@ -1,6 +1,8 @@
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
+
 export async function queueAction(action: Record<string, any>): Promise<void> {
   try {
-    await fetch('/api/action', {
+    await fetch(`${API_BASE}/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(action),
