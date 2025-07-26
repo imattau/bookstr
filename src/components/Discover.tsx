@@ -5,6 +5,7 @@ import { BookCard } from './BookCard';
 import { BookCardSkeleton } from './BookCardSkeleton';
 import { OnboardingTooltip } from './OnboardingTooltip';
 import { logEvent } from '../analytics';
+import { CommunityFeed } from './CommunityFeed';
 
 const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
@@ -190,6 +191,10 @@ export const Discover: React.FC = () => {
                 />
               ))}
         </div>
+      </section>
+      <section className="p-4">
+        <h2 className="mb-2 font-semibold">Communities</h2>
+        <CommunityFeed />
       </section>
     </div>
   );
