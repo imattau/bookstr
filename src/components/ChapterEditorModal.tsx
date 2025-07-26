@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNostr } from '../nostr';
 
 interface Props {
   bookId: string;
   chapterNumber: number;
+  chapterId?: string;
   onClose: () => void;
 }
 
 export const ChapterEditorModal: React.FC<Props> = ({
   bookId,
   chapterNumber,
+  chapterId,
   onClose,
 }) => {
   const { publish, subscribe, pubkey } = useNostr();
@@ -18,6 +20,22 @@ export const ChapterEditorModal: React.FC<Props> = ({
   const [cover, setCover] = useState('');
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
+
+  useEffect(() => {
+    if (!chapterId) return;
+    const off = subscribe([{ ids: [chapterId] }], (evt) => {
+      setTitle(evt.tags.find((t) => t[0] === 'title')?.[1] ?? '');
+      setSummary(evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '');
+      setCover(evt.tags.find((t) => t[0] === 'image')?.[1] ?? '');
+      const tagVals = evt.tags
+        .filter((t) => t[0] === 't')
+        .map((t) => t[1])
+        .join(', ');
+      setTags(tagVals);
+      setContent(evt.content);
+    });
+    return off;
+  }, [chapterId, subscribe]);
 
   const handleSave = async () => {
     const chTags: string[][] = [
