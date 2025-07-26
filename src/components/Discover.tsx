@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import type { Event as NostrEvent } from 'nostr-tools';
+import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
 
 const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
 export const Discover: React.FC = () => {
-  const { subscribe } = useNostr();
+  const { subscribe, contacts } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>([]);
   const [search, setSearch] = useState('');
   const [tag, setTag] = useState('All');
 
   useEffect(() => {
-    const off = subscribe([{ kinds: [30023], limit: 50 }], (evt) =>
+    const filters: Filter[] = [{ kinds: [30023], limit: 50 }];
+    if (contacts.length) filters[0].authors = contacts;
+    const off = subscribe(filters, (evt) =>
       setEvents((e) => {
         if (e.find((x) => x.id === evt.id)) return e;
         return [...e, evt];
       }),
     );
     return off;
-  }, [subscribe]);
+  }, [subscribe, contacts]);
 
   const filtered = events.filter((evt) => {
     let ok = true;
+    if (contacts.length && !contacts.includes(evt.pubkey)) ok = false;
     if (tag !== 'All') {
       ok = evt.tags.some(
         (t) => t[0] === 't' && t[1].toLowerCase() === tag.toLowerCase(),

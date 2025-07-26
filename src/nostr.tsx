@@ -27,7 +27,6 @@ interface NostrContextValue {
   saveContacts: (list: string[]) => Promise<void>;
   toggleBookmark: (id: string) => Promise<void>;
   publishComment: (bookId: string, text: string) => Promise<void>;
-
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -127,6 +126,16 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setContacts(list);
   };
 
+  const contactsInit = useRef(true);
+  useEffect(() => {
+    if (contactsInit.current) {
+      contactsInit.current = false;
+      return;
+    }
+    saveContacts(contacts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contacts]);
+
   const toggleBookmark = async (id: string) => {
     setBookmarks((b) => {
       const idx = b.indexOf(id);
@@ -144,7 +153,6 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     await publish({ kind: 1, content: text, tags: [['e', bookId]] });
   };
 
-
   return (
     <NostrContext.Provider
       value={{
@@ -160,7 +168,6 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         saveContacts,
         toggleBookmark,
         publishComment,
-
       }}
     >
       {children}
