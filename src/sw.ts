@@ -1,6 +1,10 @@
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies';
+import {
+  StaleWhileRevalidate,
+  CacheFirst,
+  NetworkOnly,
+} from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
@@ -29,3 +33,9 @@ registerRoute(
 const bgSync = new BackgroundSyncPlugin('actions', {
   maxRetentionTime: 24 * 60,
 });
+
+registerRoute(
+  ({ url }) => url.pathname.startsWith('/api/action'),
+  new NetworkOnly({ plugins: [bgSync] }),
+  'POST',
+);

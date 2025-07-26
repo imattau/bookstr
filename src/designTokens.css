@@ -34,3 +34,33 @@
   --clr-text: #f3f4f6;
   --clr-text-muted: #b7bdc7;
 }
+[data-theme='earthy'] {
+  --clr-surface: #fbf8f3;
+  --clr-surface-alt: #f1eae1;
+  --clr-border: #e0d5c9;
+  --clr-text: #3d2b1f;
+  --clr-text-muted: #877567;
+  --clr-primary-700: #9a5f37;
+  --clr-primary-600: #b6703d;
+  --clr-primary-300: #dfbda3;
+}
+[data-theme='vibrant'] {
+  --clr-surface: #ffffff;
+  --clr-surface-alt: #fafafa;
+  --clr-border: #e5e5e5;
+  --clr-text: #1a1a1a;
+  --clr-text-muted: #555555;
+  --clr-primary-700: #ff0055;
+  --clr-primary-600: #ff3366;
+  --clr-primary-300: #ff99aa;
+}
+[data-theme='pastel'] {
+  --clr-surface: #fdfdfe;
+  --clr-surface-alt: #f5f5fa;
+  --clr-border: #e7e7f0;
+  --clr-text: #333344;
+  --clr-text-muted: #666688;
+  --clr-primary-700: #a489d4;
+  --clr-primary-600: #b9a5e6;
+  --clr-primary-300: #d8c8f2;
+}
