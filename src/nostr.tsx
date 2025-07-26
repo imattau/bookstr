@@ -126,7 +126,10 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [relays]);
   const books = useReadingStore((s) => s.books);
   const loadStatuses = useReadingStore((s) => s.loadStatuses);
-  const settings = useSettings((s) => ({ textSize: s.textSize, density: s.density }));
+  const settings = useSettings((s) => ({
+    textSize: s.textSize,
+    density: s.density,
+  }));
   const hydrateSettings = useSettings((s) => s.hydrate);
 
   useEffect(() => {
@@ -477,7 +480,9 @@ export async function sendGroupDM(
   const nt = await import('nostr-tools');
   const privBytes = hexToBytes(priv);
   const myPub = getPublicKey(privBytes);
-  const recipients = to.filter((p) => p !== myPub).map((p) => ({ publicKey: p }));
+  const recipients = to
+    .filter((p) => p !== myPub)
+    .map((p) => ({ publicKey: p }));
   const events = nt.nip17.wrapManyEvents(privBytes, recipients, text);
   for (const e of events) {
     await ctx.sendEvent(e);
@@ -533,7 +538,21 @@ export async function zap(
   const infoRes = await fetch(`https://${domain}/.well-known/lnurlp/${name}`);
   const info = await infoRes.json();
   const msats = Math.max(info.minSendable, amount * 1000);
-  const cb = `${info.callback}?amount=${msats}`;
+
+  const relays = ctx.relays;
+  const zapReq = await ctx.publish({
+    kind: 9734,
+    content: '',
+    tags: [
+      ['p', event.pubkey],
+      ['e', event.id],
+      ['relays', ...relays],
+      ['amount', msats.toString()],
+    ],
+  });
+
+  const nostr = encodeURIComponent(JSON.stringify(zapReq));
+  const cb = `${info.callback}?amount=${msats}&nostr=${nostr}`;
   const invRes = await fetch(cb);
   const inv = await invRes.json();
   const invoice: string = inv.pr;

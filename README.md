@@ -47,3 +47,15 @@ The project includes a couple of npm scripts to help with code quality:
 npm run lint    # run ESLint on the source files
 npm run format  # format files with Prettier
 ```
+
+### Zap Flow (NIP-57)
+
+Bookstr implements lightning zaps following [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md). The flow is:
+
+1. Load the recipient's lightning address from their profile and query the lnurl-pay endpoint.
+2. Construct a **zap request** event (kind `9734`) containing `p`, `e`, `relays` and `amount` tags. The event is signed and published to the current relays.
+3. Send the zap request to the lnurl callback using the `nostr` query parameter to fetch the invoice.
+4. Pay the invoice with WebLN if available or by opening a `lightning:` URL.
+5. After payment, listen for the `9735` zap receipt event (matched by the invoice's `bolt11` tag) and complete the zap once it arrives.
+
+Following this sequence allows compatible clients to interoperate when sending and receiving zaps.
