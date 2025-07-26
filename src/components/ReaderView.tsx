@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cacheBookHtml, getCachedBookHtml } from '../htmlCache';
+import { saveOfflineBook } from '../offlineStore';
 import { logEvent } from '../analytics';
 
 export interface ReaderViewProps {
@@ -38,6 +39,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     setContent(html);
     if (html) {
       cacheBookHtml(bookId, html);
+      saveOfflineBook(bookId, html);
     }
   }, [bookId, html]);
 
