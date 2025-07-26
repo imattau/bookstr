@@ -102,6 +102,7 @@ export interface NostrContextValue {
     relays?: string[],
     pow?: number,
   ) => Promise<NostrEvent>;
+  list: (filters: Filter[]) => Promise<NostrEvent[]>;
   subscribe: (filters: Filter[], cb: (event: NostrEvent) => void) => () => void;
   saveProfile: (data: Record<string, unknown>) => Promise<void>;
   saveContacts: (list: string[]) => Promise<void>;
@@ -326,6 +327,10 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     return event;
   };
 
+  const list = async (filters: Filter[]) => {
+    return poolRef.current.list(relaysRef.current, filters) as Promise<NostrEvent[]>;
+  };
+
   const subscribe = (filters: Filter[], cb: (evt: NostrEvent) => void) => {
     const sub = poolRef.current.subscribeMany(relaysRef.current, filters, {
       onevent: cb,
@@ -442,6 +447,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         loginNip07,
         logout,
         publish,
+        list,
         subscribe,
         saveProfile,
         saveContacts,
