@@ -6,6 +6,16 @@ import { ContactsManager } from './ContactsManager';
 import { RelayListManager } from './RelayListManager';
 import { DelegationManager } from './DelegationManager';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { useReadingStore } from '../store';
+import {
+  getOfflineBooks,
+  saveOfflineBook,
+  removeOfflineBook,
+  clearOfflineBooks,
+  pruneOfflineBooks,
+  type OfflineBook,
+} from '../offlineStore';
+import { useSettings } from '../useSettings';
 
 interface ProfileMeta {
   [key: string]: unknown;
@@ -27,6 +37,59 @@ export const ProfileSettings: React.FC = () => {
     lud16: (metadata as ProfileMeta | null)?.lud16 ?? '',
   }));
   const [verified, setVerified] = React.useState<boolean | null>(null);
+
+  const { books } = useReadingStore();
+  const offlineMaxBooks = useSettings((s) => s.offlineMaxBooks);
+  const setOfflineMaxBooks = useSettings((s) => s.setOfflineMaxBooks);
+  const [offlineBooks, setOfflineBooks] = React.useState<OfflineBook[]>([]);
+
+  React.useEffect(() => {
+    getOfflineBooks().then(setOfflineBooks);
+  }, []);
+
+  const toggleOffline = async (id: string) => {
+    if (offlineBooks.find((b) => b.id === id)) {
+      await removeOfflineBook(id);
+    } else {
+      try {
+        const res = await fetch(`/book/${id}`);
+        if (res.ok) {
+          const html = await res.text();
+          await saveOfflineBook(id, html);
+        }
+      } catch {
+        // ignore fetch errors
+      }
+    }
+    setOfflineBooks(await getOfflineBooks());
+    if (navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'refresh-offline',
+      });
+    }
+  };
+
+  const handleClearOffline = async () => {
+    await clearOfflineBooks();
+    setOfflineBooks([]);
+    if (navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'refresh-offline',
+      });
+    }
+  };
+
+  const handleMaxChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+    setOfflineMaxBooks(val);
+    await pruneOfflineBooks(val);
+    setOfflineBooks(await getOfflineBooks());
+    if (navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'refresh-offline',
+      });
+    }
+  };
 
   if (!pubkey) {
     return (
@@ -103,6 +166,37 @@ export const ProfileSettings: React.FC = () => {
       <div>
         <label className="block text-sm font-medium">Theme</label>
         <ThemeSwitcher />
+      </div>
+      <div className="pt-4">
+        <h2 className="mb-2 text-sm font-medium">Offline content</h2>
+        <div className="mb-2">
+          <label className="block text-sm font-medium">Max offline books</label>
+          <input
+            type="number"
+            min={1}
+            value={offlineMaxBooks}
+            onChange={handleMaxChange}
+            className="w-full rounded border p-2"
+          />
+        </div>
+        <div className="mb-2 space-y-1">
+          {books.map((b) => (
+            <label key={b.id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={offlineBooks.some((o) => o.id === b.id)}
+                onChange={() => toggleOffline(b.id)}
+              />
+              {b.title}
+            </label>
+          ))}
+        </div>
+        <button
+          onClick={handleClearOffline}
+          className="rounded bg-primary-600 px-4 py-1 text-white"
+        >
+          Clear Cached Books
+        </button>
       </div>
       <button
         onClick={handleSave}
