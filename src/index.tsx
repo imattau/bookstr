@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { Header } from './components/Header';
+import { search, Suggestion } from './search';
 import { BottomNav } from './components/BottomNav';
 import { ThemeProvider } from './ThemeProvider';
 import { DMModal } from './components/DMModal';
@@ -41,6 +42,23 @@ const AppRoutes: React.FC = () => {
   }, [location.pathname]);
   const [chatOpen, setChatOpen] = React.useState(false);
   const { contacts } = useNostr();
+  const [suggestions, setSuggestions] = React.useState<Suggestion[]>([]);
+
+  const handleSearch = async (q: string) => {
+    const res = await search(q);
+    setSuggestions(res);
+  };
+
+  const handleSelectSuggestion = (id: string, type: string) => {
+    setSuggestions([]);
+    if (type === 'book') {
+      navigate(`/book/${id}`);
+    } else if (type === 'search') {
+      navigate(`/discover?q=${encodeURIComponent(id)}`);
+    } else {
+      navigate(`/discover?${type}=${encodeURIComponent(id)}`);
+    }
+  };
 
   const handleChange = (key: typeof active) => {
     navigate(`/${key}`);
@@ -48,7 +66,11 @@ const AppRoutes: React.FC = () => {
 
   return (
     <AppShell>
-      <Header onSearch={() => {}}>
+      <Header
+        onSearch={handleSearch}
+        suggestions={suggestions}
+        onSelectSuggestion={handleSelectSuggestion}
+      >
         <button
           onClick={() => setChatOpen(true)}
           aria-label="Chat"
