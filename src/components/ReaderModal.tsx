@@ -2,6 +2,7 @@ import React from 'react';
 import { ReaderView } from './ReaderView';
 import { useTheme } from '../ThemeProvider';
 import { useReadingStore } from '../store';
+import { Notes } from './Notes';
 
 interface ReaderModalProps {
   bookId: string;
@@ -76,6 +77,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               updateProgress(bookId, p);
             }}
           />
+          <Notes bookId={bookId} />
         </div>
         <div className="flex items-center justify-between px-4 py-3">
           <button
