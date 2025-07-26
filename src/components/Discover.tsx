@@ -39,7 +39,8 @@ export const Discover: React.FC = () => {
       if (voteIds.current.has(evt.id)) return;
       voteIds.current.add(evt.id);
       const target = evt.tags.find((t) => t[0] === 'e')?.[1];
-      if (target) {
+      // only count publishVote events ('+' content)
+      if (target && evt.content === '+') {
         setVotes((v) => ({ ...v, [target]: (v[target] ?? 0) + 1 }));
       }
     });
@@ -61,7 +62,7 @@ export const Discover: React.FC = () => {
     return ok;
   });
 
-  const topRated = [...events]
+  const trending = [...events]
     .sort((a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0))
     .slice(0, 6);
 
@@ -113,9 +114,9 @@ export const Discover: React.FC = () => {
         ))}
       </div>
       <section className="p-4">
-        <h2 className="mb-2 font-semibold">Top Rated</h2>
+        <h2 className="mb-2 font-semibold">Trending Books</h2>
         <div className="grid grid-cols-2 gap-4">
-          {topRated.map((e) => (
+          {trending.map((e) => (
             <BookCard key={e.id} event={e as NostrEvent} />
           ))}
         </div>
