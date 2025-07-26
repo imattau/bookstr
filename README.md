@@ -106,6 +106,16 @@ docker run -e PORT=8080 -p 8080:8080 bookstr:latest
 This starts the API server on port 8080 while still serving the compiled web
 app.
 
+### Environment Variables
+
+The frontend reads certain configuration from Vite environment variables:
+
+- `VITE_RELAY_URLS` – comma separated list of default Nostr relay URLs.
+- `VITE_API_BASE` – base path for API requests (defaults to `/api`).
+
+The API server also honours `API_BASE` to match the frontend and `PORT` for
+the listening port.
+
 ### Zap Flow (NIP-57)
 
 Bookstr implements lightning zaps following [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md). The flow is:

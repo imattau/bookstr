@@ -3,15 +3,16 @@ const express = require('express');
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+const API_BASE = process.env.API_BASE || '/api';
 
 app.use(express.json());
 
-app.post('/api/action', (req, res) => {
+app.post(`${API_BASE}/action`, (req, res) => {
   console.log('action', req.body);
   res.json({ status: 'ok' });
 });
 
-app.post('/api/event', (req, res) => {
+app.post(`${API_BASE}/event`, (req, res) => {
   console.log('event', req.body);
   res.json({ status: 'ok' });
 });

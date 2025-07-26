@@ -4,6 +4,8 @@ interface EventRecord {
   ts: number;
 }
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
+
 export async function logEvent(
   name: string,
   params: Record<string, unknown> = {},
@@ -11,7 +13,7 @@ export async function logEvent(
   const record: EventRecord = { name, params, ts: Date.now() };
 
   try {
-    await fetch('/api/event', {
+    await fetch(`${API_BASE}/event`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(record),

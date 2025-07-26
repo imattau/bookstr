@@ -21,11 +21,16 @@ import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
 import { validatePrivKey } from './validatePrivKey';
 
-const DEFAULT_RELAYS = [
-  'wss://relay.damus.io',
-  'wss://relay.primal.net',
-  'wss://nostr.wine',
-];
+const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as string | undefined)
+  ? ((import.meta as any).env.VITE_RELAY_URLS as string)
+      .split(',')
+      .map((r) => r.trim())
+      .filter(Boolean)
+  : [
+      'wss://relay.damus.io',
+      'wss://relay.primal.net',
+      'wss://nostr.wine',
+    ];
 
 const encoder = new TextEncoder();
 
