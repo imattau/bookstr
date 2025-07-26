@@ -1,4 +1,5 @@
 import React from 'react';
+import { logEvent } from '../analytics';
 
 export interface ReaderToolbarProps {
   title: string;
@@ -46,7 +47,14 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
     <button onClick={onToggleTheme} aria-label="Toggle theme" className="px-2">
       Theme
     </button>
-    <button onClick={onBookmark} aria-label="Bookmark" className="px-2">
+    <button
+      onClick={() => {
+        logEvent('click_fav');
+        onBookmark();
+      }}
+      aria-label="Bookmark"
+      className="px-2"
+    >
       ★
     </button>
     <span className="ml-2 text-sm text-text-muted">{percent}%</span>
