@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { useReadingStore, BookStatus } from './store';
+import { useSettings } from './useSettings';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
 import {
   SimplePool,
@@ -111,6 +112,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [relays]);
   const books = useReadingStore((s) => s.books);
   const loadStatuses = useReadingStore((s) => s.loadStatuses);
+  const settings = useSettings((s) => ({ textSize: s.textSize, density: s.density }));
+  const hydrateSettings = useSettings((s) => s.hydrate);
 
   useEffect(() => {
     const pool = poolRef.current;
@@ -187,6 +190,19 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
               (t[2] as BookStatus) || 'want',
             ]);
           loadStatuses(statuses);
+        }
+      });
+    (poolRef.current as any)
+      .list(relaysRef.current, [
+        { kinds: [30033], authors: [pubkey], '#d': ['settings'], limit: 1 },
+      ])
+      .then((events: NostrEvent[]) => {
+        if (events[0]) {
+          try {
+            hydrateSettings(JSON.parse(events[0].content));
+          } catch {
+            /* ignore */
+          }
         }
       });
   }, [pubkey, relays]);
@@ -296,6 +312,21 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     publish({ kind: 30001, content: '', tags });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [books, pubkey]);
+
+  const settingsInit = useRef(true);
+  useEffect(() => {
+    if (settingsInit.current) {
+      settingsInit.current = false;
+      return;
+    }
+    if (!pubkey) return;
+    publish({
+      kind: 30033,
+      content: JSON.stringify(settings),
+      tags: [['d', 'settings']],
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.textSize, settings.density, pubkey]);
 
   const toggleBookmark = async (id: string) => {
     setBookmarks((b) => {
