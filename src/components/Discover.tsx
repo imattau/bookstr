@@ -3,6 +3,7 @@ import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
 import { useOnboarding } from '../useOnboarding';
+import { logEvent } from '../analytics';
 
 const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
@@ -13,6 +14,10 @@ export const Discover: React.FC = () => {
   const voteIds = useRef(new Set<string>());
   const [search, setSearch] = useState('');
   const [tag, setTag] = useState('All');
+
+  useEffect(() => {
+    logEvent('discover_view');
+  }, []);
 
   useEffect(() => {
     const filters: Filter[] = [{ kinds: [30023], limit: 50 }];

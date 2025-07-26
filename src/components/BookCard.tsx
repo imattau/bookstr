@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNostr, zap } from '../nostr';
+import { logEvent } from '../analytics';
 
 interface BookCardProps {
   event: {
@@ -21,6 +22,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
     setStatus('zapping');
     try {
       await zap(ctx, event);
+      logEvent('book_zap', { id: event.id });
       setStatus('done');
     } catch {
       setStatus('idle');

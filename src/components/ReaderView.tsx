@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cacheBookHtml, getCachedBookHtml } from '../htmlCache';
+import { logEvent } from '../analytics';
 
 export interface ReaderViewProps {
   bookId: string;
@@ -41,6 +42,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   }, [bookId, html]);
 
   useEffect(() => {
+    logEvent('reader_open', { bookId });
+  }, [bookId]);
+
+  useEffect(() => {
     if (!navigator.onLine && !html) {
       getCachedBookHtml(bookId).then((cached) => {
         if (cached) setContent(cached);
@@ -64,7 +69,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
         window.requestAnimationFrame(() => {
           const pct = calcPercent(el);
           onPercentChange?.(pct);
-          if (pct >= 100) onFinish?.();
+          if (pct >= 100) {
+            logEvent('reader_finish', { bookId });
+            onFinish?.();
+          }
           ticking = false;
         });
         ticking = true;
