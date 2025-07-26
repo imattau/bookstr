@@ -18,6 +18,7 @@ import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
+import { validatePrivKey } from './validatePrivKey';
 
 const DEFAULT_RELAYS = [
   'wss://relay.damus.io',
@@ -225,6 +226,9 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [pubkey, relays]);
 
   const login = (priv: string) => {
+    if (!validatePrivKey(priv)) {
+      throw new Error('invalid private key');
+    }
     sessionPrivKey = priv;
     const pub = getPublicKey(hexToBytes(priv));
     localStorage.setItem('pubKey', pub);
