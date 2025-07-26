@@ -8,13 +8,47 @@ import React, {
 import { useReadingStore, BookStatus } from './store';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
 import { SimplePool, getPublicKey, finalizeEvent } from 'nostr-tools';
-import { hexToBytes } from '@noble/hashes/utils';
+import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
+import { schnorr } from '@noble/curves/secp256k1';
+import { sha256 } from '@noble/hashes/sha256';
 
 const DEFAULT_RELAYS = [
   'wss://relay.damus.io',
   'wss://relay.primal.net',
   'wss://nostr.wine',
 ];
+
+const encoder = new TextEncoder();
+
+export function createDelegationTag(
+  priv: string,
+  delegate: string,
+  conditions: string,
+) {
+  const str = `nostr:delegation:${delegate}:${conditions}`;
+  const hash = sha256(encoder.encode(str));
+  const sig = bytesToHex(schnorr.sign(hash, hexToBytes(priv)));
+  const delegator = bytesToHex(schnorr.getPublicKey(hexToBytes(priv)));
+  return ['delegation', delegator, conditions, sig];
+}
+
+function checkDelegationConditions(
+  cond: string,
+  kind: number,
+  created: number,
+) {
+  const parts = cond.split('&');
+  for (const p of parts) {
+    if (p.startsWith('kind=')) {
+      if (kind !== parseInt(p.slice(5), 10)) return false;
+    } else if (p.startsWith('created_at<')) {
+      if (created >= parseInt(p.slice(11), 10)) return false;
+    } else if (p.startsWith('created_at>')) {
+      if (created <= parseInt(p.slice(11), 10)) return false;
+    }
+  }
+  return true;
+}
 
 interface NostrContextValue {
   pubkey: string | null;
@@ -151,8 +185,18 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     const priv = localStorage.getItem('privKey');
     if (!priv) throw new Error('not logged in');
+    const now = Math.floor(Date.now() / 1000);
+    const del = tpl.tags?.find((t) => t[0] === 'delegation');
+    if (del) {
+      const [, delegator, cond, sig] = del;
+      const str = `nostr:delegation:${getPublicKey(hexToBytes(priv))}:${cond}`;
+      const hash = sha256(encoder.encode(str));
+      const okSig = schnorr.verify(sig, hash, delegator);
+      const okCond = checkDelegationConditions(cond, tpl.kind, now);
+      if (!okSig || !okCond) throw new Error('invalid delegation');
+    }
     const event = finalizeEvent(
-      { ...tpl, created_at: Math.floor(Date.now() / 1000) },
+      { ...tpl, created_at: now },
       hexToBytes(priv),
     );
     const targets = relaysOverride ?? relaysRef.current;
