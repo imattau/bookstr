@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNostr, verifyNip05 } from '../nostr';
 import { ContactsManager } from './ContactsManager';
+import { RelayListManager } from './RelayListManager';
 
 interface ProfileMeta {
   [key: string]: unknown;
@@ -95,6 +96,10 @@ export const ProfileSettings: React.FC = () => {
       <div className="pt-4">
         <h2 className="mb-2 text-sm font-medium">Following</h2>
         <ContactsManager />
+      </div>
+      <div className="pt-4">
+        <h2 className="mb-2 text-sm font-medium">Relays</h2>
+        <RelayListManager />
       </div>
     </div>
   );
