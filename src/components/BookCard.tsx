@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNostr, zap } from '../nostr';
+import { ReactionButton } from './ReactionButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 
@@ -53,6 +54,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event }) => {
               ? 'Zapped!'
               : 'Zap'}
         </button>
+        <ReactionButton target={event.id} type="vote" />
         <button
           onClick={handleFav}
           aria-label="Favorite"
