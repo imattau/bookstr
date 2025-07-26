@@ -43,5 +43,6 @@ export async function nostrLogin(
   });
 
   await ctx.sendEvent(signed);
+  if (ctx.loginNip07) ctx.loginNip07(pubkey);
   return pubkey;
 }

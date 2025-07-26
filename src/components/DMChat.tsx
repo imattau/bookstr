@@ -29,11 +29,17 @@ export const DMChat: React.FC<DMChatProps> = ({ to, onClose }) => {
       (evt: NostrEvent) => {
         (async () => {
           const priv = getPrivKey();
-          if (!priv) return;
           const other = evt.pubkey === pubkey ? to : evt.pubkey;
-          const plain = await (
-            await import('nostr-tools')
-          ).nip04.decrypt(priv, other, evt.content);
+          let plain: string;
+          if (priv) {
+            plain = await (
+              await import('nostr-tools')
+            ).nip04.decrypt(priv, other, evt.content);
+          } else {
+            const nostr = (window as any).nostr;
+            if (!nostr?.nip04?.decrypt) return;
+            plain = await nostr.nip04.decrypt(other, evt.content);
+          }
           setMsgs((m) => [...m, { id: evt.id, from: evt.pubkey, text: plain }]);
         })();
       },

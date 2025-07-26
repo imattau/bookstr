@@ -60,7 +60,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
     } else {
       ids[chapterNumber - 1] = evt.id;
     }
-    const tagsOut = [['d', bookId], ...ids.map((i) => ['e', i])];
+    const tagsOut = [['d', bookId], ...ids.map((i: string) => ['e', i])];
     await publish({ kind: 30001, content: '', tags: tagsOut });
     onClose();
   };
