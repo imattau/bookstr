@@ -1,5 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
@@ -8,40 +14,60 @@ import { DMModal } from './components/DMModal';
 import { useNostr } from './nostr';
 import { BookListScreen } from './screens/BookListScreen';
 import { BookDetailScreen } from './screens/BookDetailScreen';
+import { Discover } from './components/Discover';
+import { Library } from './components/Library';
+import { BookPublishWizard } from './components/BookPublishWizard';
+import { CommunityFeed } from './components/CommunityFeed';
+import { ProfileSettings } from './components/ProfileSettings';
 
-export const App: React.FC = () => {
+const AppRoutes: React.FC = () => {
+  const navigate = useNavigate();
   const [active, setActive] = React.useState<
     'discover' | 'library' | 'write' | 'activity' | 'profile'
   >('discover');
   const [chatOpen, setChatOpen] = React.useState(false);
   const { contacts } = useNostr();
 
+  const handleChange = (key: typeof active) => {
+    setActive(key);
+    navigate(`/${key}`);
+  };
+
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <AppShell>
-          <Header onSearch={() => {}}>
-            <button
-              onClick={() => setChatOpen(true)}
-              aria-label="Chat"
-              className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-            >
-              💬
-            </button>
-          </Header>
-          <main className="p-4">
-            <Routes>
-              <Route path="/books" element={<BookListScreen />} />
-              <Route path="/book/:bookId" element={<BookDetailScreen />} />
-              <Route path="*" element={<Navigate to="/books" />} />
-            </Routes>
-          </main>
-          <BottomNav active={active} onChange={setActive} />
-          {chatOpen && contacts[0] && (
-            <DMModal to={contacts[0]} onClose={() => setChatOpen(false)} />
-          )}
-        </AppShell>
-      </BrowserRouter>
-    </ThemeProvider>
+    <AppShell>
+      <Header onSearch={() => {}}>
+        <button
+          onClick={() => setChatOpen(true)}
+          aria-label="Chat"
+          className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+        >
+          💬
+        </button>
+      </Header>
+      <main className="p-4">
+        <Routes>
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/write" element={<BookPublishWizard />} />
+          <Route path="/activity" element={<CommunityFeed />} />
+          <Route path="/profile" element={<ProfileSettings />} />
+          <Route path="/books" element={<BookListScreen />} />
+          <Route path="/book/:bookId" element={<BookDetailScreen />} />
+          <Route path="*" element={<Navigate to="/discover" />} />
+        </Routes>
+      </main>
+      <BottomNav active={active} onChange={handleChange} />
+      {chatOpen && contacts[0] && (
+        <DMModal to={contacts[0]} onClose={() => setChatOpen(false)} />
+      )}
+    </AppShell>
   );
 };
+
+export const App: React.FC = () => (
+  <ThemeProvider>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  </ThemeProvider>
+);
