@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNostr } from '../nostr';
+import { useNostr, publishLongPost } from '../nostr';
 import { useToast } from './ToastProvider';
 
 interface Props {
@@ -17,7 +17,8 @@ export const ChapterEditorModal: React.FC<Props> = ({
   authorPubkey,
   onClose,
 }) => {
-  const { publish, subscribe, pubkey } = useNostr();
+  const ctx = useNostr();
+  const { publish, subscribe, list, pubkey } = ctx;
   const toast = useToast();
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
@@ -46,19 +47,25 @@ export const ChapterEditorModal: React.FC<Props> = ({
       toast('Action failed', { type: 'error' });
       return;
     }
-    const chTags: string[][] = [
+    const baseTags: string[][] = [
       ['book', bookId],
       ['chapter', String(chapterNumber)],
     ];
-    if (title) chTags.push(['title', title]);
-    if (summary) chTags.push(['summary', summary]);
-    if (cover) chTags.push(['image', cover]);
-    tags
+    const tTags = tags
       .split(',')
       .map((t) => t.trim())
-      .filter(Boolean)
-      .forEach((t) => chTags.push(['t', t]));
-    const evt = await publish({ kind: 30023, content, tags: chTags });
+      .filter(Boolean);
+    const evt = await publishLongPost(
+      ctx,
+      {
+        title,
+        summary: summary || undefined,
+        content,
+        cover: cover || undefined,
+        extraTags: baseTags,
+        tags: tTags,
+      },
+    );
 
     let listEvt: any = null;
     if (pubkey) {

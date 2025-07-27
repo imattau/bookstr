@@ -34,6 +34,9 @@ const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as string | un
 
 const encoder = new TextEncoder();
 
+// Maximum size for long-form event content in bytes
+export const MAX_EVENT_SIZE = 1000;
+
 // Prevent endless proof-of-work loops from freezing the browser
 const MAX_POW_TIME_MS = 5000;
 const MAX_POW_ITERATIONS = 500000;
@@ -476,6 +479,7 @@ export async function publishLongPost(
     content: string;
     tags?: string[];
     cover?: string;
+    extraTags?: string[][];
   },
   pow = 0,
 ) {
@@ -484,11 +488,65 @@ export async function publishLongPost(
   if (data.summary) tags.push(['summary', data.summary]);
   if (data.cover) tags.push(['image', data.cover]);
   data.tags?.forEach((t) => tags.push(['t', t]));
-  return ctx.publish(
-    { kind: 30023, content: data.content, tags },
-    undefined,
-    pow,
-  );
+  if (data.extraTags) tags.push(...data.extraTags);
+
+  const sliceContent = (text: string) => {
+    const parts: string[] = [];
+    let buf = '';
+    let size = 0;
+    for (const ch of text) {
+      const b = encoder.encode(ch).length;
+      if (size + b > MAX_EVENT_SIZE && buf) {
+        parts.push(buf);
+        buf = ch;
+        size = b;
+      } else {
+        buf += ch;
+        size += b;
+      }
+    }
+    if (buf) parts.push(buf);
+    return parts;
+  };
+
+  const parts = sliceContent(data.content);
+  if (parts.length === 1) {
+    return ctx.publish(
+      { kind: 30023, content: data.content, tags },
+      undefined,
+      pow,
+    );
+  }
+
+  const dTag = Math.random().toString(36).slice(2);
+  let first: NostrEvent | null = null;
+  for (let i = 0; i < parts.length; i++) {
+    const ptTags = [...tags, ['d', dTag], ['part', String(i + 1)]];
+    const evt = await ctx.publish(
+      { kind: 30023, content: parts[i], tags: ptTags },
+      undefined,
+      pow,
+    );
+    if (i === 0) first = evt;
+  }
+  return first!;
+}
+
+export async function fetchLongPostParts(
+  ctx: NostrContextValue,
+  evt: NostrEvent,
+): Promise<string> {
+  const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+  if (!d) return evt.content;
+  const parts = await ctx.list([
+    { kinds: [evt.kind], '#d': [d], authors: [evt.pubkey] },
+  ]);
+  const sorted = parts.sort((a, b) => {
+    const pa = parseInt(a.tags.find((t) => t[0] === 'part')?.[1] ?? '1', 10);
+    const pb = parseInt(b.tags.find((t) => t[0] === 'part')?.[1] ?? '1', 10);
+    return pa - pb;
+  });
+  return sorted.map((p) => p.content).join('');
 }
 
 export async function publishBookMeta(

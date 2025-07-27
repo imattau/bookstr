@@ -24,3 +24,11 @@ the long-form `kind:30023` entry and a matching `kind:41` list event that
 references it. This list event ensures your book appears in the library and in
 `BookListScreen`. Most clients will show the events in your profile or search
 results a few seconds after publication.
+
+## 5. Large Chapters
+
+Bookstr limits individual event content to `MAX_EVENT_SIZE` bytes (1000 by
+default). When a chapter is longer, `publishLongPost` slices the text into
+numbered parts. Each part shares a unique `d` tag and stores its position with a
+`part` index. The reader collects all events with the same `d` value and
+concatenates them before rendering so the full chapter is shown to the user.
