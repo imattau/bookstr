@@ -62,7 +62,7 @@ export const Comments: React.FC<CommentsProps> = ({
 
     return (
       <div className="space-y-2">
-        <div className="rounded border p-2 flex items-start gap-2">
+          <div className="rounded border p-[var(--space-2)] flex items-start gap-2">
           <span className="flex-1">{comment.content}</span>
           <ReportButton target={comment.id} />
           {pubkey === comment.pubkey && (
@@ -78,10 +78,10 @@ export const Comments: React.FC<CommentsProps> = ({
           <Comments bookId={bookId} parentEventId={comment.id} events={events} />
         )}
         {!showChildren && childCount > 0 && (
-          <button
-            onClick={() => setShowChildren(true)}
-            className="ml-4 text-sm text-primary-600"
-          >
+            <button
+              onClick={() => setShowChildren(true)}
+              className="ml-4 text-sm text-[color:var(--clr-primary-600)]"
+            >
             Show replies ({childCount})
           </button>
         )}
@@ -102,22 +102,22 @@ export const Comments: React.FC<CommentsProps> = ({
           onClick={() =>
             setVisibleCount((c) => Math.min(c + PAGE_SIZE, replies.length))
           }
-          className="text-sm text-primary-600"
+          className="text-sm text-[color:var(--clr-primary-600)]"
         >
           Show more
         </button>
       )}
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        maxLength={200}
-        className="w-full rounded border p-2"
-        placeholder="Add comment"
-      />
-      <button
-        onClick={handleSend}
-        className="rounded bg-primary-600 px-2 py-1 text-white"
-      >
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          maxLength={200}
+          className="w-full rounded border p-[var(--space-2)]"
+          placeholder="Add comment"
+        />
+        <button
+          onClick={handleSend}
+          className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-2)] py-[var(--space-1)] text-white"
+        >
         Reply
       </button>
     </div>

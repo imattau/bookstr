@@ -19,7 +19,7 @@ export const Login: React.FC = () => {
     return (
       <button
         onClick={logout}
-        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+        className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Logout
       </button>
@@ -30,13 +30,13 @@ export const Login: React.FC = () => {
       <input
         value={priv}
         onChange={(e) => setPriv(e.target.value)}
-        className="w-full rounded border p-2"
+          className="w-full rounded border p-[var(--space-2)]"
         placeholder="Private key"
       />
       {error && <div className="text-red-600">{error}</div>}
       <button
         onClick={handleLogin}
-        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Login
       </button>

@@ -48,13 +48,13 @@ export const BookHistory: React.FC<BookHistoryProps> = ({ bookId, onClose }) => 
                 <div className="flex gap-2">
                   <button
                     onClick={() => setOpenId(openId === e.id ? null : e.id)}
-                    className="rounded border px-2 py-1 text-sm"
+                    className="rounded border px-[var(--space-2)] py-[var(--space-1)] text-sm"
                   >
                     Preview
                   </button>
                   <button
                     onClick={() => handleRevert(e)}
-                    className="rounded bg-primary-600 px-2 py-1 text-sm text-white"
+                    className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-2)] py-[var(--space-1)] text-sm text-white"
                   >
                     Revert to this version
                   </button>

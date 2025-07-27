@@ -92,9 +92,9 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-2 sm:p-4">
-      <div className="flex w-full max-h-screen flex-col bg-[color:var(--clr-surface)] sm:max-w-[360px] sm:rounded-md">
-        <div className="flex items-center justify-between border-b p-2">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]">
+      <div className="flex w-full max-h-screen flex-col bg-[color:var(--clr-surface)] sm:max-w-[360px] sm:rounded-modal">
+        <div className="flex items-center justify-between border-b p-[var(--space-2)]">
           <h2 className="text-lg font-medium">Chat</h2>
           {onClose && (
             <button
@@ -106,7 +106,7 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
             </button>
           )}
         </div>
-        <div className="flex-1 p-2">
+        <div className="flex-1 p-[var(--space-2)]">
           {msgs.length > 0 && (
             <FixedSizeList
               height={Math.min(400, msgs.length * (ITEM_HEIGHT + GAP))}
@@ -118,11 +118,11 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
             </FixedSizeList>
           )}
         </div>
-        <div className="flex gap-2 border-t p-2">
+        <div className="flex gap-2 border-t p-[var(--space-2)]">
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="flex-1 rounded border p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            className="flex-1 rounded border p-[var(--space-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
             placeholder="Message"
             aria-label="Message"
           />
@@ -130,7 +130,7 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
             <button
               onClick={handleSend}
               aria-label="Send message"
-              className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+              className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
             >
               Send
             </button>

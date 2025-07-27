@@ -29,7 +29,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
       onClick={toggle}
       className={
         className ??
-        'rounded-[var(--radius-button)] bg-primary-600 px-[var(--space-2)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50'
+        'rounded-[var(--radius-button)] bg-[color:var(--clr-primary-600)] px-[var(--space-2)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50'
       }
     >
       {following ? 'Unfollow' : 'Follow'}

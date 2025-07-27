@@ -31,13 +31,13 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      <div className="fixed bottom-4 left-4 space-y-2 pointer-events-none">
+        <div className="fixed bottom-[var(--space-4)] left-[var(--space-4)] space-y-2 pointer-events-none">
         {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={`rounded px-4 py-2 transition-opacity duration-500 ${
-              t.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-800 text-white'
-            } ${t.visible ? 'opacity-90' : 'opacity-0'}`}
+            <div
+              key={t.id}
+              className={`rounded-card px-[var(--space-4)] py-[var(--space-2)] transition-opacity duration-500 ${
+                t.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-800 text-white'
+              } ${t.visible ? 'opacity-90' : 'opacity-0'}`}
           >
             {t.message}
           </div>

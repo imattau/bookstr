@@ -31,17 +31,17 @@ export const ContactsManager: React.FC = () => {
           </li>
         ))}
       </ul>
-      <div className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 rounded border p-2"
-          placeholder="Pubkey"
-        />
-        <button
-          onClick={handleAdd}
-          className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-        >
+        <div className="flex gap-2">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1 rounded border p-[var(--space-2)]"
+            placeholder="Pubkey"
+          />
+          <button
+            onClick={handleAdd}
+            className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          >
           Follow
         </button>
       </div>

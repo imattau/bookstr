@@ -89,7 +89,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
-            className="w-full rounded border p-2"
+            className="w-full rounded border p-[var(--space-2)]"
           />
           <textarea
             value={summary}
@@ -99,7 +99,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
           />
           <button
             onClick={next}
-            className="rounded bg-primary-600 px-4 py-2 text-white"
+            className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white"
           >
             Next
           </button>
@@ -111,15 +111,15 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
             value={cover}
             onChange={(e) => setCover(e.target.value)}
             placeholder="Cover image URL"
-            className="w-full rounded border p-2"
+              className="w-full rounded border p-[var(--space-2)]"
           />
           <div className="flex justify-between gap-2">
-            <button onClick={back} className="rounded border px-4 py-2">
+            <button onClick={back} className="rounded border px-[var(--space-4)] py-[var(--space-2)]">
               Back
             </button>
             <button
               onClick={next}
-              className="rounded bg-primary-600 px-4 py-2 text-white"
+                className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white"
             >
               Next
             </button>
@@ -132,15 +132,15 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="Tags comma separated"
-            className="w-full rounded border p-2"
+              className="w-full rounded border p-[var(--space-2)]"
           />
           <div className="flex justify-between gap-2">
-            <button onClick={back} className="rounded border px-4 py-2">
+            <button onClick={back} className="rounded border px-[var(--space-4)] py-[var(--space-2)]">
               Back
             </button>
             <button
               onClick={next}
-              className="rounded bg-primary-600 px-4 py-2 text-white"
+                className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white"
             >
               Next
             </button>
@@ -153,15 +153,15 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Markdown content"
-            className="w-full rounded border p-2 min-h-[200px]"
+              className="w-full rounded border p-[var(--space-2)] min-h-[200px]"
           />
           <div className="flex justify-between gap-2">
-            <button onClick={back} className="rounded border px-4 py-2">
+            <button onClick={back} className="rounded border px-[var(--space-4)] py-[var(--space-2)]">
               Back
             </button>
             <button
               onClick={next}
-              className="rounded bg-primary-600 px-4 py-2 text-white"
+                className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white"
             >
               Next
             </button>
@@ -187,14 +187,14 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
               .map((t) => (
                 <span
                   key={t}
-                  className="rounded bg-primary-100 px-2 py-1 text-sm"
+                    className="rounded bg-primary-100 px-[var(--space-2)] py-[var(--space-1)] text-sm"
                 >
                   {t}
                 </span>
               ))}
           </div>
           <div
-            className="prose max-w-none"
+              className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: previewHtml }}
           />
           <label className="flex items-center gap-2">
@@ -205,21 +205,21 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
             />
             Enable proof-of-work
           </label>
-          <div className="flex justify-between gap-2">
-            <button onClick={back} className="rounded border px-4 py-2">
+            <div className="flex justify-between gap-2">
+              <button onClick={back} className="rounded border px-[var(--space-4)] py-[var(--space-2)]">
               Back
             </button>
-            <button
-              onClick={handlePublish}
-              disabled={publishing}
-              className="rounded bg-primary-600 px-4 py-2 text-white disabled:opacity-50"
-            >
+              <button
+                onClick={handlePublish}
+                disabled={publishing}
+                className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white disabled:opacity-50"
+              >
               {publishing ? 'Publishing...' : 'Publish'}
             </button>
           </div>
           {publishing && (
-            <div className="flex justify-center pt-2">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-600 border-t-transparent" />
+              <div className="flex justify-center pt-[var(--space-2)]">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-[color:var(--clr-primary-600)] border-t-transparent" />
             </div>
           )}
         </div>

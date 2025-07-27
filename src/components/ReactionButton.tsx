@@ -73,7 +73,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
     <button
       onClick={handleClick}
       aria-label={type === 'vote' ? 'Vote' : 'Favourite'}
-      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${active ? 'border-primary-600 bg-primary-600 text-white' : ''} ${className ?? ''}`}
+      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${active ? 'border-[color:var(--clr-primary-600)] bg-[color:var(--clr-primary-600)] text-white' : ''} ${className ?? ''}`}
     >
       {icon} {count > 0 ? count : ''}
     </button>

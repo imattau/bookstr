@@ -31,27 +31,27 @@ export const DelegationManager: React.FC = () => {
           value={pubkey}
           onChange={(e) => setPubkey(e.target.value)}
           placeholder="Delegate pubkey"
-          className="flex-1 rounded border p-2"
+          className="flex-1 rounded border p-[var(--space-2)]"
         />
         <input
           type="number"
           value={kind}
           onChange={(e) => setKind(e.target.value)}
-          className="w-24 rounded border p-2"
+          className="w-24 rounded border p-[var(--space-2)]"
           placeholder="kind"
         />
         <input
           type="number"
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
-          className="w-24 rounded border p-2"
+          className="w-24 rounded border p-[var(--space-2)]"
           placeholder="days"
         />
         <OnboardingTooltip storageKey="create-delegation" text="Create a delegation tag">
-          <button
-            onClick={handleCreate}
-            className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-          >
+            <button
+              onClick={handleCreate}
+              className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            >
             Create
           </button>
         </OnboardingTooltip>

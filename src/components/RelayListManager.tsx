@@ -32,27 +32,27 @@ export const RelayListManager: React.FC = () => {
         {relays.map((r) => (
           <li key={r} className="flex items-center gap-2">
             <span className="flex-1 break-all">{r}</span>
-            <button
-              onClick={() => handleRemove(r)}
-              className="rounded bg-red-600 px-2 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-            >
+              <button
+                onClick={() => handleRemove(r)}
+                className="rounded bg-red-600 px-[var(--space-2)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+              >
               Remove
             </button>
           </li>
         ))}
       </ul>
-      <div className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 rounded border p-2"
-          placeholder="wss://relay.example"
-        />
+        <div className="flex gap-2">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1 rounded border p-[var(--space-2)]"
+            placeholder="wss://relay.example"
+          />
         <OnboardingTooltip storageKey="relay-add" text="Add a relay URL">
-          <button
-            onClick={handleAdd}
-            className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-          >
+            <button
+              onClick={handleAdd}
+              className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            >
             Add
           </button>
         </OnboardingTooltip>

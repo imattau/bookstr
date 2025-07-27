@@ -22,6 +22,6 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     className={`h-2 w-full overflow-hidden rounded bg-border ${className ?? ''}`}
     data-testid={dataTestId}
   >
-    <div className="h-full bg-primary-600" style={{ width: `${value}%` }} />
+    <div className="h-full bg-[color:var(--clr-primary-600)]" style={{ width: `${value}%` }} />
   </div>
 );

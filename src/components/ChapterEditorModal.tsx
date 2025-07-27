@@ -131,45 +131,45 @@ export const ChapterEditorModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-2 sm:p-4">
-      <div className="space-y-2 w-full max-w-sm max-h-screen overflow-y-auto rounded bg-[color:var(--clr-surface)] p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]">
+      <div className="space-y-2 w-full max-w-sm max-h-screen overflow-y-auto rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
-          className="w-full rounded border p-2"
+          className="w-full rounded border p-[var(--space-2)]"
         />
         <textarea
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
           placeholder="Summary"
-          className="w-full rounded border p-2"
+          className="w-full rounded border p-[var(--space-2)]"
         />
         <input
           value={cover}
           onChange={(e) => setCover(e.target.value)}
           placeholder="Cover"
-          className="w-full rounded border p-2"
+          className="w-full rounded border p-[var(--space-2)]"
         />
         <input
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder="Tags comma separated"
-          className="w-full rounded border p-2"
+          className="w-full rounded border p-[var(--space-2)]"
         />
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Content"
-          className="w-full rounded border p-2 min-h-[120px]"
+          className="w-full rounded border p-[var(--space-2)] min-h-[120px]"
         />
-        <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="rounded border px-3 py-1">
+        <div className="flex justify-end gap-2 pt-[var(--space-2)]">
+          <button onClick={onClose} className="rounded border px-[var(--space-3)] py-[var(--space-1)]">
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="rounded bg-primary-600 px-3 py-1 text-white"
+            className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white"
           >
             Save
           </button>
