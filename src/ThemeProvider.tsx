@@ -3,6 +3,14 @@ import { useSettings } from './useSettings';
 
 export type Theme = 'default' | 'dark' | 'earthy' | 'vibrant' | 'pastel';
 
+export const THEMES: Theme[] = [
+  'default',
+  'dark',
+  'earthy',
+  'vibrant',
+  'pastel',
+];
+
 interface ThemeContextValue {
   theme: Theme;
   setTheme: (t: Theme | ((t: Theme) => Theme)) => void;

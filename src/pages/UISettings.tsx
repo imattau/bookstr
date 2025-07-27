@@ -1,8 +1,7 @@
 import React from 'react';
 import { useSettings } from '../useSettings';
 import type { Theme } from '../ThemeProvider';
-
-const themes: Theme[] = ['dark', 'earthy', 'vibrant', 'pastel'];
+import { THEMES } from '../ThemeProvider';
 
 const UISettingsPage: React.FC = () => {
   const theme = useSettings((s) => s.theme);
@@ -23,7 +22,7 @@ const UISettingsPage: React.FC = () => {
           onChange={(e) => setTheme(e.target.value as Theme)}
           className="w-full rounded border p-2"
         >
-          {themes.map((t) => (
+          {THEMES.map((t) => (
             <option key={t} value={t}>
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </option>
