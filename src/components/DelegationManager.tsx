@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createDelegationTag, getPrivKey } from '../nostr';
+import { OnboardingTooltip } from './OnboardingTooltip';
 
 /**
  * Allow users to create delegation tags that authorize another
@@ -46,12 +47,14 @@ export const DelegationManager: React.FC = () => {
           className="w-24 rounded border p-2"
           placeholder="days"
         />
-        <button
-          onClick={handleCreate}
-          className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-        >
-          Create
-        </button>
+        <OnboardingTooltip storageKey="create-delegation" text="Create a delegation tag">
+          <button
+            onClick={handleCreate}
+            className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          >
+            Create
+          </button>
+        </OnboardingTooltip>
       </div>
       {result && (
         <textarea

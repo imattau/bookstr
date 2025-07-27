@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNostr } from '../nostr';
+import { OnboardingTooltip } from './OnboardingTooltip';
 
 /**
  * Manage the list of relay URLs. Allows adding new relays and
@@ -47,12 +48,14 @@ export const RelayListManager: React.FC = () => {
           className="flex-1 rounded border p-2"
           placeholder="wss://relay.example"
         />
-        <button
-          onClick={handleAdd}
-          className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-        >
-          Add
-        </button>
+        <OnboardingTooltip storageKey="relay-add" text="Add a relay URL">
+          <button
+            onClick={handleAdd}
+            className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          >
+            Add
+          </button>
+        </OnboardingTooltip>
       </div>
     </div>
   );

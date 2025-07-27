@@ -57,6 +57,11 @@ For a step-by-step guide on using the book publishing wizard, see
 To learn more about sending lightning zaps, read
 [docs/zapping.md](docs/zapping.md).
 
+## Nostr Features
+
+Read about managing relays, creating delegation tags and using the chat modals in
+[docs/nostr_features.md](docs/nostr_features.md).
+
 The build setup is now complete and consists of the following steps:
 
 1. Run `npm test` to execute the unit tests.
