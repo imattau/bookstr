@@ -4,6 +4,8 @@ import { DeleteButton } from './DeleteButton';
 import { ReportButton } from './ReportButton';
 import type { Event as NostrEvent } from 'nostr-tools';
 
+const PAGE_SIZE = 5;
+
 interface CommentsProps {
   bookId: string;
   parentEventId?: string;
@@ -18,6 +20,7 @@ export const Comments: React.FC<CommentsProps> = ({
   const { subscribe, publishComment, pubkey } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>(initialEvents ?? []);
   const [text, setText] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     if (initialEvents) return;
@@ -43,28 +46,62 @@ export const Comments: React.FC<CommentsProps> = ({
     return parentEventId ? parent === parentEventId : parent === undefined;
   });
 
+  const visibleReplies = replies.slice(0, visibleCount);
+
+  const CommentItem: React.FC<{ comment: NostrEvent }> = ({ comment }) => {
+    const [showChildren, setShowChildren] = useState(false);
+    const childCount = events.filter((evt) => {
+      const parent = evt.tags.find((t) => t[0] === 'e' && t[3] === 'reply')?.[1];
+      return parent === comment.id;
+    }).length;
+
+    return (
+      <div className="space-y-2">
+        <div className="rounded border p-2 flex items-start gap-2">
+          <span className="flex-1">{comment.content}</span>
+          <ReportButton target={comment.id} />
+          {pubkey === comment.pubkey && (
+            <DeleteButton
+              target={comment.id}
+              onDelete={() =>
+                setEvents((evts) => evts.filter((e) => e.id !== comment.id))
+              }
+            />
+          )}
+        </div>
+        {showChildren && (
+          <Comments bookId={bookId} parentEventId={comment.id} events={events} />
+        )}
+        {!showChildren && childCount > 0 && (
+          <button
+            onClick={() => setShowChildren(true)}
+            className="ml-4 text-sm text-primary-600"
+          >
+            Show replies ({childCount})
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={`${parentEventId ? 'ml-4' : ''} space-y-2`}>
       {replies.length === 0 && !parentEventId && (
         <p className="text-gray-500">No comments yet – be the first to reply!</p>
       )}
-      {replies.map((c) => (
-        <div key={c.id} className="space-y-2">
-          <div className="rounded border p-2 flex items-start gap-2">
-            <span className="flex-1">{c.content}</span>
-            <ReportButton target={c.id} />
-            {pubkey === c.pubkey && (
-              <DeleteButton
-                target={c.id}
-                onDelete={() =>
-                  setEvents((evts) => evts.filter((e) => e.id !== c.id))
-                }
-              />
-            )}
-          </div>
-          <Comments bookId={bookId} parentEventId={c.id} events={events} />
-        </div>
+      {visibleReplies.map((c) => (
+        <CommentItem key={c.id} comment={c} />
       ))}
+      {visibleCount < replies.length && (
+        <button
+          onClick={() =>
+            setVisibleCount((c) => Math.min(c + PAGE_SIZE, replies.length))
+          }
+          className="text-sm text-primary-600"
+        >
+          Show more
+        </button>
+      )}
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
