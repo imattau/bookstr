@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaAt, FaReply, FaUserPlus, FaBolt } from 'react-icons/fa';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { useNostr } from '../nostr';
+import { useEventStore } from '../store/events';
 
 type Notification = {
   id: string;
@@ -13,6 +14,7 @@ type Notification = {
 
 export const NotificationFeed: React.FC = () => {
   const { pubkey, subscribe } = useNostr();
+  const addEvent = useEventStore((s) => s.addEvent);
   const [items, setItems] = useState<Notification[]>([]);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export const NotificationFeed: React.FC = () => {
     offs.push(
       subscribe([{ kinds: [1], '#p': [pubkey], limit: 20 }], (evt) => {
         if (evt.pubkey === pubkey) return;
+        addEvent(evt);
         const isReply = evt.tags.some((t) => t[0] === 'e' && t[3] === 'reply');
         const bookId =
           evt.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1] ??
@@ -41,6 +44,7 @@ export const NotificationFeed: React.FC = () => {
     offs.push(
       subscribe([{ kinds: [3], '#p': [pubkey], limit: 20 }], (evt) => {
         if (evt.pubkey === pubkey) return;
+        addEvent(evt);
         setItems((n) =>
           n.find((x) => x.id === evt.id)
             ? n
@@ -56,6 +60,7 @@ export const NotificationFeed: React.FC = () => {
     offs.push(
       subscribe([{ kinds: [9735], '#p': [pubkey], limit: 20 }], (evt) => {
         if (evt.pubkey === pubkey) return;
+        addEvent(evt);
         const bookId = evt.tags.find((t) => t[0] === 'e')?.[1];
         const link = bookId ? `/book/${bookId}` : undefined;
         setItems((n) =>

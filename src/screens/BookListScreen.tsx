@@ -12,6 +12,7 @@ if (typeof window === 'undefined') {
 }
 import { useNavigate } from 'react-router-dom';
 import { useNostr } from '../nostr';
+import { useEventStore } from '../store/events';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { BookPublishWizard } from '../components/BookPublishWizard';
 
@@ -26,6 +27,7 @@ interface BookMeta {
 
 export const BookListScreen: React.FC = () => {
   const { subscribe, list, pubkey } = useNostr();
+  const { addEvents } = useEventStore((s) => ({ addEvents: s.addEvents }));
   const [books, setBooks] = useState<BookMeta[]>([]);
   const [cursor, setCursor] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,6 +49,7 @@ export const BookListScreen: React.FC = () => {
     const filters: Filter[] = [{ kinds: [41], limit: 10 }];
     if (cursor) filters[0].until = cursor;
     const events = (await list(filters)) as NostrEvent[];
+    addEvents(events);
     if (!events.length) {
       setLoading(false);
       return;
@@ -55,6 +58,7 @@ export const BookListScreen: React.FC = () => {
       .map((e) => e.tags.find((t) => t[0] === 'd')?.[1])
       .filter(Boolean) as string[];
     const zapEvents = await list([{ kinds: [9735], '#e': ids }]);
+    addEvents(zapEvents as NostrEvent[]);
     const zapCount: Record<string, number> = {};
     zapEvents.forEach((e) => {
       const id = e.tags.find((t) => t[0] === 'e')?.[1];
