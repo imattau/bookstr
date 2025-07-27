@@ -19,7 +19,13 @@ import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
-import { validatePrivKey } from './validatePrivKey';
+import {
+  loadKey,
+  importKey,
+  generateKey,
+  validatePrivKey,
+  saveKey,
+} from './lib/keys';
 import { initOfflineSync } from './lib/offlineSync';
 import { savePointer, getPointer } from './lib/cache';
 
@@ -136,6 +142,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   const [contacts, setContacts] = useState<string[]>([]);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [relays, setRelays] = useState<string[]>(DEFAULT_RELAYS);
+  const [keyError, setKeyError] = useState<boolean>(false);
   const relaysRef = useRef<string[]>(DEFAULT_RELAYS);
   useEffect(() => {
     relaysRef.current = relays;
@@ -151,9 +158,22 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const pool = poolRef.current;
     const storedPub = localStorage.getItem('pubKey');
-    if (storedPub) setPubkey(storedPub);
+    const rawPriv = localStorage.getItem('privKey');
+    const priv = loadKey();
     const nip07Flag = localStorage.getItem('nip07');
     setNip07(nip07Flag === '1');
+    if (priv) {
+      const pub = bytesToHex(schnorr.getPublicKey(hexToBytes(priv)));
+      if (storedPub && storedPub !== pub) {
+        setKeyError(true);
+      } else {
+        sessionPrivKey = priv;
+        setPubkey(pub);
+      }
+    } else {
+      if (rawPriv) setKeyError(true);
+      if (storedPub) setPubkey(storedPub);
+    }
     return () => pool.close(relaysRef.current);
   }, []);
 
@@ -243,20 +263,24 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       });
   }, [pubkey, relays]);
 
-  const login = (priv: string) => {
-    if (!validatePrivKey(priv)) {
+  const login = (raw: string) => {
+    const priv = importKey(raw);
+    if (!priv || !validatePrivKey(priv)) {
       throw new Error('invalid private key');
     }
     sessionPrivKey = priv;
+    saveKey(priv);
     const pub = getPublicKey(hexToBytes(priv));
     localStorage.setItem('pubKey', pub);
     localStorage.setItem('nip07', '0');
     setPubkey(pub);
     setNip07(false);
+    setKeyError(false);
   };
 
   const loginNip07 = (pub: string) => {
     sessionPrivKey = null;
+    localStorage.removeItem('privKey');
     setPubkey(pub);
     setNip07(true);
     localStorage.setItem('pubKey', pub);
@@ -267,6 +291,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     sessionPrivKey = null;
     localStorage.removeItem('pubKey');
     localStorage.removeItem('nip07');
+    localStorage.removeItem('privKey');
     setPubkey(null);
     setNip07(false);
   };
@@ -488,6 +513,24 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     } as any);
   }, [pubkey]);
 
+  const handleImportKey = () => {
+    const input = prompt('Enter your private key');
+    if (!input) return;
+    try {
+      login(input);
+      setKeyError(false);
+    } catch {
+      alert('Invalid key');
+    }
+  };
+
+  const handleGenerateKey = () => {
+    const priv = generateKey();
+    login(priv);
+    alert(`Your new private key:\n${priv}`);
+    setKeyError(false);
+  };
+
   return (
     <NostrContext.Provider
       value={{
@@ -512,6 +555,19 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       }}
     >
       {children}
+      {keyError && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2">
+          <div className="space-y-2 w-full max-w-sm rounded bg-[color:var(--clr-surface)] p-4">
+            <p className="text-sm">
+              Stored key is corrupted. Import your backup or generate a new one. Events signed with a new key cannot overwrite old ones.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button onClick={handleImportKey} className="rounded border px-3 py-1">Import key</button>
+              <button onClick={handleGenerateKey} className="rounded bg-primary-600 px-3 py-1 text-white">Generate new key</button>
+            </div>
+          </div>
+        </div>
+      )}
     </NostrContext.Provider>
   );
 };
