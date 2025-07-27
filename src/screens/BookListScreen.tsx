@@ -1,4 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import type {
+  ListChildComponentProps,
+  FixedSizeList as FixedSizeListType,
+} from 'react-window';
+let FixedSizeList: typeof FixedSizeListType;
+if (typeof window === 'undefined') {
+  (globalThis as any).process = { env: { NODE_ENV: 'production' } };
+  FixedSizeList = require('react-window').FixedSizeList;
+} else {
+  FixedSizeList = require('react-window').FixedSizeList;
+}
 import { useNavigate } from 'react-router-dom';
 import { useNostr } from '../nostr';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
@@ -40,7 +51,9 @@ export const BookListScreen: React.FC = () => {
       setLoading(false);
       return;
     }
-    const ids = events.map((e) => e.tags.find((t) => t[0] === 'd')?.[1]).filter(Boolean) as string[];
+    const ids = events
+      .map((e) => e.tags.find((t) => t[0] === 'd')?.[1])
+      .filter(Boolean) as string[];
     const zapEvents = await list([{ kinds: [9735], '#e': ids }]);
     const zapCount: Record<string, number> = {};
     zapEvents.forEach((e) => {
@@ -85,6 +98,30 @@ export const BookListScreen: React.FC = () => {
     navigate(`/book/${id}`);
   };
 
+  const ITEM_HEIGHT = 150;
+  const GAP = 8;
+  const Row = ({ index, style }: ListChildComponentProps) => {
+    const b = books[index];
+    if (!b) return null;
+    return (
+      <div
+        style={{ ...style, height: ITEM_HEIGHT }}
+        className="rounded border p-2 cursor-pointer"
+        onClick={() => navigate(`/book/${b.id}`)}
+      >
+        {b.cover && (
+          <img
+            src={b.cover}
+            alt={`Cover image for ${b.title}`}
+            className="h-24 w-auto"
+          />
+        )}
+        <h3 className="font-semibold">{b.title}</h3>
+        {b.summary && <p className="text-sm">{b.summary}</p>}
+      </div>
+    );
+  };
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -108,23 +145,16 @@ export const BookListScreen: React.FC = () => {
         {books.length === 0 && (
           <p className="text-center text-text-muted">No books found.</p>
         )}
-        {books.map((b) => (
-          <div
-            key={b.id}
-            className="rounded border p-2 cursor-pointer"
-            onClick={() => navigate(`/book/${b.id}`)}
+        {books.length > 0 && (
+          <FixedSizeList
+            height={Math.min(600, books.length * (ITEM_HEIGHT + GAP))}
+            itemCount={books.length}
+            itemSize={ITEM_HEIGHT + GAP}
+            width="100%"
           >
-            {b.cover && (
-              <img
-                src={b.cover}
-                alt={`Cover image for ${b.title}`}
-                className="h-24 w-auto"
-              />
-            )}
-            <h3 className="font-semibold">{b.title}</h3>
-            {b.summary && <p className="text-sm">{b.summary}</p>}
-          </div>
-        ))}
+            {Row}
+          </FixedSizeList>
+        )}
         <div className="pt-2">
           <button
             onClick={loadPage}
@@ -140,7 +170,10 @@ export const BookListScreen: React.FC = () => {
           <div className="space-y-2 rounded bg-[color:var(--clr-surface)] p-4 w-full max-w-sm">
             <BookPublishWizard onPublish={handlePublished} />
             <div className="flex justify-end pt-2">
-              <button onClick={() => setShow(false)} className="rounded border px-3 py-1">
+              <button
+                onClick={() => setShow(false)}
+                className="rounded border px-3 py-1"
+              >
                 Close
               </button>
             </div>
