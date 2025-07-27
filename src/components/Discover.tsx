@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { addEvent } from '../store/events';
@@ -8,8 +8,8 @@ import { BookCardSkeleton } from './BookCardSkeleton';
 import { OnboardingTooltip } from './OnboardingTooltip';
 import { logEvent } from '../analytics';
 import { CommunityFeed } from './CommunityFeed';
+import { Illustration } from './Illustration';
 
-const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
 export const Discover: React.FC = () => {
   const { subscribe, contacts } = useNostr();
@@ -95,6 +95,20 @@ export const Discover: React.FC = () => {
     (evt) => !evt.tags.some((t) => t[0] === 'book'),
   );
 
+  const tagOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const evt of bookEvents) {
+      evt.tags.forEach((t) => {
+        if (t[0] === 't') set.add(t[1]);
+      });
+    }
+    return ['All', ...Array.from(set).sort()];
+  }, [bookEvents]);
+
+  useEffect(() => {
+    if (!tagOptions.includes(tag)) setTag('All');
+  }, [tagOptions, tag]);
+
   const filtered = bookEvents.filter((evt) => {
     let ok = true;
     if (
@@ -131,18 +145,26 @@ export const Discover: React.FC = () => {
       <header className="flex items-center gap-[var(--space-2)] bg-primary-600 p-[var(--space-3)]">
         <h1 className="text-[18px] font-semibold text-white">Bookstr</h1>
         <OnboardingTooltip storageKey="discover-search" text="Search for books">
-          <div className="flex-1">
+          <div className="flex flex-1 items-center gap-1">
             <input
               value={search}
               onChange={(e) => updateSearch(e.target.value)}
               placeholder="Search"
               className="w-full rounded-[var(--radius-button)] border border-border p-[var(--space-2)] bg-[color:var(--clr-surface)] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)]"
             />
+            {search && (
+              <button
+                onClick={() => updateSearch('')}
+                className="rounded bg-primary-500 px-2 py-1 text-sm text-white"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </OnboardingTooltip>
       </header>
       <div className="flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]">
-        {TAGS.map((t) => (
+        {tagOptions.map((t) => (
           <button
             key={t}
             onClick={() => setTag(t)}
@@ -198,9 +220,9 @@ export const Discover: React.FC = () => {
         <h2 className="mb-2 font-semibold">Recommended for You</h2>
         <div className="grid grid-cols-1 gap-[var(--space-4)] lg:grid-cols-4">
           {noResults ? (
-            <p className="col-span-full text-center">
-              No matching books found.
-            </p>
+            <div className="col-span-full">
+              <Illustration text="No matching books found." />
+            </div>
           ) : recommended.length === 0 ? (
             Array.from({ length: 6 }).map((_, i) => (
               <BookCardSkeleton key={i} />
