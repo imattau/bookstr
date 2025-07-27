@@ -23,6 +23,7 @@ import ManageChaptersPage from './pages/ManageChapters';
 import { BookPublishWizard } from './components/BookPublishWizard';
 import { NotificationFeed } from './components/NotificationFeed';
 import ProfileSettingsPage from './pages/ProfileSettings';
+import DataExportPage from './pages/DataExport';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { ToastProvider } from './components/ToastProvider';
 
@@ -91,6 +92,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/activity" element={<NotificationFeed />} />
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/profile/settings" element={<ProfileSettingsPage />} />
+          <Route path="/export" element={<DataExportPage />} />
           <Route path="/books" element={<BookListScreen />} />
           <Route path="/book/:bookId" element={<BookDetailScreen />} />
           <Route path="/book/:bookId/chapters" element={<ManageChaptersPage />} />
