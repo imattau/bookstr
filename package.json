@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test/commentUtils.test.js && node test/commentsPlaceholder.test.js && node test/validatePrivKey.test.js && node test/auth.test.js && node test/actions.test.js && node test/registerSw.test.js && node test/bookListScreen.test.js && node test/bookDetailScreen.test.js && node test/bookDetailAuthorFilter.test.js && node test/discoverSearchNoMatch.test.js && node test/bookPublishToast.test.js && node test/bookPublishMeta.test.js && node test/reactionButtonToast.test.js && node test/repostButtonToast.test.js && node test/deleteButtonToast.test.js && node test/chapterEditorModalAuth.test.js && node test/validators.test.js",
+    "test": "node test/commentUtils.test.js && node test/commentsPlaceholder.test.js && node test/validatePrivKey.test.js && node test/auth.test.js && node test/actions.test.js && node test/registerSw.test.js && node test/bookListScreen.test.js && node test/bookDetailScreen.test.js && node test/bookDetailAuthorFilter.test.js && node test/discoverSearchNoMatch.test.js && node test/bookPublishToast.test.js && node test/bookPublishMeta.test.js && node test/reactionButtonToast.test.js && node test/repostButtonToast.test.js && node test/deleteButtonToast.test.js && node test/chapterEditorModalAuth.test.js && node test/validators.test.js && node test/api_action.test.js",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "dev": "vite",
