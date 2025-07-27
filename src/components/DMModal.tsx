@@ -1,4 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import type {
+  ListChildComponentProps,
+  FixedSizeList as FixedSizeListType,
+} from 'react-window';
+let FixedSizeList: typeof FixedSizeListType;
+if (typeof window === 'undefined') {
+  (globalThis as any).process = { env: { NODE_ENV: 'production' } };
+  FixedSizeList = require('react-window').FixedSizeList;
+} else {
+  FixedSizeList = require('react-window').FixedSizeList;
+}
 import type { Event as NostrEvent } from 'nostr-tools';
 import { useNostr, sendDM, getPrivKey } from '../nostr';
 import { OnboardingTooltip } from './OnboardingTooltip';
@@ -19,6 +30,26 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
   const { pubkey, subscribe } = ctx;
   const [msgs, setMsgs] = useState<Message[]>([]);
   const [text, setText] = useState('');
+
+  const ITEM_HEIGHT = 48;
+  const GAP = 8;
+
+  const Row = ({ index, style }: ListChildComponentProps) => {
+    const m = msgs[index];
+    if (!m) return null;
+    return (
+      <div
+        style={{ ...style, height: ITEM_HEIGHT, marginBottom: GAP }}
+        className={`rounded border p-2 ${
+          m.from === pubkey
+            ? 'self-end bg-primary-100'
+            : 'self-start bg-[color:var(--clr-surface-alt)]'
+        }`}
+      >
+        {m.text}
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (!pubkey) return;
@@ -41,7 +72,13 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
             if (!nostr?.nip04?.decrypt) return;
             plain = await nostr.nip04.decrypt(other, evt.content);
           }
-          setMsgs((m) => [...m, { id: evt.id, from: evt.pubkey, text: plain }]);
+          setMsgs((m) => {
+            const updated = [
+              ...m,
+              { id: evt.id, from: evt.pubkey, text: plain },
+            ];
+            return updated.slice(-100);
+          });
         })();
       },
     );
@@ -69,15 +106,17 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
             </button>
           )}
         </div>
-        <div className="flex-1 space-y-2 overflow-y-auto p-2">
-          {msgs.map((m) => (
-            <div
-              key={m.id}
-              className={`rounded border p-2 ${m.from === pubkey ? 'self-end bg-primary-100' : 'self-start bg-[color:var(--clr-surface-alt)]'}`}
+        <div className="flex-1 p-2">
+          {msgs.length > 0 && (
+            <FixedSizeList
+              height={Math.min(400, msgs.length * (ITEM_HEIGHT + GAP))}
+              itemCount={msgs.length}
+              itemSize={ITEM_HEIGHT + GAP}
+              width="100%"
             >
-              {m.text}
-            </div>
-          ))}
+              {Row}
+            </FixedSizeList>
+          )}
         </div>
         <div className="flex gap-2 border-t p-2">
           <input
