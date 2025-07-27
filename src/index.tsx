@@ -21,6 +21,7 @@ import { Library } from './components/Library';
 import { BookPublishWizard } from './components/BookPublishWizard';
 import { NotificationFeed } from './components/NotificationFeed';
 import { ProfileSettings } from './components/ProfileSettings';
+import { ToastProvider } from './components/ToastProvider';
 
 const AppRoutes: React.FC = () => {
   const navigate = useNavigate();
@@ -100,9 +101,11 @@ const AppRoutes: React.FC = () => {
 };
 
 export const App: React.FC = () => (
-  <ThemeProvider>
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  </ThemeProvider>
+  <ToastProvider>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </ThemeProvider>
+  </ToastProvider>
 );

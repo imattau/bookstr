@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
 import { useNostr, publishLongPost } from '../nostr';
+import { useToast } from './ToastProvider';
 import DOMPurify from 'dompurify';
 import { reportBookPublished } from '../achievements';
 
@@ -27,30 +28,36 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const next = () => setStep((s) => Math.min(4, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
 
+  const toast = useToast();
+
   const handlePublish = async () => {
-    const evt = await publishLongPost(
-      ctx,
-      {
-        title,
-        summary,
-        content,
-        cover: cover || undefined,
-        tags: tags
-          .split(',')
-          .map((t) => t.trim())
-          .filter(Boolean),
-      },
-      pow ? 20 : 0,
-    );
-    setStep(0);
-    setTitle('');
-    setSummary('');
-    setCover('');
-    setTags('');
-    setContent('');
-    setPow(false);
-    reportBookPublished();
-    if (onPublish) onPublish(evt.id);
+    try {
+      const evt = await publishLongPost(
+        ctx,
+        {
+          title,
+          summary,
+          content,
+          cover: cover || undefined,
+          tags: tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
+        },
+        pow ? 20 : 0,
+      );
+      setStep(0);
+      setTitle('');
+      setSummary('');
+      setCover('');
+      setTags('');
+      setContent('');
+      setPow(false);
+      reportBookPublished();
+      if (onPublish) onPublish(evt.id);
+    } catch {
+      toast('Failed to publish book.');
+    }
   };
 
   return (
