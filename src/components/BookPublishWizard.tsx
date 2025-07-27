@@ -20,6 +20,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [pow, setPow] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const previewHtml = useMemo(
     () => sanitizeHtml(marked.parse(content)),
     [content],
@@ -31,6 +32,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const toast = useToast();
 
   const handlePublish = async () => {
+    setPublishing(true);
     try {
       const evt = await publishLongPost(
         ctx,
@@ -69,8 +71,13 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
       setPow(false);
       reportBookPublished();
       if (onPublish) onPublish(evt.id);
+      toast(
+        `Book published! <a href="/book/${evt.id}">View book</a>`,
+      );
     } catch {
       toast('Failed to publish book.');
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -204,11 +211,17 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
             </button>
             <button
               onClick={handlePublish}
-              className="rounded bg-primary-600 px-4 py-2 text-white"
+              disabled={publishing}
+              className="rounded bg-primary-600 px-4 py-2 text-white disabled:opacity-50"
             >
-              Publish
+              {publishing ? 'Publishing...' : 'Publish'}
             </button>
           </div>
+          {publishing && (
+            <div className="flex justify-center pt-2">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-600 border-t-transparent" />
+            </div>
+          )}
         </div>
       )}
     </div>
