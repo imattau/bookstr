@@ -25,11 +25,11 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="flex h-full w-full flex-col bg-[color:var(--clr-surface)] sm:m-4 sm:max-w-[360px] sm:rounded-[8px]">
+      <div className="flex h-full w-full flex-col bg-[color:var(--clr-surface)] sm:m-[var(--space-4)] sm:max-w-[360px] sm:rounded-card">
         <div className="relative">
           <div className="h-1 w-full bg-border">
             <div
-              className="h-full bg-primary-600"
+              className="h-full bg-[color:var(--clr-primary-600)]"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -38,7 +38,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           </span>
         </div>
         <div
-          className="flex items-center justify-between px-4"
+          className="flex items-center justify-between px-[var(--space-4)]"
           style={{ height: 48 }}
         >
           <button
@@ -68,7 +68,7 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           </div>
         </div>
           <div
-            className="flex-1 overflow-y-auto px-4 py-2 text-[color:var(--clr-text)]"
+          className="flex-1 overflow-y-auto px-[var(--space-4)] py-[var(--space-2)] text-[color:var(--clr-text)]"
             style={{ fontFamily: 'Georgia,serif', fontSize, lineHeight: '24px' }}
           >
           <ReaderView
@@ -82,20 +82,20 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
           />
           <Notes bookId={bookId} />
         </div>
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-[var(--space-4)] py-[var(--space-3)]">
           <button
             onClick={() => {
               finishBook(bookId);
               queueAction({ type: 'finish', id: bookId });
               onClose();
             }}
-            className="rounded-[6px] bg-border px-4 py-2 text-[14px] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            className="rounded-[var(--radius-button)] bg-border px-[var(--space-4)] py-[var(--space-2)] text-[14px] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
           >
             Mark as finished
           </button>
           <button
             aria-label="Home"
-            className="flex h-10 w-10 items-center justify-center rounded-[6px] bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-button)] bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
           >
             🏠
           </button>

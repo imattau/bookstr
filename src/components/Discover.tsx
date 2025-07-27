@@ -142,7 +142,7 @@ export const Discover: React.FC = () => {
 
   return (
     <div className="pb-[var(--space-4)]">
-      <header className="flex items-center gap-[var(--space-2)] bg-primary-600 p-[var(--space-3)]">
+      <header className="flex items-center gap-[var(--space-2)] bg-[color:var(--clr-primary-600)] p-[var(--space-3)]">
         <h1 className="text-[18px] font-semibold text-white">Bookstr</h1>
         <OnboardingTooltip storageKey="discover-search" text="Search for books">
           <div className="flex flex-1 items-center gap-1">
@@ -155,7 +155,7 @@ export const Discover: React.FC = () => {
             {search && (
               <button
                 onClick={() => updateSearch('')}
-                className="rounded bg-primary-500 px-2 py-1 text-sm text-white"
+                className="rounded bg-primary-500 px-[var(--space-2)] py-[var(--space-1)] text-sm text-white"
               >
                 Clear
               </button>
@@ -172,8 +172,8 @@ export const Discover: React.FC = () => {
             aria-label={t}
             className={`btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] ${
               tag === t
-                ? 'bg-primary-600 text-white'
-                : 'border border-border text-primary-600 bg-[color:var(--clr-surface)]'
+                ? 'bg-[color:var(--clr-primary-600)] text-white'
+                : 'border border-border text-[color:var(--clr-primary-600)] bg-[color:var(--clr-surface)]'
             }`}
           >
             {t}

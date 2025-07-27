@@ -23,28 +23,28 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   'data-testid': dataTestId,
 }) => (
   <div
-    className={`flex items-center justify-between gap-2 p-2 ${className ?? ''}`}
+    className={`flex items-center justify-between gap-2 p-[var(--space-2)] ${className ?? ''}`}
     data-testid={dataTestId}
   >
-    <button onClick={onBack} aria-label="Back" className="px-2">
+    <button onClick={onBack} aria-label="Back" className="px-[var(--space-2)]">
       Back
     </button>
     <div className="flex-1 text-center truncate">{title}</div>
     <button
       onClick={() => onFontSize(1)}
       aria-label="Increase font"
-      className="px-2"
+      className="px-[var(--space-2)]"
     >
       A+
     </button>
     <button
       onClick={() => onFontSize(-1)}
       aria-label="Decrease font"
-      className="px-2"
+      className="px-[var(--space-2)]"
     >
       A-
     </button>
-    <button onClick={onToggleTheme} aria-label="Toggle theme" className="px-2">
+    <button onClick={onToggleTheme} aria-label="Toggle theme" className="px-[var(--space-2)]">
       Theme
     </button>
     <button
@@ -53,7 +53,7 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
         onBookmark();
       }}
       aria-label="Bookmark"
-      className="px-2"
+      className="px-[var(--space-2)]"
     >
       ★
     </button>

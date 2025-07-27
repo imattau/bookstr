@@ -54,17 +54,17 @@ export const Notes: React.FC<NotesProps> = ({ bookId }) => {
         className="w-full rounded border p-2"
         placeholder="Add a note"
       />
-      <div className="flex gap-2">
-        <button
-          onClick={() => handleSave(false)}
-          className="rounded bg-primary-600 px-3 py-1 text-white"
-        >
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleSave(false)}
+            className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white"
+          >
           Save
         </button>
-        <button
-          onClick={() => handleSave(true)}
-          className="rounded bg-primary-600 px-3 py-1 text-white"
-        >
+          <button
+            onClick={() => handleSave(true)}
+            className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white"
+          >
           Publish
         </button>
       </div>

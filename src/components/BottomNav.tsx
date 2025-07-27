@@ -25,8 +25,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   className,
   'data-testid': dataTestId,
 }) => (
-  <nav
-    className={`flex justify-around border-t bg-[color:var(--clr-surface-alt)] ${className ?? ''}`}
+    <nav
+      className={`flex justify-around border-t bg-[color:var(--clr-surface-alt)] ${className ?? ''}`}
     data-testid={dataTestId}
   >
     {items.map(({ key, label, Icon }) => (
@@ -36,7 +36,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         onClick={() => onChange(key)}
         aria-pressed={active === key}
         aria-label={label}
-        className="flex flex-col items-center py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+        className="flex flex-col items-center py-[var(--space-2)] text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         <Icon className="text-xl" aria-hidden="true" />
         <span>{label}</span>

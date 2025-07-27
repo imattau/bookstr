@@ -82,14 +82,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
 
   if (pubkey) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2">
-        <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]">
+          <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
           <p className="text-sm break-all">Logged in as {pubkey}</p>
           <div className="flex justify-end gap-2">
-            <button onClick={logout} className="rounded border px-3 py-1">
+              <button onClick={logout} className="rounded border px-[var(--space-3)] py-[var(--space-1)]">
               Logout
             </button>
-            <button onClick={onClose} className="rounded bg-primary-600 px-3 py-1 text-white">
+              <button onClick={onClose} className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white">
               Close
             </button>
           </div>
@@ -99,24 +99,24 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2">
-      <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]">
+        <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
         <div className="flex gap-2">
           <button
             onClick={() => setTab('priv')}
-            className={`flex-1 rounded border px-2 py-1 ${tab === 'priv' ? 'bg-border' : ''}`}
+            className={`flex-1 rounded border px-[var(--space-2)] py-[var(--space-1)] ${tab === 'priv' ? 'bg-border' : ''}`}
           >
             Private Key
           </button>
           <button
             onClick={() => setTab('nip07')}
-            className={`flex-1 rounded border px-2 py-1 ${tab === 'nip07' ? 'bg-border' : ''}`}
+            className={`flex-1 rounded border px-[var(--space-2)] py-[var(--space-1)] ${tab === 'nip07' ? 'bg-border' : ''}`}
           >
             NIP-07
           </button>
           <button
             onClick={() => setTab('remote')}
-            className={`flex-1 rounded border px-2 py-1 ${tab === 'remote' ? 'bg-border' : ''}`}
+            className={`flex-1 rounded border px-[var(--space-2)] py-[var(--space-1)] ${tab === 'remote' ? 'bg-border' : ''}`}
           >
             Remote
           </button>
@@ -127,13 +127,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
               value={privInput}
               onChange={(e) => setPrivInput(e.target.value)}
               placeholder="nsec or hex"
-              className="w-full rounded border p-2"
+              className="w-full rounded border p-[var(--space-2)]"
             />
             {privError && <p className="text-red-600 text-sm">{privError}</p>}
             <button
               onClick={handlePrivLogin}
               disabled={!isPrivValid || loading}
-              className="w-full rounded bg-primary-600 px-3 py-1 text-white disabled:opacity-50"
+              className="w-full rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white disabled:opacity-50"
             >
               Login
             </button>
@@ -146,7 +146,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
             <button
               onClick={handleWalletLogin}
               disabled={!hasWallet || loading}
-              className="w-full rounded bg-primary-600 px-3 py-1 text-white disabled:opacity-50"
+              className="w-full rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white disabled:opacity-50"
             >
               Connect Wallet
             </button>
@@ -158,26 +158,26 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
               value={remoteUrl}
               onChange={(e) => setRemoteUrl(e.target.value)}
               placeholder="Signer URL"
-              className="w-full rounded border p-2"
+              className="w-full rounded border p-[var(--space-2)]"
             />
             <input
               value={remoteToken}
               onChange={(e) => setRemoteToken(e.target.value)}
               placeholder="Auth token"
-              className="w-full rounded border p-2"
+              className="w-full rounded border p-[var(--space-2)]"
             />
             {remoteError && <p className="text-red-600 text-sm">{remoteError}</p>}
             <button
               onClick={handleRemoteLogin}
               disabled={!isRemoteValid || loading}
-              className="w-full rounded bg-primary-600 px-3 py-1 text-white disabled:opacity-50"
+              className="w-full rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white disabled:opacity-50"
             >
               Connect
             </button>
           </div>
         )}
         <div className="flex justify-end">
-          <button onClick={onClose} className="rounded px-3 py-1 border">
+          <button onClick={onClose} className="rounded px-[var(--space-3)] py-[var(--space-1)] border">
             Close
           </button>
         </div>
