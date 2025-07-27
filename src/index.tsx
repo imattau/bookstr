@@ -16,6 +16,7 @@ import { DMModal } from './components/DMModal';
 import { useNostr } from './nostr';
 import { BookListScreen } from './screens/BookListScreen';
 import { BookDetailScreen } from './screens/BookDetailScreen';
+import { ReaderScreen } from './screens/ReaderScreen';
 import { Discover } from './components/Discover';
 import { Library } from './components/Library';
 import { BookPublishWizard } from './components/BookPublishWizard';
@@ -89,6 +90,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/profile" element={<ProfileSettings />} />
           <Route path="/books" element={<BookListScreen />} />
           <Route path="/book/:bookId" element={<BookDetailScreen />} />
+          <Route path="/read/:bookId" element={<ReaderScreen />} />
           <Route path="*" element={<Navigate to="/discover" />} />
         </Routes>
       </main>
