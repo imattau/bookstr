@@ -105,6 +105,9 @@ export const BookListScreen: React.FC = () => {
         </button>
       </div>
       <div className="space-y-2">
+        {books.length === 0 && (
+          <p className="text-center text-text-muted">No books found.</p>
+        )}
         {books.map((b) => (
           <div
             key={b.id}
