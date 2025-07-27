@@ -6,7 +6,7 @@ import {
   Draggable,
   DropResult,
 } from '@hello-pangea/dnd';
-import { useNostr } from '../nostr';
+import { useNostr, fetchLongPostParts } from '../nostr';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { BookMetadataEditor } from '../components/BookMetadataEditor';
 import { DeleteButton } from '../components/DeleteButton';
@@ -15,11 +15,13 @@ interface ChapterEvent {
   id: string;
   title: string;
   summary: string;
+  content: string;
 }
 
 export const BookDetailScreen: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
-  const { subscribe, publish, pubkey } = useNostr();
+  const ctx = useNostr();
+  const { subscribe, publish, list, pubkey } = ctx;
   const [authorPubkey, setAuthorPubkey] = useState<string | null>(null);
   const [meta, setMeta] = useState<{
     title: string;
@@ -79,18 +81,20 @@ export const BookDetailScreen: React.FC = () => {
 
   useEffect(() => {
     if (!chapterIds.length) return undefined;
-    const off = subscribe([{ ids: chapterIds }], (evt) => {
+    const off = subscribe([{ ids: chapterIds }], async (evt) => {
+      const content = await fetchLongPostParts(ctx, evt);
       setChapters((c) => ({
         ...c,
         [evt.id]: {
           id: evt.id,
           title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
           summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
+          content,
         },
       }));
     });
     return off;
-  }, [subscribe, chapterIds]);
+  }, [subscribe, chapterIds, ctx]);
 
   const handleDragEnd = async (res: DropResult) => {
     if (pubkey !== authorPubkey) return;
