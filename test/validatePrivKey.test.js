@@ -1,6 +1,6 @@
 require('ts-node/register');
 const assert = require('assert');
-const { validatePrivKey } = require('../src/validatePrivKey');
+const { validatePrivKey } = require('../src/lib/keys');
 
 assert.strictEqual(validatePrivKey('a'.repeat(63)), false);
 assert.strictEqual(validatePrivKey('g'.repeat(64)), false);
