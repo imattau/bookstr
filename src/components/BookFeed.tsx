@@ -3,11 +3,10 @@ import { useNostr } from '../nostr';
 import { BookCard } from './BookCard';
 import { BookCardSkeleton } from './BookCardSkeleton';
 import type { Event as NostrEvent } from 'nostr-tools';
-import { useEventStore } from '../store/events';
+import { addEvent } from '../store/events';
 
 export const BookFeed: React.FC = () => {
   const { subscribe } = useNostr();
-  const addEvent = useEventStore((s) => s.addEvent);
   const [events, setEvents] = useState<
     (NostrEvent & { repostedBy?: string })[]
   >([]);

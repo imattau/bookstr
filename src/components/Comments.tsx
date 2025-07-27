@@ -3,7 +3,7 @@ import { useNostr } from '../nostr';
 import { DeleteButton } from './DeleteButton';
 import { ReportButton } from './ReportButton';
 import type { Event as NostrEvent } from 'nostr-tools';
-import { useEventStore } from '../store/events';
+import { addEvent, addEvents } from '../store/events';
 
 const PAGE_SIZE = 5;
 
@@ -19,10 +19,6 @@ export const Comments: React.FC<CommentsProps> = ({
   events: initialEvents,
 }) => {
   const { subscribe, publishComment, pubkey } = useNostr();
-  const { addEvent, addEvents } = useEventStore((s) => ({
-    addEvent: s.addEvent,
-    addEvents: s.addEvents,
-  }));
   const [events, setEvents] = useState<NostrEvent[]>(initialEvents ?? []);
   const [text, setText] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -37,7 +33,7 @@ export const Comments: React.FC<CommentsProps> = ({
       setEvents((c) => (c.find((e) => e.id === evt.id) ? c : [...c, evt]));
     });
     return off;
-  }, [subscribe, bookId, initialEvents, addEvent, addEvents]);
+  }, [subscribe, bookId, initialEvents]);
 
   const handleSend = async () => {
     const content = text.trim();

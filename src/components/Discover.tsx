@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
-import { useEventStore } from '../store/events';
+import { addEvent } from '../store/events';
 import { useSearchParams } from 'react-router-dom';
 import { BookCard } from './BookCard';
 import { BookCardSkeleton } from './BookCardSkeleton';
@@ -13,7 +13,6 @@ const TAGS = ['All', 'Fiction', 'Mystery', 'Fantasy'];
 
 export const Discover: React.FC = () => {
   const { subscribe, contacts } = useNostr();
-  const { addEvent } = useEventStore((s) => ({ addEvent: s.addEvent }));
   const [params, setParams] = useSearchParams();
   const [events, setEvents] = useState<
     (NostrEvent & { repostedBy?: string })[]

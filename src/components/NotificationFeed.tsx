@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaAt, FaReply, FaUserPlus, FaBolt } from 'react-icons/fa';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { useNostr } from '../nostr';
-import { useEventStore } from '../store/events';
+import { addEvent } from '../store/events';
 
 type Notification = {
   id: string;
@@ -14,7 +14,6 @@ type Notification = {
 
 export const NotificationFeed: React.FC = () => {
   const { pubkey, subscribe } = useNostr();
-  const addEvent = useEventStore((s) => s.addEvent);
   const [items, setItems] = useState<Notification[]>([]);
 
   useEffect(() => {
