@@ -1,4 +1,6 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { FaChevronLeft } from 'react-icons/fa';
 
 export interface HeaderProps {
   onSearch: (q: string) => void;
@@ -25,6 +27,9 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [q, setQ] = React.useState('');
   const [active, setActive] = React.useState(-1);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const nested = location.pathname.split('/').filter(Boolean).length > 1;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!suggestions || suggestions.length === 0) return;
@@ -43,6 +48,15 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className={className} data-testid={dataTestId} role="search">
+      {nested && (
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Back"
+          className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+        >
+          <FaChevronLeft />
+        </button>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
