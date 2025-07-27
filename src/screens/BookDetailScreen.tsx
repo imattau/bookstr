@@ -9,6 +9,7 @@ import {
 import { useNostr } from '../nostr';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { BookMetadataEditor } from '../components/BookMetadataEditor';
+import { DeleteButton } from '../components/DeleteButton';
 
 interface ChapterEvent {
   id: string;
@@ -27,6 +28,7 @@ export const BookDetailScreen: React.FC = () => {
     tags: string[];
   } | null>(null);
   const [chapterIds, setChapterIds] = useState<string[]>([]);
+  const [listId, setListId] = useState<string | null>(null);
   const [chapters, setChapters] = useState<Record<string, ChapterEvent>>({});
   const [modalData, setModalData] = useState<{
     id?: string;
@@ -69,6 +71,7 @@ export const BookDetailScreen: React.FC = () => {
       (evt) => {
         const ids = evt.tags.filter((t) => t[0] === 'e').map((t) => t[1]);
         setChapterIds(ids);
+        setListId(evt.id);
       },
     );
     return off;
@@ -98,6 +101,21 @@ export const BookDetailScreen: React.FC = () => {
     setChapterIds(items);
     const tags = [['d', bookId!], ...items.map((id) => ['e', id])];
     await publish({ kind: 30001, content: '', tags });
+  };
+
+  const handleDeleteBook = async () => {
+    if (!listId) return;
+    try {
+      await publish({
+        kind: 5,
+        content: '',
+        tags: [['e', listId], ...chapterIds.map((id) => ['e', id])],
+      });
+      setChapterIds([]);
+      setChapters({});
+    } catch {
+      /* ignore */
+    }
   };
 
   return (
@@ -131,6 +149,12 @@ export const BookDetailScreen: React.FC = () => {
           >
             Add Chapter
           </button>
+          <button
+            onClick={handleDeleteBook}
+            className="rounded border px-3 py-1 text-red-600"
+          >
+            Delete Book
+          </button>
         </div>
       )}
       <DragDropContext onDragEnd={canEdit ? handleDragEnd : () => {}}>
@@ -158,16 +182,33 @@ export const BookDetailScreen: React.FC = () => {
                         ref={p.innerRef}
                         {...p.draggableProps}
                         {...p.dragHandleProps}
-                        className={`rounded border p-2${canEdit ? ' cursor-pointer' : ''}`}
+                        className={`rounded border p-2 flex items-start gap-2${canEdit ? ' cursor-pointer' : ''}`}
                         onClick={() =>
                           canEdit &&
                           setModalData({ id, number: index + 1 })
                         }
                       >
-                        <h3 className="font-semibold">
-                          {ch?.title || 'Chapter'}
-                        </h3>
-                        {ch?.summary && <p className="text-sm">{ch.summary}</p>}
+                        <div className="flex-1">
+                          <h3 className="font-semibold">
+                            {ch?.title || 'Chapter'}
+                          </h3>
+                          {ch?.summary && <p className="text-sm">{ch.summary}</p>}
+                        </div>
+                        {canEdit && (
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <DeleteButton
+                              target={id}
+                              onDelete={() => {
+                                setChapterIds((c) => c.filter((x) => x !== id));
+                                setChapters((c) => {
+                                  const copy = { ...c };
+                                  delete copy[id];
+                                  return copy;
+                                });
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </Draggable>
