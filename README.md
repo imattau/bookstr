@@ -54,6 +54,8 @@ Open the profile settings from the library screen to configure the app:
 
 For a step-by-step guide on using the book publishing wizard, see
 [docs/first_publish.md](docs/first_publish.md).
+To learn more about sending lightning zaps, read
+[docs/zapping.md](docs/zapping.md).
 
 The build setup is now complete and consists of the following steps:
 
