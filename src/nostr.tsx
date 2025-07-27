@@ -29,21 +29,37 @@ import {
 import { initOfflineSync } from './lib/offlineSync';
 import { savePointer, getPointer } from './lib/cache';
 
-const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as string | undefined)
+const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
+  | string
+  | undefined)
   ? ((import.meta as any).env.VITE_RELAY_URLS as string)
       .split(',')
       .map((r) => r.trim())
       .filter(Boolean)
-  : [
-      'wss://relay.damus.io',
-      'wss://relay.primal.net',
-      'wss://nostr.wine',
-    ];
+  : ['wss://relay.damus.io', 'wss://relay.primal.net', 'wss://nostr.wine'];
 
 const encoder = new TextEncoder();
 
 // Maximum size for long-form event content in bytes
-export const MAX_EVENT_SIZE = 1000;
+export let MAX_EVENT_SIZE = 1000;
+try {
+  const stored = localStorage.getItem('max-event-size');
+  if (stored) {
+    const num = parseInt(stored, 10);
+    if (!Number.isNaN(num) && num > 0) MAX_EVENT_SIZE = num;
+  }
+} catch {
+  /* ignore */
+}
+
+export function setMaxEventSize(size: number) {
+  MAX_EVENT_SIZE = size;
+  try {
+    localStorage.setItem('max-event-size', String(size));
+  } catch {
+    /* ignore */
+  }
+}
 
 // Prevent endless proof-of-work loops from freezing the browser
 const MAX_POW_TIME_MS = 5000;
@@ -176,7 +192,6 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     return () => pool.close(relaysRef.current);
   }, []);
-
 
   useEffect(() => {
     if (!pubkey) {
@@ -366,19 +381,24 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         const ptr = await getPointer(d);
         if (!ptr) return f;
         try {
-          const [evt] = (await poolRef.current.list(relaysRef.current, [{ ids: [ptr] }])) as NostrEvent[];
+          const [evt] = (await poolRef.current.list(relaysRef.current, [
+            { ids: [ptr] },
+          ])) as NostrEvent[];
           if (evt) return { ...f, since: evt.created_at } as Filter;
         } catch {
           /* ignore */
         }
         return f;
-      })
+      }),
     );
   };
 
   const list = async (filters: Filter[]) => {
     const final = await applyPointers(filters);
-    const evts = (await poolRef.current.list(relaysRef.current, final)) as NostrEvent[];
+    const evts = (await poolRef.current.list(
+      relaysRef.current,
+      final,
+    )) as NostrEvent[];
     evts.forEach((e) => {
       const d = e.tags.find((t) => t[0] === 'd')?.[1];
       if (d) savePointer(d, e.id);
@@ -559,11 +579,22 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2">
           <div className="space-y-2 w-full max-w-sm rounded bg-[color:var(--clr-surface)] p-4">
             <p className="text-sm">
-              Stored key is corrupted. Import your backup or generate a new one. Events signed with a new key cannot overwrite old ones.
+              Stored key is corrupted. Import your backup or generate a new one.
+              Events signed with a new key cannot overwrite old ones.
             </p>
             <div className="flex justify-end gap-2">
-              <button onClick={handleImportKey} className="rounded border px-3 py-1">Import key</button>
-              <button onClick={handleGenerateKey} className="rounded bg-primary-600 px-3 py-1 text-white">Generate new key</button>
+              <button
+                onClick={handleImportKey}
+                className="rounded border px-3 py-1"
+              >
+                Import key
+              </button>
+              <button
+                onClick={handleGenerateKey}
+                className="rounded bg-primary-600 px-3 py-1 text-white"
+              >
+                Generate new key
+              </button>
             </div>
           </div>
         </div>
@@ -698,9 +729,7 @@ export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
   const priv = sessionPrivKey;
   let cipher: string;
   if (priv) {
-    cipher = await (
-      await import('nostr-tools')
-    ).nip04.encrypt(priv, to, text);
+    cipher = await (await import('nostr-tools')).nip04.encrypt(priv, to, text);
   } else {
     const nostr = (window as any).nostr;
     if (!nostr?.nip04?.encrypt) throw new Error('not logged in');

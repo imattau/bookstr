@@ -11,6 +11,8 @@ export interface SettingsState {
   yearlyGoal: number;
   reduceMotion: boolean;
   theme: import('./ThemeProvider').Theme;
+  advancedMode: boolean;
+  maxEventSize: number;
   setTextSize: (size: number) => void;
   setDensity: (d: Density) => void;
   setOfflineMaxBooks: (n: number) => void;
@@ -18,6 +20,8 @@ export interface SettingsState {
   setYearlyGoal: (n: number) => void;
   setReduceMotion: (v: boolean) => void;
   setTheme: (t: import('./ThemeProvider').Theme) => void;
+  setAdvancedMode: (v: boolean) => void;
+  setMaxEventSize: (n: number) => void;
   hydrate: (
     data: Partial<
       Pick<
@@ -29,6 +33,8 @@ export interface SettingsState {
         | 'yearlyGoal'
         | 'reduceMotion'
         | 'theme'
+        | 'advancedMode'
+        | 'maxEventSize'
       >
     >,
   ) => void;
@@ -44,6 +50,8 @@ export const useSettings = create<SettingsState>()(
       yearlyGoal: 12,
       reduceMotion: false,
       theme: 'default',
+      advancedMode: false,
+      maxEventSize: 1000,
       setTextSize: (textSize) => set({ textSize }),
       setDensity: (density) => set({ density }),
       setOfflineMaxBooks: (offlineMaxBooks) => set({ offlineMaxBooks }),
@@ -51,6 +59,8 @@ export const useSettings = create<SettingsState>()(
       setYearlyGoal: (yearlyGoal) => set({ yearlyGoal }),
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
       setTheme: (theme) => set({ theme }),
+      setAdvancedMode: (advancedMode) => set({ advancedMode }),
+      setMaxEventSize: (maxEventSize) => set({ maxEventSize }),
       hydrate: (data) => set(data),
     }),
     { name: 'settings-store' },
