@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNostr } from '../nostr';
+import { useToast } from './ToastProvider';
 
 interface Props {
   bookId: string;
   chapterNumber: number;
   chapterId?: string;
+  authorPubkey: string;
   onClose: () => void;
 }
 
@@ -12,9 +14,11 @@ export const ChapterEditorModal: React.FC<Props> = ({
   bookId,
   chapterNumber,
   chapterId,
+  authorPubkey,
   onClose,
 }) => {
   const { publish, subscribe, pubkey } = useNostr();
+  const toast = useToast();
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [cover, setCover] = useState('');
@@ -38,6 +42,10 @@ export const ChapterEditorModal: React.FC<Props> = ({
   }, [chapterId, subscribe]);
 
   const handleSave = async () => {
+    if (pubkey !== authorPubkey) {
+      toast('Action failed', { type: 'error' });
+      return;
+    }
     const chTags: string[][] = [
       ['book', bookId],
       ['chapter', String(chapterNumber)],
@@ -56,7 +64,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
     if (pubkey) {
       await new Promise<void>((resolve) => {
         const off = subscribe(
-          [{ kinds: [30001], authors: [pubkey], '#d': [bookId], limit: 1 }],
+          [{ kinds: [30001], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
           (e) => {
             listEvt = e;
             off();

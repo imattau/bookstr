@@ -17,7 +17,8 @@ interface ChapterEvent {
 
 export const BookDetailScreen: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
-  const { subscribe, publish } = useNostr();
+  const { subscribe, publish, pubkey } = useNostr();
+  const [authorPubkey, setAuthorPubkey] = useState<string | null>(null);
   const [meta, setMeta] = useState<{
     title: string;
     summary: string;
@@ -29,11 +30,23 @@ export const BookDetailScreen: React.FC = () => {
     id?: string;
     number: number;
   } | null>(null);
+  const canEdit = pubkey && authorPubkey && pubkey === authorPubkey;
 
   useEffect(() => {
     if (!bookId) return undefined;
     const off = subscribe(
-      [{ kinds: [41], '#d': [bookId], limit: 1 }],
+      [{ kinds: [30023], ids: [bookId], limit: 1 }],
+      (evt) => {
+        setAuthorPubkey(evt.pubkey);
+      },
+    );
+    return off;
+  }, [subscribe, bookId]);
+
+  useEffect(() => {
+    if (!bookId || !authorPubkey) return undefined;
+    const off = subscribe(
+      [{ kinds: [41], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
       (evt) => {
         setMeta({
           title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
@@ -43,19 +56,19 @@ export const BookDetailScreen: React.FC = () => {
       },
     );
     return off;
-  }, [subscribe, bookId]);
+  }, [subscribe, bookId, authorPubkey]);
 
   useEffect(() => {
-    if (!bookId) return undefined;
+    if (!bookId || !authorPubkey) return undefined;
     const off = subscribe(
-      [{ kinds: [30001], '#d': [bookId], limit: 1 }],
+      [{ kinds: [30001], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
       (evt) => {
         const ids = evt.tags.filter((t) => t[0] === 'e').map((t) => t[1]);
         setChapterIds(ids);
       },
     );
     return off;
-  }, [subscribe, bookId]);
+  }, [subscribe, bookId, authorPubkey]);
 
   useEffect(() => {
     if (!chapterIds.length) return undefined;
@@ -73,6 +86,7 @@ export const BookDetailScreen: React.FC = () => {
   }, [subscribe, chapterIds]);
 
   const handleDragEnd = async (res: DropResult) => {
+    if (pubkey !== authorPubkey) return;
     if (!res.destination) return;
     const items = Array.from(chapterIds);
     const [moved] = items.splice(res.source.index, 1);
@@ -102,7 +116,8 @@ export const BookDetailScreen: React.FC = () => {
           onClick={() =>
             setModalData({ number: chapterIds.length + 1 })
           }
-          className="rounded bg-primary-600 px-3 py-1 text-white"
+          disabled={!canEdit}
+          className="rounded bg-primary-600 px-3 py-1 text-white disabled:opacity-50"
         >
           Add Chapter
         </button>
@@ -121,7 +136,12 @@ export const BookDetailScreen: React.FC = () => {
               {chapterIds.map((id, index) => {
                 const ch = chapters[id];
                 return (
-                  <Draggable key={id} draggableId={id} index={index}>
+                  <Draggable
+                    key={id}
+                    draggableId={id}
+                    index={index}
+                    isDragDisabled={!canEdit}
+                  >
                     {(p) => (
                       <div
                         ref={p.innerRef}
@@ -151,6 +171,7 @@ export const BookDetailScreen: React.FC = () => {
           bookId={bookId}
           chapterNumber={modalData.number}
           chapterId={modalData.id}
+          authorPubkey={authorPubkey ?? ''}
           onClose={() => setModalData(null)}
         />
       )}
