@@ -491,6 +491,20 @@ export async function publishLongPost(
   );
 }
 
+export async function publishBookMeta(
+  ctx: NostrContextValue,
+  bookId: string,
+  meta: { title?: string; summary?: string; cover?: string; tags?: string[] },
+  pow = 0,
+) {
+  const tags: string[][] = [['d', bookId]];
+  if (meta.title) tags.push(['title', meta.title]);
+  if (meta.summary) tags.push(['summary', meta.summary]);
+  if (meta.cover) tags.push(['image', meta.cover]);
+  meta.tags?.forEach((t) => tags.push(['t', t]));
+  return ctx.publish({ kind: 41, content: '', tags }, undefined, pow);
+}
+
 export async function publishVote(ctx: NostrContextValue, target: string) {
   return ctx.publish({ kind: 7, content: '+', tags: [['e', target]] });
 }
