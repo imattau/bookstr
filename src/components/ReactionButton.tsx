@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaThumbsUp, FaStar } from 'react-icons/fa';
-import { useNostr, publishVote, publishFavourite } from '../nostr';
-import { queueOfflineEdit } from '../lib/offlineSync';
+import { useNostr } from '../nostr';
+import { publishVote, publishFavourite } from '../nostr/events';
+import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 import type { Event as NostrEvent } from 'nostr-tools';
 

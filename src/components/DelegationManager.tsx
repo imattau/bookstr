@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createDelegationTag, getPrivKey } from '../nostr';
+import { createDelegationTag, getPrivKey } from '../nostr/auth';
 import { OnboardingTooltip } from './OnboardingTooltip';
 
 /**

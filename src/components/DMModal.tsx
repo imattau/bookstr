@@ -11,7 +11,9 @@ if (typeof window === 'undefined') {
   FixedSizeList = require('react-window').FixedSizeList;
 }
 import type { Event as NostrEvent } from 'nostr-tools';
-import { useNostr, sendDM, getPrivKey } from '../nostr';
+import { useNostr } from '../nostr';
+import { sendDM } from '../nostr/events';
+import { getPrivKey } from '../nostr/auth';
 import { OnboardingTooltip } from './OnboardingTooltip';
 
 interface Message {

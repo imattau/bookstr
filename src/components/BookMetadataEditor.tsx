@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNostr, publishBookMeta } from '../nostr';
-import { queueOfflineEdit } from '../lib/offlineSync';
+import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 
 export interface BookMetadataEditorProps {

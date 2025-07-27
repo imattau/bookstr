@@ -5,7 +5,7 @@ import {
   publishLongPost,
   publishRepost,
   publishVote,
-} from '../nostr';
+} from "./events";
 
 export interface OfflineEdit {
   id: string;

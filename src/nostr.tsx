@@ -1,3 +1,5 @@
+import { TextEncoder as UtilTextEncoder } from "util";
+if (typeof globalThis.TextEncoder === "undefined") { (globalThis as any).TextEncoder = UtilTextEncoder; }
 import React, {
   createContext,
   useContext,
@@ -19,6 +21,7 @@ import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
+import { getPrivKey, setPrivKey } from "./nostr/auth";
 import {
   loadKey,
   importKey,
@@ -26,7 +29,7 @@ import {
   validatePrivKey,
   saveKey,
 } from './lib/keys';
-import { initOfflineSync } from './lib/offlineSync';
+import { initOfflineSync } from './nostr/offline';
 import { savePointer, getPointer } from './lib/cache';
 
 const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
@@ -37,8 +40,7 @@ const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
       .map((r) => r.trim())
       .filter(Boolean)
   : ['wss://relay.damus.io', 'wss://relay.primal.net', 'wss://nostr.wine'];
-
-const encoder = new TextEncoder();
+const encoder = typeof TextEncoder === "undefined" ? new UtilTextEncoder() : new TextEncoder();
 
 // Maximum size for long-form event content in bytes
 export let MAX_EVENT_SIZE = 1000;
@@ -64,21 +66,6 @@ export function setMaxEventSize(size: number) {
 // Prevent endless proof-of-work loops from freezing the browser
 const MAX_POW_TIME_MS = 5000;
 const MAX_POW_ITERATIONS = 500000;
-
-let sessionPrivKey: string | null = null;
-export const getPrivKey = () => sessionPrivKey;
-
-export function createDelegationTag(
-  priv: string,
-  delegate: string,
-  conditions: string,
-) {
-  const str = `nostr:delegation:${delegate}:${conditions}`;
-  const hash = sha256(encoder.encode(str));
-  const sig = bytesToHex(schnorr.sign(hash, hexToBytes(priv)));
-  const delegator = bytesToHex(schnorr.getPublicKey(hexToBytes(priv)));
-  return ['delegation', delegator, conditions, sig];
-}
 
 function checkDelegationConditions(
   cond: string,
@@ -183,7 +170,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       if (storedPub && storedPub !== pub) {
         setKeyError(true);
       } else {
-        sessionPrivKey = priv;
+        setPrivKey(priv);
         setPubkey(pub);
       }
     } else {
@@ -283,7 +270,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!priv || !validatePrivKey(priv)) {
       throw new Error('invalid private key');
     }
-    sessionPrivKey = priv;
+    setPrivKey(priv);
     saveKey(priv);
     const pub = getPublicKey(hexToBytes(priv));
     localStorage.setItem('pubKey', pub);
@@ -294,7 +281,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const loginNip07 = (pub: string) => {
-    sessionPrivKey = null;
+    setPrivKey(null);
     localStorage.removeItem('privKey');
     setPubkey(pub);
     setNip07(true);
@@ -303,7 +290,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = () => {
-    sessionPrivKey = null;
+    setPrivKey(null);
     localStorage.removeItem('pubKey');
     localStorage.removeItem('nip07');
     localStorage.removeItem('privKey');
@@ -316,7 +303,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     relaysOverride?: string[],
     pow = 0,
   ) => {
-    const priv = sessionPrivKey;
+    const priv = getPrivKey();
     const nostr = (window as any).nostr;
     if (!priv && !(nostr && typeof nostr.signEvent === 'function')) {
       throw new Error('not logged in');
@@ -609,247 +596,4 @@ export function useNostr() {
   return ctx;
 }
 
-export async function publishLongPost(
-  ctx: NostrContextValue,
-  data: {
-    title: string;
-    summary?: string;
-    content: string;
-    tags?: string[];
-    cover?: string;
-    extraTags?: string[][];
-  },
-  pow = 0,
-) {
-  const tags: string[][] = [];
-  if (data.title) tags.push(['title', data.title]);
-  if (data.summary) tags.push(['summary', data.summary]);
-  if (data.cover) tags.push(['image', data.cover]);
-  data.tags?.forEach((t) => tags.push(['t', t]));
-  if (data.extraTags) tags.push(...data.extraTags);
 
-  const sliceContent = (text: string) => {
-    const parts: string[] = [];
-    let buf = '';
-    let size = 0;
-    for (const ch of text) {
-      const b = encoder.encode(ch).length;
-      if (size + b > MAX_EVENT_SIZE && buf) {
-        parts.push(buf);
-        buf = ch;
-        size = b;
-      } else {
-        buf += ch;
-        size += b;
-      }
-    }
-    if (buf) parts.push(buf);
-    return parts;
-  };
-
-  const parts = sliceContent(data.content);
-  if (parts.length === 1) {
-    return ctx.publish(
-      { kind: 30023, content: data.content, tags },
-      undefined,
-      pow,
-    );
-  }
-
-  const dTag = Math.random().toString(36).slice(2);
-  let first: NostrEvent | null = null;
-  for (let i = 0; i < parts.length; i++) {
-    const ptTags = [...tags, ['d', dTag], ['part', String(i + 1)]];
-    const evt = await ctx.publish(
-      { kind: 30023, content: parts[i], tags: ptTags },
-      undefined,
-      pow,
-    );
-    if (i === 0) first = evt;
-  }
-  return first!;
-}
-
-export async function fetchLongPostParts(
-  ctx: NostrContextValue,
-  evt: NostrEvent,
-): Promise<string> {
-  const d = evt.tags.find((t) => t[0] === 'd')?.[1];
-  if (!d) return evt.content;
-  const parts = await ctx.list([
-    { kinds: [evt.kind], '#d': [d], authors: [evt.pubkey] },
-  ]);
-  const sorted = parts.sort((a, b) => {
-    const pa = parseInt(a.tags.find((t) => t[0] === 'part')?.[1] ?? '1', 10);
-    const pb = parseInt(b.tags.find((t) => t[0] === 'part')?.[1] ?? '1', 10);
-    return pa - pb;
-  });
-  return sorted.map((p) => p.content).join('');
-}
-
-export async function publishBookMeta(
-  ctx: NostrContextValue,
-  bookId: string,
-  meta: { title?: string; summary?: string; cover?: string; tags?: string[] },
-  pow = 0,
-) {
-  const tags: string[][] = [['d', bookId]];
-  if (meta.title) tags.push(['title', meta.title]);
-  if (meta.summary) tags.push(['summary', meta.summary]);
-  if (meta.cover) tags.push(['image', meta.cover]);
-  meta.tags?.forEach((t) => tags.push(['t', t]));
-  return ctx.publish({ kind: 41, content: '', tags }, undefined, pow);
-}
-
-export async function publishVote(ctx: NostrContextValue, target: string) {
-  return ctx.publish({ kind: 7, content: '+', tags: [['e', target]] });
-}
-
-export async function publishFavourite(ctx: NostrContextValue, target: string) {
-  return ctx.publish({ kind: 7, content: '★', tags: [['e', target]] });
-}
-
-export async function publishRepost(ctx: NostrContextValue, target: string) {
-  return ctx.publish({ kind: 6, content: '', tags: [['e', target]] });
-}
-
-export async function publishAttachment(
-  ctx: NostrContextValue,
-  data: { mime: string; url: string; bookId?: string },
-) {
-  const tags: string[][] = [
-    ['mime', data.mime],
-    ['url', data.url],
-  ];
-  if (data.bookId) tags.push(['e', data.bookId]);
-  return ctx.publish({ kind: 1064, content: '', tags });
-}
-
-export async function sendDM(ctx: NostrContextValue, to: string, text: string) {
-  const priv = sessionPrivKey;
-  let cipher: string;
-  if (priv) {
-    cipher = await (await import('nostr-tools')).nip04.encrypt(priv, to, text);
-  } else {
-    const nostr = (window as any).nostr;
-    if (!nostr?.nip04?.encrypt) throw new Error('not logged in');
-    cipher = await nostr.nip04.encrypt(to, text);
-  }
-  return ctx.publish({ kind: 4, content: cipher, tags: [['p', to]] });
-}
-
-export async function sendGroupDM(
-  ctx: NostrContextValue,
-  to: string[],
-  text: string,
-) {
-  const priv = sessionPrivKey;
-  if (!priv) throw new Error('not logged in');
-  const nt = await import('nostr-tools');
-  const privBytes = hexToBytes(priv);
-  const myPub = getPublicKey(privBytes);
-  const recipients = to
-    .filter((p) => p !== myPub)
-    .map((p) => ({ publicKey: p }));
-  const events = nt.nip17.wrapManyEvents(privBytes, recipients, text);
-  for (const e of events) {
-    await ctx.sendEvent(e);
-  }
-  return events;
-}
-
-export async function verifyNip05(handle: string, pubkey: string) {
-  const [name, domain] = handle.split('@');
-  if (!name || !domain) return false;
-  try {
-    const res = await fetch(
-      `https://${domain}/.well-known/nostr.json?name=${name}`,
-    );
-    const data = await res.json();
-    return data.names?.[name] === pubkey;
-  } catch {
-    return false;
-  }
-}
-
-export async function zap(
-  ctx: NostrContextValue,
-  event: NostrEvent,
-  amount = 1,
-) {
-  const meta = await new Promise<Record<string, any> | null>((resolve) => {
-    let done = false;
-    const off = ctx.subscribe(
-      [{ kinds: [0], authors: [event.pubkey], limit: 1 }],
-      (evt) => {
-        if (done) return;
-        done = true;
-        off();
-        try {
-          resolve(JSON.parse(evt.content));
-        } catch {
-          resolve(null);
-        }
-      },
-    );
-    setTimeout(() => {
-      if (!done) {
-        off();
-        resolve(null);
-      }
-    }, 5000);
-  });
-
-  const address = meta?.lud16 as string | undefined;
-  if (!address) throw new Error('missing lightning address');
-  const [name, domain] = address.split('@');
-  const infoRes = await fetch(`https://${domain}/.well-known/lnurlp/${name}`);
-  const info = await infoRes.json();
-  const msats = Math.max(info.minSendable, amount * 1000);
-
-  const relays = ctx.relays;
-  const zapReq = await ctx.publish({
-    kind: 9734,
-    content: '',
-    tags: [
-      ['p', event.pubkey],
-      ['e', event.id],
-      ['relays', ...relays],
-      ['amount', msats.toString()],
-    ],
-  });
-
-  const nostr = encodeURIComponent(JSON.stringify(zapReq));
-  const cb = `${info.callback}?amount=${msats}&nostr=${nostr}`;
-  const invRes = await fetch(cb);
-  const inv = await invRes.json();
-  const invoice: string = inv.pr;
-
-  const webln = (window as any).webln;
-  if (webln && webln.sendPayment) {
-    try {
-      await webln.enable();
-      await webln.sendPayment(invoice);
-    } catch {
-      window.open(`lightning:${invoice}`);
-    }
-  } else {
-    window.open(`lightning:${invoice}`);
-  }
-
-  await new Promise<void>((resolve) => {
-    const off = ctx.subscribe(
-      [{ kinds: [9735], '#bolt11': [invoice], limit: 1 }],
-      () => {
-        off();
-        resolve();
-      },
-    );
-    setTimeout(() => {
-      off();
-      resolve();
-    }, 30000);
-  });
-}
-
-export { connectNostrWallet, nostrLogin } from './nostr/auth';

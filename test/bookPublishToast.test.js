@@ -17,7 +17,7 @@ const path = require('path');
       'react',
       'dompurify',
       'marked',
-      './src/nostr.tsx',
+      './src/nostr.tsx','./src/nostr/events.ts',
       './src/achievements.ts',
       './src/components/ToastProvider.tsx',
     ],
@@ -28,7 +28,10 @@ const path = require('path');
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
-        return { useNostr: () => ({}), publishLongPost: async () => { throw new Error('fail'); } };
+        return { useNostr: () => ({}) };
+      }
+      if (p === './src/nostr/events.ts') {
+        return { publishLongPost: async () => { throw new Error('fail'); } };
       }
       if (p === './src/achievements.ts') {
         return { reportBookPublished: () => {} };

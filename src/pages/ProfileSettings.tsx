@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import type { Event as NostrEvent, EventTemplate } from 'nostr-tools';
 import { finalizeEvent } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
-import { useNostr, verifyNip05, getPrivKey } from '../nostr';
+import { useNostr } from '../nostr';
+import { verifyNip05 } from '../nostr/events';
+import { getPrivKey } from '../nostr/auth';
 import { isValidUrl, isValidNip05 } from '../validators';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';

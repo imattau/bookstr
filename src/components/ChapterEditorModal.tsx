@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNostr, publishLongPost } from '../nostr';
-import { queueOfflineEdit } from '../lib/offlineSync';
+import { useNostr } from '../nostr';
+import { publishLongPost } from '../nostr/events';
+import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 
 interface Props {

@@ -6,7 +6,8 @@ import {
   Draggable,
   DropResult,
 } from '@hello-pangea/dnd';
-import { useNostr, fetchLongPostParts } from '../nostr';
+import { useNostr } from '../nostr';
+import { fetchLongPostParts } from '../nostr/events';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { BookMetadataEditor } from '../components/BookMetadataEditor';
 import { DeleteButton } from '../components/DeleteButton';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getOfflineEdits } from './lib/offlineSync';
+import { getOfflineEdits } from './nostr/offline';
 
 interface AppShellProps {
   children: React.ReactNode;

@@ -17,7 +17,7 @@ const path = require('path');
       'react',
       'dompurify',
       'marked',
-      './src/nostr.tsx',
+      './src/nostr.tsx','./src/nostr/events.ts',
       './src/achievements.ts',
       './src/components/ToastProvider.tsx',
     ],
@@ -29,12 +29,12 @@ const path = require('path');
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
+        return { useNostr: () => ({}) };
+      }
+      if (p === './src/nostr/events.ts') {
         return {
-          useNostr: () => ({}),
           publishLongPost: async () => ({ id: 'abc123' }),
-          publishBookMeta: async (...args) => {
-            metaArgs = args;
-          },
+          publishBookMeta: async (...args) => { metaArgs = args; },
         };
       }
       if (p === './src/achievements.ts') {

@@ -16,7 +16,7 @@ const path = require('path');
     external: [
       'react',
       'react-icons/fa',
-      './src/nostr.tsx',
+      './src/nostr.tsx','./src/nostr/events.ts',
       './src/components/ToastProvider.tsx',
       'nostr-tools',
     ],
@@ -27,15 +27,17 @@ const path = require('path');
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
+        return { useNostr: () => ({ subscribe: () => () => {}, pubkey: '1' }) };
+      }
+      if (p === './src/nostr/events.ts') {
         return {
-          useNostr: () => ({ subscribe: () => () => {}, pubkey: '1' }),
           publishVote: async () => { throw new Error('fail'); },
           publishFavourite: async () => { throw new Error('fail'); },
         };
       }
-      if (p === './src/components/ToastProvider.tsx') {
-        return { useToast: () => (msg) => calls.push(msg) };
-      }
+        if (p === "./src/components/ToastProvider.tsx") {
+          return { useToast: () => (msg) => calls.push(msg) };
+        }
       if (p === 'react-icons/fa') {
         return { FaThumbsUp: () => React.createElement('div'), FaStar: () => React.createElement('div') };
       }
