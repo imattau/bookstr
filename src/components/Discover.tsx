@@ -127,32 +127,26 @@ export const Discover: React.FC = () => {
   const noResults = search.trim() !== '' && recommended.length === 0;
 
   return (
-    <div className="pb-4">
-      <header className="relative bg-primary-600 py-3 text-center text-white">
+    <div className="pb-[var(--space-4)]">
+      <header className="flex items-center gap-[var(--space-2)] bg-primary-600 p-[var(--space-3)]">
+        <h1 className="text-[18px] font-semibold text-white">Bookstr</h1>
         <OnboardingTooltip storageKey="discover-search" text="Search for books">
-          <button
-            aria-label="Search"
-            className="relative absolute left-2 top-1/2 -translate-y-1/2"
-          >
-            🔍
-          </button>
+          <div className="flex-1">
+            <input
+              value={search}
+              onChange={(e) => updateSearch(e.target.value)}
+              placeholder="Search"
+              className="w-full rounded-[var(--radius-button)] border border-border p-[var(--space-2)] bg-[color:var(--clr-surface)] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)]"
+            />
+          </div>
         </OnboardingTooltip>
-        <h1 className="text-[18px] font-semibold">Bookstr</h1>
       </header>
-      <div className="p-4">
-        <input
-          value={search}
-          onChange={(e) => updateSearch(e.target.value)}
-          placeholder="Search"
-          className="w-full rounded border border-border p-2 focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)]"
-        />
-      </div>
-      <div className="flex overflow-x-auto gap-1 px-2 pb-2">
+      <div className="flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]">
         {TAGS.map((t) => (
           <button
             key={t}
             onClick={() => setTag(t)}
-            className={`btn-tap whitespace-nowrap rounded px-2 py-1 text-[14px] ${
+            className={`btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] ${
               tag === t
                 ? 'bg-primary-600 text-white'
                 : 'border border-border text-primary-600 bg-[color:var(--clr-surface)]'
@@ -164,7 +158,7 @@ export const Discover: React.FC = () => {
       </div>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Trending Books</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-4">
           {trending.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
@@ -182,7 +176,7 @@ export const Discover: React.FC = () => {
       </section>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">New Releases</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-4">
           {newReleases.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
@@ -200,7 +194,7 @@ export const Discover: React.FC = () => {
       </section>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Recommended for You</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-4">
           {noResults ? (
             <p className="col-span-full text-center">No matching books found.</p>
           ) : recommended.length === 0 ? (
