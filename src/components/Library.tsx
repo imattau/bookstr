@@ -61,28 +61,28 @@ export const Library: React.FC = () => {
           </button>
         ))}
       </div>
-      <p className="mt-2 text-right text-[12px] text-text-muted">
+      <p className="mt-[var(--space-2)] text-right text-[12px] text-text-muted">
         {finishedCount}/{yearlyGoal} books finished this year
       </p>
       <ProgressBar
         value={Math.min(100, (finishedCount / yearlyGoal) * 100)}
         aria-label="Yearly goal progress"
-        className="my-2"
+        className="my-[var(--space-2)]"
       />
       {unlocked.length > 0 && (
-        <div className="mt-2 flex gap-2">
+        <div className="mt-[var(--space-2)] flex gap-2">
           {unlocked.map((id) => (
             <span
               key={id}
               title={ACHIEVEMENT_LABELS[id]}
-              className="text-[color:var(--clr-primary-600)] text-lg"
+              className="text-[color:var(--clr-primary-600)] text-xl"
             >
               {iconMap[id]}
             </span>
           ))}
         </div>
       )}
-      <div className="mt-4 space-y-2">
+      <div className="mt-[var(--space-4)] space-y-2">
         {books
           .filter((item) => {
             if (tab === 'following') {
@@ -93,7 +93,7 @@ export const Library: React.FC = () => {
           .map((item) => (
             <div
               key={item.id}
-                className="mb-2 flex items-center gap-4 rounded-card bg-border p-[var(--space-3)]"
+                className="mb-[var(--space-2)] flex items-center gap-4 rounded-card bg-border p-[var(--space-3)]"
             >
               <img
                 src={item.cover}
@@ -101,16 +101,16 @@ export const Library: React.FC = () => {
                   className="h-[84px] w-[56px] rounded object-cover"
               />
               <div className="flex-1 space-y-1">
-                <h3 className="text-[16px] font-semibold leading-[24px]">
+                <h3 className="text-[16px] font-semibold leading-6">
                   {item.title}
                 </h3>
-                <p className="text-[14px] leading-[20px] text-text-muted">
+                <p className="text-[14px] leading-5 text-text-muted">
                   {item.author}
                 </p>
                   <span className="inline-block rounded bg-[color:var(--clr-surface-alt)] px-[var(--space-2)] py-[2px] text-[12px] text-text-muted">
                   {item.genre}
                 </span>
-                <div className="mt-1 h-1 rounded bg-border">
+                <div className="mt-[var(--space-1)] h-1 rounded bg-border">
                   <div
                     className="h-full rounded bg-[color:var(--clr-primary-600)]"
                     style={{ width: `${item.percent}%` }}

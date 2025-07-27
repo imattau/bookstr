@@ -60,7 +60,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   return (
     <div className="rounded-[var(--radius-card)] border p-[var(--space-2)]">
       {event.repostedBy && (
-        <p className="mb-1 text-xs text-gray-500">
+        <p className="mb-[var(--space-1)] text-xs text-gray-500">
           Reposted by {event.repostedBy}
         </p>
       )}
@@ -68,7 +68,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         <img
           src={cover}
           alt={`Cover image for ${title}`}
-          className="mb-2 h-32 w-24 object-cover"
+          className="mb-[var(--space-2)] h-32 w-24 object-cover"
         />
       )}
       <h3 className="font-semibold">{title}</h3>

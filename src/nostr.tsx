@@ -577,7 +577,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
       {keyError && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2">
-          <div className="space-y-2 w-full max-w-sm rounded bg-[color:var(--clr-surface)] p-4">
+          <div className="space-y-2 w-full max-w-sm rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
             <p className="text-sm">
               Stored key is corrupted. Import your backup or generate a new one.
               Events signed with a new key cannot overwrite old ones.

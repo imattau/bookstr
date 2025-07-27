@@ -30,10 +30,10 @@ export const BookHistory: React.FC<BookHistoryProps> = ({ bookId, onClose }) => 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-2 sm:p-4">
-      <div className="w-full max-w-md max-h-screen space-y-2 overflow-y-auto rounded bg-[color:var(--clr-surface)] p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]">
+      <div className="w-full max-w-md max-h-screen space-y-2 overflow-y-auto rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
         <div className="flex items-center justify-between border-b pb-2">
-          <h2 className="text-lg font-medium">History</h2>
+          <h2 className="text-xl font-medium">History</h2>
           {onClose && (
             <button onClick={onClose} aria-label="Close">
               ×

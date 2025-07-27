@@ -180,8 +180,8 @@ export const Discover: React.FC = () => {
           </button>
         ))}
       </div>
-      <section className="p-4">
-        <h2 className="mb-2 font-semibold">Trending Books</h2>
+      <section className="p-[var(--space-4)]">
+        <h2 className="mb-[var(--space-2)] font-semibold">Trending Books</h2>
         <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
           {trending.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
@@ -198,8 +198,8 @@ export const Discover: React.FC = () => {
               ))}
         </div>
       </section>
-      <section className="p-4">
-        <h2 className="mb-2 font-semibold">New Releases</h2>
+      <section className="p-[var(--space-4)]">
+        <h2 className="mb-[var(--space-2)] font-semibold">New Releases</h2>
         <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
           {newReleases.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
@@ -216,8 +216,8 @@ export const Discover: React.FC = () => {
               ))}
         </div>
       </section>
-      <section className="p-4">
-        <h2 className="mb-2 font-semibold">Recommended for You</h2>
+      <section className="p-[var(--space-4)]">
+        <h2 className="mb-[var(--space-2)] font-semibold">Recommended for You</h2>
         <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
           {noResults ? (
             <div className="col-span-full">
@@ -240,8 +240,8 @@ export const Discover: React.FC = () => {
           )}
         </div>
       </section>
-      <section className="p-4">
-        <h2 className="mb-2 font-semibold">Communities</h2>
+      <section className="p-[var(--space-4)]">
+        <h2 className="mb-[var(--space-2)] font-semibold">Communities</h2>
         <CommunityFeed />
       </section>
     </div>
