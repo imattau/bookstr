@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
-import { useNostr, publishLongPost } from '../nostr';
+import { useNostr, publishLongPost, publishBookMeta } from '../nostr';
 import { useToast } from './ToastProvider';
 import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';
@@ -38,6 +38,20 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
           title,
           summary,
           content,
+          cover: cover || undefined,
+          tags: tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
+        },
+        pow ? 20 : 0,
+      );
+      await publishBookMeta(
+        ctx,
+        evt.id,
+        {
+          title,
+          summary,
           cover: cover || undefined,
           tags: tags
             .split(',')

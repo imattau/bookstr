@@ -19,4 +19,8 @@ On the final screen you can review the preview. Tick **Enable proof-of-work** if
 
 ## 4. Locating the Event
 
-After publishing, the wizard returns to the first step. You can find your new `kind:30023` event by querying your configured relays. Most clients will show it in your profile or search results a few seconds after publication.
+After publishing, the wizard returns to the first step. Two events are sent:
+the long-form `kind:30023` entry and a matching `kind:41` list event that
+references it. This list event ensures your book appears in the library and in
+`BookListScreen`. Most clients will show the events in your profile or search
+results a few seconds after publication.
