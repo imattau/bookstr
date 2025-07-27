@@ -7,6 +7,7 @@ import { ReportButton } from './ReportButton';
 import { FaHeart } from 'react-icons/fa';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
+import { OnboardingTooltip } from './OnboardingTooltip';
 
 interface BookCardProps {
   event: NostrEvent & { repostedBy?: string };
@@ -80,16 +81,21 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         </a>
       ))}
       <div className="pt-2 flex gap-2">
-        <button
-          onClick={handleZap}
-          className="rounded bg-yellow-500 px-2 py-1 text-white"
+        <OnboardingTooltip
+          storageKey="zap-button"
+          text="Send a lightning zap tip"
         >
-          {status === 'zapping'
-            ? 'Zapping...'
-            : status === 'done'
-              ? 'Zapped!'
-              : 'Zap'}
-        </button>
+          <button
+            onClick={handleZap}
+            className="rounded bg-yellow-500 px-2 py-1 text-white"
+          >
+            {status === 'zapping'
+              ? 'Zapping...'
+              : status === 'done'
+                ? 'Zapped!'
+                : 'Zap'}
+          </button>
+        </OnboardingTooltip>
         <ReactionButton target={event.id} type="vote" />
         <RepostButton target={event.id} />
         <ReportButton target={event.id} />
