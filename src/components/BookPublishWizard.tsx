@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
-import { useNostr, publishLongPost, publishBookMeta } from '../nostr';
+import { useNostr } from '../nostr';
+import { publishLongPost, publishBookMeta } from '../nostr/events';
 import { useToast } from './ToastProvider';
 import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';

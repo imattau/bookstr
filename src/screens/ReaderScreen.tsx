@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useNostr, fetchLongPostParts } from '../nostr';
+import { useNostr } from '../nostr';
+import { fetchLongPostParts } from '../nostr/events';
 import { ReaderToolbar } from '../components/ReaderToolbar';
 import { ProgressBar } from '../components/ProgressBar';
 import { ReaderView } from '../components/ReaderView';

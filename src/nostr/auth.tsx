@@ -1,5 +1,10 @@
 import type { Event, EventTemplate } from 'nostr-tools';
 import type { NostrContextValue } from '../nostr';
+import { TextEncoder as UtilTextEncoder } from "util";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+if (typeof globalThis.TextEncoder === "undefined") { (globalThis as any).TextEncoder = UtilTextEncoder; }
+import { schnorr } from "@noble/curves/secp256k1";
+import { sha256 } from "@noble/hashes/sha256";
 
 /**
  * Attempts to connect to a browser Nostr wallet via NIP-07.
@@ -46,3 +51,24 @@ export async function nostrLogin(
   if (ctx.loginNip07) ctx.loginNip07(pubkey);
   return pubkey;
 }
+
+const encoder = new TextEncoder();
+let sessionPrivKey: string | null = null;
+
+export const getPrivKey = () => sessionPrivKey;
+export const setPrivKey = (key: string | null) => {
+  sessionPrivKey = key;
+};
+
+export function createDelegationTag(
+  priv: string,
+  delegate: string,
+  conditions: string,
+) {
+  const str = `nostr:delegation:${delegate}:${conditions}`;
+  const hash = sha256(encoder.encode(str));
+  const sig = bytesToHex(schnorr.sign(hash, hexToBytes(priv)));
+  const delegator = bytesToHex(schnorr.getPublicKey(hexToBytes(priv)));
+  return ['delegation', delegator, conditions, sig];
+}
+

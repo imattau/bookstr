@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNostr, zap } from '../nostr';
+import { useNostr } from '../nostr';
+import { zap } from '../nostr/events';
 import { ReactionButton } from './ReactionButton';
 import { RepostButton } from './RepostButton';
 import { DeleteButton } from './DeleteButton';

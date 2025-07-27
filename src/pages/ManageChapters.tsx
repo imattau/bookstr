@@ -9,7 +9,8 @@ import {
 import type { Event as NostrEvent, EventTemplate } from 'nostr-tools';
 import { finalizeEvent } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
-import { useNostr, getPrivKey } from '../nostr';
+import { useNostr } from '../nostr';
+import { getPrivKey } from '../nostr/auth';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';

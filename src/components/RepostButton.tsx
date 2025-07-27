@@ -1,7 +1,8 @@
 import React from 'react';
 import { FaRetweet } from 'react-icons/fa';
-import { useNostr, publishRepost } from '../nostr';
-import { queueOfflineEdit } from '../lib/offlineSync';
+import { useNostr } from '../nostr';
+import { publishRepost } from '../nostr/events';
+import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 
 export interface RepostButtonProps {
