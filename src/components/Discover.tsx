@@ -120,6 +120,7 @@ export const Discover: React.FC = () => {
     .slice(0, 6);
 
   const recommended = filtered.slice(0, 6);
+  const noResults = search.trim() !== '' && recommended.length === 0;
 
   return (
     <div className="pb-4">
@@ -196,19 +197,23 @@ export const Discover: React.FC = () => {
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Recommended for You</h2>
         <div className="grid grid-cols-2 gap-4">
-          {recommended.length === 0
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <BookCardSkeleton key={i} />
-              ))
-            : recommended.map((e) => (
-                <BookCard
-                  key={e.id}
-                  event={e as NostrEvent}
-                  onDelete={(id) =>
-                    setEvents((evts) => evts.filter((x) => x.id !== id))
-                  }
-                />
-              ))}
+          {noResults ? (
+            <p className="col-span-full text-center">No matching books found.</p>
+          ) : recommended.length === 0 ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <BookCardSkeleton key={i} />
+            ))
+          ) : (
+            recommended.map((e) => (
+              <BookCard
+                key={e.id}
+                event={e as NostrEvent}
+                onDelete={(id) =>
+                  setEvents((evts) => evts.filter((x) => x.id !== id))
+                }
+              />
+            ))
+          )}
         </div>
       </section>
       <section className="p-4">
