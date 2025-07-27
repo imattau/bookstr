@@ -25,7 +25,7 @@ interface BookMeta {
 }
 
 export const BookListScreen: React.FC = () => {
-  const { subscribe, list } = useNostr();
+  const { subscribe, list, pubkey } = useNostr();
   const [books, setBooks] = useState<BookMeta[]>([]);
   const [cursor, setCursor] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -134,12 +134,14 @@ export const BookListScreen: React.FC = () => {
           <option value="oldest">Oldest</option>
           <option value="zapped">Most Zapped</option>
         </select>
-        <button
-          onClick={() => setShow(true)}
-          className="rounded bg-primary-600 px-3 py-1 text-white"
-        >
-          Create Book
-        </button>
+        {pubkey && (
+          <button
+            onClick={() => setShow(true)}
+            className="rounded bg-primary-600 px-3 py-1 text-white"
+          >
+            Create Book
+          </button>
+        )}
       </div>
       <div className="space-y-2">
         {books.length === 0 && (

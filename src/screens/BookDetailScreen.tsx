@@ -111,18 +111,19 @@ export const BookDetailScreen: React.FC = () => {
           {meta.summary && <p>{meta.summary}</p>}
         </div>
       )}
-      <div className="flex justify-end">
-        <button
-          onClick={() =>
-            setModalData({ number: chapterIds.length + 1 })
-          }
-          disabled={!canEdit}
-          className="rounded bg-primary-600 px-3 py-1 text-white disabled:opacity-50"
-        >
-          Add Chapter
-        </button>
-      </div>
-      <DragDropContext onDragEnd={handleDragEnd}>
+      {canEdit && (
+        <div className="flex justify-end">
+          <button
+            onClick={() =>
+              setModalData({ number: chapterIds.length + 1 })
+            }
+            className="rounded bg-primary-600 px-3 py-1 text-white"
+          >
+            Add Chapter
+          </button>
+        </div>
+      )}
+      <DragDropContext onDragEnd={canEdit ? handleDragEnd : () => {}}>
         <Droppable droppableId="chapters">
           {(provided) => (
             <div
@@ -147,8 +148,9 @@ export const BookDetailScreen: React.FC = () => {
                         ref={p.innerRef}
                         {...p.draggableProps}
                         {...p.dragHandleProps}
-                        className="rounded border p-2 cursor-pointer"
+                        className={`rounded border p-2${canEdit ? ' cursor-pointer' : ''}`}
                         onClick={() =>
+                          canEdit &&
                           setModalData({ id, number: index + 1 })
                         }
                       >
