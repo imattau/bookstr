@@ -10,6 +10,7 @@ import { useNostr, fetchLongPostParts } from '../nostr';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { BookMetadataEditor } from '../components/BookMetadataEditor';
 import { DeleteButton } from '../components/DeleteButton';
+import { BookHistory } from '../components/BookHistory';
 
 interface ChapterEvent {
   id: string;
@@ -37,6 +38,7 @@ export const BookDetailScreen: React.FC = () => {
     number: number;
   } | null>(null);
   const [editMeta, setEditMeta] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const canEdit = pubkey && authorPubkey && pubkey === authorPubkey;
 
   useEffect(() => {
@@ -154,6 +156,12 @@ export const BookDetailScreen: React.FC = () => {
             Add Chapter
           </button>
           <button
+            onClick={() => setShowHistory(true)}
+            className="rounded border px-3 py-1"
+          >
+            Versions
+          </button>
+          <button
             onClick={handleDeleteBook}
             className="rounded border px-3 py-1 text-red-600"
           >
@@ -239,6 +247,9 @@ export const BookDetailScreen: React.FC = () => {
           meta={meta}
           onClose={() => setEditMeta(false)}
         />
+      )}
+      {showHistory && bookId && (
+        <BookHistory bookId={bookId} onClose={() => setShowHistory(false)} />
       )}
     </div>
   );
