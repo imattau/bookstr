@@ -29,7 +29,7 @@ const { finalizeEvent, generateSecretKey } = require('nostr-tools');
 
   const badSig = { ...validEvent, sig: '0'.repeat(128) };
   res.statusCode = undefined; res.body = null; published = null;
-  await eventHandler({ body: badSig, user: { pubkey: validEvent.pubkey } }, res);
+  await eventHandler({ body: JSON.parse(JSON.stringify(badSig)), user: { pubkey: validEvent.pubkey } }, res);
   assert.strictEqual(res.statusCode, 400);
   assert.ok(res.body.error);
 

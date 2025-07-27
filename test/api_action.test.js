@@ -1,6 +1,7 @@
 require('ts-node/register');
 const assert = require('assert');
 const { actionHandler, fallbackVersions, pool } = require('../server');
+const { finalizeEvent, generateSecretKey } = require('nostr-tools');
 
 (async () => {
   let published;
@@ -10,16 +11,22 @@ const { actionHandler, fallbackVersions, pool } = require('../server');
 
   const res = { json: () => {}, status: () => res, body: null };
 
-  const baseEvent = { kind: 30001, content: '', tags: [['d', 'library']] };
+  const sk = generateSecretKey();
+  const baseEvent = finalizeEvent({
+    kind: 30001,
+    created_at: Math.floor(Date.now() / 1000),
+    content: '',
+    tags: [['d', 'library']],
+  }, sk);
 
-  await actionHandler({ body: JSON.parse(JSON.stringify(baseEvent)) }, res);
+  await actionHandler({ body: JSON.parse(JSON.stringify(baseEvent)), user: { pubkey: baseEvent.pubkey } }, res);
   assert.strictEqual(fallbackVersions['library'], 1);
   assert.strictEqual(
     published.tags.find((t) => t[0] === 'd')[1],
     'library-v1',
   );
 
-  await actionHandler({ body: JSON.parse(JSON.stringify(baseEvent)) }, res);
+  await actionHandler({ body: JSON.parse(JSON.stringify(baseEvent)), user: { pubkey: baseEvent.pubkey } }, res);
   assert.strictEqual(fallbackVersions['library'], 2);
   assert.strictEqual(
     published.tags.find((t) => t[0] === 'd')[1],
