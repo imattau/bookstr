@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaThumbsUp, FaStar } from 'react-icons/fa';
 import { useNostr, publishVote, publishFavourite } from '../nostr';
+import { useToast } from './ToastProvider';
 import type { Event as NostrEvent } from 'nostr-tools';
 
 export interface ReactionButtonProps {
@@ -15,6 +16,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
   className,
 }) => {
   const ctx = useNostr();
+  const toast = useToast();
   const [count, setCount] = useState(0);
   const ids = useRef(new Set<string>());
   const [active, setActive] = useState(false);
@@ -44,7 +46,7 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
       }
       setActive(true);
     } catch {
-      /* ignore publish errors */
+      toast('Action failed', { type: 'error' });
     }
   };
 

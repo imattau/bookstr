@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaRetweet } from 'react-icons/fa';
 import { useNostr, publishRepost } from '../nostr';
+import { useToast } from './ToastProvider';
 
 export interface RepostButtonProps {
   target: string;
@@ -12,12 +13,13 @@ export const RepostButton: React.FC<RepostButtonProps> = ({
   className,
 }) => {
   const ctx = useNostr();
+  const toast = useToast();
 
   const handleClick = async () => {
     try {
       await publishRepost(ctx, target);
     } catch {
-      // ignore publish errors
+      toast('Action failed', { type: 'error' });
     }
   };
 

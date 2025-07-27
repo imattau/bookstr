@@ -4,10 +4,11 @@ interface Toast {
   id: number;
   message: string;
   visible: boolean;
+  type: 'success' | 'error';
 }
 
 interface ToastContextValue {
-  addToast: (msg: string) => void;
+  addToast: (msg: string, opts?: { type?: 'success' | 'error' }) => void;
 }
 
 const ToastContext = React.createContext<ToastContextValue | undefined>(undefined);
@@ -15,9 +16,10 @@ const ToastContext = React.createContext<ToastContextValue | undefined>(undefine
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = React.useState<Toast[]>([]);
 
-  const addToast = React.useCallback((message: string) => {
+  const addToast = React.useCallback((message: string, opts?: { type?: 'success' | 'error' }) => {
     const id = Date.now() + Math.random();
-    setToasts((ts) => [...ts, { id, message, visible: true }]);
+    const type = opts?.type ?? 'success';
+    setToasts((ts) => [...ts, { id, message, visible: true, type }]);
     setTimeout(() => {
       setToasts((ts) => ts.map((t) => (t.id === id ? { ...t, visible: false } : t)));
     }, 2500);
@@ -33,7 +35,9 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`rounded bg-gray-800 text-white px-4 py-2 transition-opacity duration-500 ${t.visible ? 'opacity-90' : 'opacity-0'}`}
+            className={`rounded px-4 py-2 transition-opacity duration-500 ${
+              t.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-800 text-white'
+            } ${t.visible ? 'opacity-90' : 'opacity-0'}`}
           >
             {t.message}
           </div>
