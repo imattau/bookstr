@@ -7,12 +7,14 @@ html {
   font-family: theme('fontFamily.sans');
 }
 
-@keyframes shimmer {
-  0% {
-    background-position-y: 100%;
+@keyframes skeleton-fade {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
   }
-  100% {
-    background-position-y: 0%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -31,7 +33,7 @@ html {
   );
   background-repeat: no-repeat;
   background-size: 100% 200%;
-  animation: shimmer 0.5s linear infinite;
+  animation: skeleton-fade 0.5s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -45,9 +47,9 @@ html {
 }
 
 .btn-tap {
-  @apply transition-transform duration-150 active:scale-95 focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)];
+  @apply transition-transform duration-150 active:scale-110 focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)];
 }
 
 .card-hover {
-  @apply transition-transform duration-150 ease-in-out hover:-translate-y-0.5;
+  @apply transition-shadow duration-150 ease-in-out hover:[box-shadow:var(--shadow-1)];
 }
