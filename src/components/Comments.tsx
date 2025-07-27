@@ -45,6 +45,9 @@ export const Comments: React.FC<CommentsProps> = ({
 
   return (
     <div className={`${parentEventId ? 'ml-4' : ''} space-y-2`}>
+      {replies.length === 0 && !parentEventId && (
+        <p className="text-gray-500">No comments yet – be the first to reply!</p>
+      )}
       {replies.map((c) => (
         <div key={c.id} className="space-y-2">
           <div className="rounded border p-2 flex items-start gap-2">
