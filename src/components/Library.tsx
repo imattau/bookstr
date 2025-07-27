@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNostr } from '../nostr';
 import { useReadingStore } from '../store';
 import { ProgressBar } from './ProgressBar';
@@ -13,6 +14,7 @@ import { FaPen, FaTrophy } from 'react-icons/fa';
 export const Library: React.FC = () => {
   const { contacts } = useNostr();
   const { books, finishBook, yearlyGoal, finishedCount } = useReadingStore();
+  const navigate = useNavigate();
   const { unlocked } = useAchievements();
   const iconMap: Record<AchievementId, JSX.Element> = {
     'first-publish': <FaPen />,
@@ -41,6 +43,7 @@ export const Library: React.FC = () => {
         >
           <button
             aria-label="Settings"
+            onClick={() => navigate('/profile')}
             className="text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50"
           >
             ⚙
