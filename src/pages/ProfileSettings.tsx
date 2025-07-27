@@ -6,6 +6,7 @@ import { hexToBytes } from '@noble/hashes/utils';
 import { useNostr } from '../nostr';
 import { verifyNip05 } from '../nostr/events';
 import { getPrivKey } from '../nostr/auth';
+import { Button, Input } from '../components/ui';
 import { isValidUrl, isValidNip05 } from '../validators';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
@@ -112,12 +113,7 @@ export const ProfileSettingsPage: React.FC = () => {
       <div className="space-y-2">
         <div>
           <label className="block text-sm font-medium">Name</label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full rounded border p-2"
-          />
+          <Input name="name" value={form.name} onChange={handleChange} />
         </div>
         <div>
           <label className="block text-sm font-medium">Bio</label>
@@ -130,12 +126,11 @@ export const ProfileSettingsPage: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium">Avatar URL</label>
-          <input
+          <Input
             name="picture"
             value={form.picture}
             onChange={handleChange}
             onBlur={handleBlur}
-            className="w-full rounded border p-2"
           />
           {touched.picture && errors.picture && (
             <p className="text-red-600 text-sm">{errors.picture}</p>
@@ -143,12 +138,11 @@ export const ProfileSettingsPage: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium">NIP-05</label>
-          <input
+          <Input
             name="nip05"
             value={form.nip05}
             onChange={handleChange}
             onBlur={handleBlur}
-            className="w-full rounded border p-2"
           />
           {touched.nip05 && errors.nip05 && (
             <p className="text-red-600 text-sm">{errors.nip05}</p>
@@ -159,12 +153,7 @@ export const ProfileSettingsPage: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium">Lightning (lud16)</label>
-          <input
-            name="lud16"
-            value={form.lud16}
-            onChange={handleChange}
-            className="w-full rounded border p-2"
-          />
+          <Input name="lud16" value={form.lud16} onChange={handleChange} />
         </div>
       </div>
       <div className="space-y-2">
@@ -184,19 +173,17 @@ export const ProfileSettingsPage: React.FC = () => {
         </div>
       </div>
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={handleSave}
           disabled={!isFormValid}
-          className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          variant="primary"
+          className="px-4 py-2"
         >
           Save
-        </button>
-        <button
-          onClick={() => navigate(-1)}
-          className="rounded border px-4 py-2"
-        >
+        </Button>
+        <Button onClick={() => navigate(-1)} className="px-4 py-2">
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

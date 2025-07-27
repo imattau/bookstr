@@ -2,6 +2,7 @@ import React from 'react';
 import { useSettings } from '../useSettings';
 import type { Theme } from '../ThemeProvider';
 import { THEMES } from '../ThemeProvider';
+import { Input, Button } from '../components/ui';
 
 const UISettingsPage: React.FC = () => {
   const theme = useSettings((s) => s.theme);
@@ -31,14 +32,13 @@ const UISettingsPage: React.FC = () => {
       </div>
       <div>
         <label className="block text-sm font-medium">Yearly reading goal</label>
-        <input
+        <Input
           type="number"
           min={1}
           value={yearlyGoal}
           onChange={(e) =>
             setYearlyGoal(Math.max(1, parseInt(e.target.value, 10) || 1))
           }
-          className="w-full rounded border p-2"
         />
       </div>
       <div>
