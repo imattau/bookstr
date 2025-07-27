@@ -27,6 +27,7 @@ import {
   unregisterPushSubscription,
   isPushSubscribed,
 } from '../push';
+import { isValidUrl, isValidNip05 } from '../validators';
 
 interface ProfileMeta {
   [key: string]: unknown;
@@ -60,6 +61,14 @@ export const ProfileSettings: React.FC = () => {
   const pushEnabled = useSettings((s) => s.pushEnabled);
   const setPushEnabled = useSettings((s) => s.setPushEnabled);
   const [offlineBooks, setOfflineBooks] = React.useState<OfflineBook[]>([]);
+  const [errors, setErrors] = React.useState<{
+    picture?: string;
+    nip05?: string;
+  }>({});
+  const [touched, setTouched] = React.useState<{
+    picture?: boolean;
+    nip05?: boolean;
+  }>({});
 
   React.useEffect(() => {
     getOfflineBooks().then(setOfflineBooks);
@@ -127,6 +136,23 @@ export const ProfileSettings: React.FC = () => {
     setYearlyGoal(val);
   };
 
+  const validateField = (name: string, value: string) => {
+    let error = '';
+    if (name === 'picture' && value) {
+      if (!isValidUrl(value)) error = 'Invalid URL';
+    }
+    if (name === 'nip05' && value) {
+      if (!isValidNip05(value)) error = 'Invalid NIP-05';
+    }
+    setErrors((e) => ({ ...e, [name]: error }));
+  };
+
+  React.useEffect(() => {
+    validateField('picture', form.picture ?? '');
+    validateField('nip05', form.nip05 ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!pubkey) {
     return (
       <div className="p-4">
@@ -140,6 +166,19 @@ export const ProfileSettings: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
+    if (name === 'picture' || name === 'nip05') {
+      validateField(name, value);
+    }
+  };
+
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    if (name === 'picture' || name === 'nip05') {
+      setTouched((t) => ({ ...t, [name]: true }));
+      validateField(name, value);
+    }
   };
 
   const handleSave = async () => {
@@ -148,6 +187,8 @@ export const ProfileSettings: React.FC = () => {
       setVerified(await verifyNip05(form.nip05, pubkey));
     }
   };
+
+  const isFormValid = !errors.picture && !errors.nip05;
 
   return (
     <div className="space-y-2">
@@ -175,8 +216,12 @@ export const ProfileSettings: React.FC = () => {
           name="picture"
           value={form.picture}
           onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full rounded border p-2"
         />
+        {touched.picture && errors.picture && (
+          <p className="text-red-600 text-sm">{errors.picture}</p>
+        )}
       </div>
       <div>
         <label className="block text-sm font-medium">NIP-05</label>
@@ -184,8 +229,12 @@ export const ProfileSettings: React.FC = () => {
           name="nip05"
           value={form.nip05}
           onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full rounded border p-2"
         />
+        {touched.nip05 && errors.nip05 && (
+          <p className="text-red-600 text-sm">{errors.nip05}</p>
+        )}
         {verified !== null && (
           <p className="text-sm">{verified ? 'Verified ✔' : 'Unverified'}</p>
         )}
@@ -272,6 +321,7 @@ export const ProfileSettings: React.FC = () => {
       </div>
       <button
         onClick={handleSave}
+        disabled={!isFormValid}
         className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Save
