@@ -29,7 +29,6 @@ Open the profile settings from the library screen to configure the app:
 - **Yearly reading goal** – store your annual goal which updates progress in the library view.
 - **Clear Cached Books** – remove any books saved for offline reading.
 
-
 ## Getting Started
 
 1. Install dependencies
@@ -41,7 +40,7 @@ Open the profile settings from the library screen to configure the app:
    ```bash
    npx vite
    ```
- The entry point is `src/main.tsx`.
+   The entry point is `src/main.tsx`.
 3. Build the PWA for production. With Vite the build command is:
    ```bash
    npx vite build
@@ -56,6 +55,8 @@ For a step-by-step guide on using the book publishing wizard, see
 [docs/first_publish.md](docs/first_publish.md).
 To learn more about sending lightning zaps, read
 [docs/zapping.md](docs/zapping.md).
+For details on the HTML permitted in Markdown, see
+[docs/allowed_html.md](docs/allowed_html.md).
 
 ## Nostr Features
 
