@@ -143,6 +143,14 @@ The frontend reads certain configuration from Vite environment variables:
 The API server also honours `API_BASE` to match the frontend and `PORT` for
 the listening port.
 
+### Event History Cache
+
+Bookstr keeps an IndexedDB pointer for each record it indexes. Before requesting
+events from relays the application loads the pointer and only asks for events
+newer than the cached ID. A background worker defined in
+`src/workers/historyBackup.ts` continues fetching the rest of the history and
+stores it locally.
+
 ### Zap Flow (NIP-57)
 
 Bookstr implements lightning zaps following [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md). The flow is:

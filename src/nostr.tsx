@@ -21,6 +21,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
 import { validatePrivKey } from './validatePrivKey';
 import { initOfflineSync } from './lib/offlineSync';
+import { savePointer, getPointer } from './lib/cache';
 
 const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as string | undefined)
   ? ((import.meta as any).env.VITE_RELAY_URLS as string)
@@ -332,15 +333,53 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     return event;
   };
 
+  const applyPointers = async (filters: Filter[]): Promise<Filter[]> => {
+    return Promise.all(
+      filters.map(async (f) => {
+        const d = (f as any)['#d']?.[0];
+        if (!d) return f;
+        const ptr = await getPointer(d);
+        if (!ptr) return f;
+        try {
+          const [evt] = (await poolRef.current.list(relaysRef.current, [{ ids: [ptr] }])) as NostrEvent[];
+          if (evt) return { ...f, since: evt.created_at } as Filter;
+        } catch {
+          /* ignore */
+        }
+        return f;
+      })
+    );
+  };
+
   const list = async (filters: Filter[]) => {
-    return poolRef.current.list(relaysRef.current, filters) as Promise<NostrEvent[]>;
+    const final = await applyPointers(filters);
+    const evts = (await poolRef.current.list(relaysRef.current, final)) as NostrEvent[];
+    evts.forEach((e) => {
+      const d = e.tags.find((t) => t[0] === 'd')?.[1];
+      if (d) savePointer(d, e.id);
+    });
+    return evts;
   };
 
   const subscribe = (filters: Filter[], cb: (evt: NostrEvent) => void) => {
-    const sub = poolRef.current.subscribeMany(relaysRef.current, filters, {
-      onevent: cb,
-    });
-    return () => (sub as any).unsub();
+    let unsub: (() => void) | null = null;
+    let stopped = false;
+    (async () => {
+      const final = await applyPointers(filters);
+      if (stopped) return;
+      const sub = poolRef.current.subscribeMany(relaysRef.current, final, {
+        onevent: (evt: NostrEvent) => {
+          const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+          if (d) savePointer(d, evt.id);
+          cb(evt);
+        },
+      });
+      unsub = () => (sub as any).unsub();
+    })();
+    return () => {
+      stopped = true;
+      if (unsub) unsub();
+    };
   };
 
   const saveProfile = async (data: Record<string, unknown>) => {
