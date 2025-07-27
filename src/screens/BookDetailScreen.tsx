@@ -115,6 +115,9 @@ export const BookDetailScreen: React.FC = () => {
               {...provided.droppableProps}
               className="space-y-2"
             >
+              {chapterIds.length === 0 && (
+                <p className="text-center text-text-muted">No chapters yet.</p>
+              )}
               {chapterIds.map((id, index) => {
                 const ch = chapters[id];
                 return (
