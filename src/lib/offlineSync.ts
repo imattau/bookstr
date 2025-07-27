@@ -1,10 +1,15 @@
 import { get, set } from 'idb-keyval';
 import type { NostrContextValue } from '../nostr';
-import { publishBookMeta, publishLongPost } from '../nostr';
+import {
+  publishBookMeta,
+  publishLongPost,
+  publishRepost,
+  publishVote,
+} from '../nostr';
 
 export interface OfflineEdit {
   id: string;
-  type: 'meta' | 'chapter';
+  type: 'meta' | 'chapter' | 'publish' | 'vote' | 'repost';
   data: any;
 }
 
@@ -26,10 +31,15 @@ async function saveEdits(edits: OfflineEdit[]): Promise<void> {
   }
 }
 
+function dispatchQueueEvent(count: number) {
+  window.dispatchEvent(new CustomEvent('offline-queue', { detail: count }));
+}
+
 export async function queueOfflineEdit(edit: OfflineEdit): Promise<void> {
   const edits = await loadEdits();
   edits.push(edit);
   await saveEdits(edits);
+  dispatchQueueEvent(edits.length);
   if (navigator.serviceWorker?.controller) {
     navigator.serviceWorker.controller.postMessage({
       type: 'queue-edit',
@@ -46,7 +56,9 @@ export async function queueOfflineEdit(edit: OfflineEdit): Promise<void> {
 
 export async function removeOfflineEdit(id: string): Promise<void> {
   const edits = await loadEdits();
-  await saveEdits(edits.filter((e) => e.id !== id));
+  const remaining = edits.filter((e) => e.id !== id);
+  await saveEdits(remaining);
+  dispatchQueueEvent(remaining.length);
 }
 
 export async function getOfflineEdits(): Promise<OfflineEdit[]> {
@@ -110,6 +122,33 @@ function showMergeModal(localText: string, remoteText: string): Promise<string> 
 
 export async function processOfflineEdits(ctx: NostrContextValue, edits: OfflineEdit[]): Promise<void> {
   for (const edit of edits) {
+    if (edit.type === 'publish') {
+      try {
+        await ctx.publish(edit.data.event, edit.data.relays, edit.data.pow);
+      } catch {
+        /* ignore */
+      }
+      await removeOfflineEdit(edit.id);
+      continue;
+    }
+    if (edit.type === 'vote') {
+      try {
+        await publishVote(ctx, edit.data.target);
+      } catch {
+        /* ignore */
+      }
+      await removeOfflineEdit(edit.id);
+      continue;
+    }
+    if (edit.type === 'repost') {
+      try {
+        await publishRepost(ctx, edit.data.target);
+      } catch {
+        /* ignore */
+      }
+      await removeOfflineEdit(edit.id);
+      continue;
+    }
     let remote: any = null;
     try {
       if (edit.type === 'meta') {

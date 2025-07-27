@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaThumbsUp, FaStar } from 'react-icons/fa';
 import { useNostr, publishVote, publishFavourite } from '../nostr';
+import { queueOfflineEdit } from '../lib/offlineSync';
 import { useToast } from './ToastProvider';
 import type { Event as NostrEvent } from 'nostr-tools';
 
@@ -39,6 +40,17 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
   const handleClick = async () => {
     if (active) return;
     try {
+      if (!navigator.onLine && type === 'vote') {
+        await queueOfflineEdit({
+          id: Math.random().toString(36).slice(2),
+          type: 'vote',
+          data: { target },
+        });
+        setCount((c) => c + 1);
+        setActive(true);
+        toast('Saved offline, will sync later');
+        return;
+      }
       if (type === 'vote') {
         await publishVote(ctx, target);
       } else {

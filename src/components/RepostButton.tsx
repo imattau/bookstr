@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaRetweet } from 'react-icons/fa';
 import { useNostr, publishRepost } from '../nostr';
+import { queueOfflineEdit } from '../lib/offlineSync';
 import { useToast } from './ToastProvider';
 
 export interface RepostButtonProps {
@@ -17,6 +18,15 @@ export const RepostButton: React.FC<RepostButtonProps> = ({
 
   const handleClick = async () => {
     try {
+      if (!navigator.onLine) {
+        await queueOfflineEdit({
+          id: Math.random().toString(36).slice(2),
+          type: 'repost',
+          data: { target },
+        });
+        toast('Saved offline, will sync later');
+        return;
+      }
       await publishRepost(ctx, target);
     } catch {
       toast('Action failed', { type: 'error' });
