@@ -23,7 +23,7 @@ async function actionHandler(req, res) {
     .map((r) => r.url);
 
   let fallbackVersion;
-  if (activeRelays.some((r) => !r.supportsNip27) && Array.isArray(event.tags)) {
+  if (relays.some((r) => !r.supportsNip27) && Array.isArray(event.tags)) {
     const dTag = event.tags.find((t) => t[0] === 'd');
     if (dTag) {
       const base = dTag[1];
