@@ -8,6 +8,7 @@ import {
 import { ExpirationPlugin } from 'workbox-expiration';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { getOfflineBooks } from './offlineStore';
+import { get, set } from 'idb-keyval';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -37,6 +38,42 @@ const bgSync = new BackgroundSyncPlugin('actions', {
   maxRetentionTime: 24 * 60,
 });
 
+interface OfflineEdit {
+  id: string;
+  type: string;
+  data: any;
+}
+
+const EDITS_KEY = 'pending-edits';
+
+async function loadEdits(): Promise<OfflineEdit[]> {
+  try {
+    return (await get<OfflineEdit[]>(EDITS_KEY)) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function saveEdits(edits: OfflineEdit[]): Promise<void> {
+  try {
+    await set(EDITS_KEY, edits);
+  } catch {
+    /* ignore */
+  }
+}
+
+async function notifyClients() {
+  const edits = await loadEdits();
+  if (!edits.length) return;
+  const clients = await self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true,
+  });
+  for (const client of clients) {
+    client.postMessage({ type: 'pending-edits', edits });
+  }
+}
+
 async function precacheOfflineBooks() {
   const cache = await caches.open('offline-books');
   const books = await getOfflineBooks();
@@ -63,6 +100,22 @@ self.addEventListener('install', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'refresh-offline') {
     event.waitUntil(precacheOfflineBooks());
+  }
+  if (event.data?.type === 'queue-edit') {
+    event.waitUntil(
+      (async () => {
+        const edits = await loadEdits();
+        edits.push(event.data.edit as OfflineEdit);
+        await saveEdits(edits);
+      })(),
+    );
+  }
+  if (event.data?.type === 'request-edits') {
+    event.waitUntil(
+      loadEdits().then((ed) => {
+        (event.source as Client)?.postMessage({ type: 'pending-edits', edits: ed });
+      }),
+    );
   }
 });
 
@@ -101,6 +154,12 @@ registerRoute(
     }
   },
 );
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'process-edits') {
+    event.waitUntil(notifyClients());
+  }
+});
 
 self.addEventListener('push', (event) => {
   const data = (() => {

@@ -20,6 +20,7 @@ import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
 import { validatePrivKey } from './validatePrivKey';
+import { initOfflineSync } from './lib/offlineSync';
 
 const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as string | undefined)
   ? ((import.meta as any).env.VITE_RELAY_URLS as string)
@@ -154,6 +155,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setNip07(nip07Flag === '1');
     return () => pool.close(relaysRef.current);
   }, []);
+
 
   useEffect(() => {
     if (!pubkey) {
@@ -436,6 +438,16 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     const targets = relaysOverride ?? relaysRef.current;
     await poolRef.current.publish(targets, event);
   };
+
+  useEffect(() => {
+    if (!pubkey) return;
+    initOfflineSync({
+      sendEvent,
+      publish,
+      list,
+      pubkey,
+    } as any);
+  }, [pubkey]);
 
   return (
     <NostrContext.Provider

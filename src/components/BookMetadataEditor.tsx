@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNostr, publishBookMeta } from '../nostr';
+import { queueOfflineEdit } from '../lib/offlineSync';
 import { useToast } from './ToastProvider';
 
 export interface BookMetadataEditorProps {
@@ -34,23 +35,27 @@ export const BookMetadataEditor: React.FC<BookMetadataEditorProps> = ({
       toast('Action failed', { type: 'error' });
       return;
     }
+    const data = {
+      title,
+      summary,
+      cover: cover || undefined,
+      tags: tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean),
+    };
     try {
-      await publishBookMeta(
-        ctx,
-        bookId,
-        {
-          title,
-          summary,
-          cover: cover || undefined,
-          tags: tags
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
-        },
-      );
+      if (!navigator.onLine) throw new Error('offline');
+      await publishBookMeta(ctx, bookId, data);
       onClose();
     } catch {
-      toast('Action failed', { type: 'error' });
+      await queueOfflineEdit({
+        id: Math.random().toString(36).slice(2),
+        type: 'meta',
+        data: { ...data, bookId },
+      });
+      toast('Saved offline, will sync later');
+      onClose();
     }
   };
 
