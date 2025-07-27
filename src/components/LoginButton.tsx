@@ -37,7 +37,7 @@ export const LoginButton: React.FC = () => {
     return (
       <button
         onClick={logout}
-        className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+        className="rounded-[var(--radius-button)] bg-primary-600 px-[var(--space-3)] py-[var(--space-2)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
       >
         Logout
       </button>
@@ -48,7 +48,7 @@ export const LoginButton: React.FC = () => {
       {hasWallet ? (
         <button
           onClick={handleWalletLogin}
-          className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          className="rounded-[var(--radius-button)] bg-primary-600 px-[var(--space-3)] py-[var(--space-2)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
         >
           Login with Nostr
         </button>
@@ -63,7 +63,7 @@ export const LoginButton: React.FC = () => {
           {error && <div className="text-red-600">{error}</div>}
           <button
             onClick={handlePrivLogin}
-            className="rounded bg-primary-600 px-4 py-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            className="rounded-[var(--radius-button)] bg-primary-600 px-[var(--space-3)] py-[var(--space-2)] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
           >
             Login
           </button>

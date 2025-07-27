@@ -11,7 +11,7 @@ export interface AuthorCardProps {
  */
 export const AuthorCard: React.FC<AuthorCardProps> = ({ pubkey, name }) => {
   return (
-    <div className="flex items-center gap-2 rounded border p-2">
+    <div className="flex items-center gap-[var(--space-2)] rounded-[var(--radius-card)] border p-[var(--space-2)]">
       <div className="flex-1">
         <p className="font-medium">{name || pubkey}</p>
       </div>

@@ -28,7 +28,7 @@ export const ReportButton: React.FC<ReportButtonProps> = ({
     <button
       onClick={handleClick}
       aria-label="Report"
-      className={`rounded border px-2 py-1 ${className ?? ''}`}
+      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${className ?? ''}`}
     >
       <FaFlag aria-hidden="true" />
     </button>

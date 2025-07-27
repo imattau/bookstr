@@ -21,14 +21,18 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   const ctx = useNostr();
   const [status, setStatus] = useState<'idle' | 'zapping' | 'done'>('idle');
   const { toggleBookmark, bookmarks, pubkey, subscribe } = ctx;
-  const [attachments, setAttachments] = useState<{ id: string; mime: string; url: string }[]>([]);
+  const [attachments, setAttachments] = useState<
+    { id: string; mime: string; url: string }[]
+  >([]);
 
   useEffect(() => {
     const off = subscribe([{ kinds: [1064], '#e': [event.id] }], (evt) => {
       const mime = evt.tags.find((t) => t[0] === 'mime')?.[1];
       const url = evt.tags.find((t) => t[0] === 'url')?.[1];
       if (!mime || !url) return;
-      setAttachments((a) => (a.find((x) => x.id === evt.id) ? a : [...a, { id: evt.id, mime, url }]));
+      setAttachments((a) =>
+        a.find((x) => x.id === evt.id) ? a : [...a, { id: evt.id, mime, url }],
+      );
     });
     return off;
   }, [subscribe, event.id]);
@@ -54,7 +58,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   };
 
   return (
-    <div className="rounded border p-2">
+    <div className="rounded-[var(--radius-card)] border p-[var(--space-2)]">
       {event.repostedBy && (
         <p className="mb-1 text-xs text-gray-500">
           Reposted by {event.repostedBy}
@@ -87,7 +91,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         >
           <button
             onClick={handleZap}
-            className="rounded bg-yellow-500 px-2 py-1 text-white"
+            className="rounded-[var(--radius-button)] bg-yellow-500 px-[var(--space-2)] py-[var(--space-1)] text-white"
           >
             {status === 'zapping'
               ? 'Zapping...'
@@ -102,7 +106,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         <button
           onClick={handleFav}
           aria-label="Favorite"
-          className="rounded border px-2 py-1"
+          className="rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)]"
         >
           <FaHeart className="inline" />
         </button>
