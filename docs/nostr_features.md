@@ -20,11 +20,10 @@ Use **DelegationManager** from the profile settings to generate delegation tags 
 
 They can then attach this tag when publishing to act on your behalf.
 
-## Direct and Group Messaging
+## Direct Messaging
 
-Bookstr includes lightweight chat modals for private conversations.
+Bookstr includes a lightweight chat modal for private conversations.
 
 - **DMModal** opens a single user chat. Messages are encrypted with NIP‑04 and displayed in a scrolling list. Use the input box and **Send** button to chat.
-- **GroupChatModal** works the same way but accepts a list of recipients. It uses NIP‑17 to wrap group messages so only the selected members can read them.
 
-Both components subscribe to recent messages when opened and append new ones in real time.
+The component subscribes to recent messages when opened and appends new ones in real time.
