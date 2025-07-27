@@ -18,6 +18,10 @@ const config: Config = {
         },
         border: 'var(--clr-border)'
       },
+      spacing: {
+        chip: 'var(--margin-chip)',
+        button: 'var(--margin-button)'
+      },
       borderRadius: {
         card: 'var(--radius-card)',
         modal: 'var(--radius-modal)',
@@ -26,6 +30,14 @@ const config: Config = {
       boxShadow: {
         1: 'var(--shadow-1)',
         2: 'var(--shadow-2)'
+      },
+      fontSize: {
+        header: 'var(--font-size-header)',
+        'header-lg': 'calc(var(--font-size-header)*1.25)',
+        'header-xl': 'calc(var(--font-size-header)*1.5)',
+        body: 'var(--font-size-body)',
+        'body-lg': 'calc(var(--font-size-body)*1.25)',
+        'body-xl': 'calc(var(--font-size-body)*1.5)'
       }
     }
   }
