@@ -158,7 +158,7 @@ export const Discover: React.FC = () => {
       </div>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Trending Books</h2>
-        <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[var(--space-4)] lg:grid-cols-4">
           {trending.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
@@ -176,7 +176,7 @@ export const Discover: React.FC = () => {
       </section>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">New Releases</h2>
-        <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[var(--space-4)] lg:grid-cols-4">
           {newReleases.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
@@ -194,9 +194,11 @@ export const Discover: React.FC = () => {
       </section>
       <section className="p-4">
         <h2 className="mb-2 font-semibold">Recommended for You</h2>
-        <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[var(--space-4)] lg:grid-cols-4">
           {noResults ? (
-            <p className="col-span-full text-center">No matching books found.</p>
+            <p className="col-span-full text-center">
+              No matching books found.
+            </p>
           ) : recommended.length === 0 ? (
             Array.from({ length: 6 }).map((_, i) => (
               <BookCardSkeleton key={i} />

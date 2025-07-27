@@ -27,7 +27,7 @@ export const RepostButton: React.FC<RepostButtonProps> = ({
     <button
       onClick={handleClick}
       aria-label="Repost"
-      className={`rounded border px-2 py-1 ${className ?? ''}`}
+      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${className ?? ''}`}
     >
       <FaRetweet aria-hidden="true" />
     </button>

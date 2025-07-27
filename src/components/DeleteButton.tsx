@@ -30,7 +30,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
     <button
       onClick={handleClick}
       aria-label="Delete"
-      className={`rounded border px-2 py-1 ${className ?? ''}`}
+      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${className ?? ''}`}
     >
       <FaTrash aria-hidden="true" />
     </button>
