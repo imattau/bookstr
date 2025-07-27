@@ -14,3 +14,12 @@ export function isValidNip05(handle: string): boolean {
   if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(domain)) return false;
   return true;
 }
+
+export function isValidWsUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'ws:' || u.protocol === 'wss:';
+  } catch {
+    return false;
+  }
+}
