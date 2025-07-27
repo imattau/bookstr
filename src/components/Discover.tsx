@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
+import { addEvent } from '../store/events';
 import { useSearchParams } from 'react-router-dom';
 import { BookCard } from './BookCard';
 import { BookCardSkeleton } from './BookCardSkeleton';
@@ -41,18 +42,20 @@ export const Discover: React.FC = () => {
   useEffect(() => {
     const filters: Filter[] = [{ kinds: [30023], limit: 50 }];
     if (contacts.length) filters[0].authors = contacts;
-    const offMain = subscribe(filters, (evt) =>
+    const offMain = subscribe(filters, (evt) => {
+      addEvent(evt);
       setEvents((e) => {
         if (e.find((x) => x.id === evt.id)) return e;
         return [...e, evt];
-      }),
-    );
+      });
+    });
     const repostFilter: Filter = { kinds: [6], limit: 50 };
     if (contacts.length) repostFilter.authors = contacts;
     const offReposts = subscribe([repostFilter], (evt) => {
       const target = evt.tags.find((t) => t[0] === 'e')?.[1];
       if (!target) return;
       const offTarget = subscribe([{ ids: [target] }], (orig) => {
+        addEvent(orig);
         setEvents((e) => {
           const idx = e.findIndex((x) => x.id === orig.id);
           if (idx !== -1) {
@@ -76,6 +79,7 @@ export const Discover: React.FC = () => {
     if (!events.length) return;
     const ids = events.map((e) => e.id);
     const off = subscribe([{ kinds: [7], '#e': ids }], (evt) => {
+      addEvent(evt);
       if (voteIds.current.has(evt.id)) return;
       voteIds.current.add(evt.id);
       const target = evt.tags.find((t) => t[0] === 'e')?.[1];
