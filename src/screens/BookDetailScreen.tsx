@@ -8,6 +8,7 @@ import {
 } from '@hello-pangea/dnd';
 import { useNostr } from '../nostr';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
+import { BookMetadataEditor } from '../components/BookMetadataEditor';
 
 interface ChapterEvent {
   id: string;
@@ -23,6 +24,7 @@ export const BookDetailScreen: React.FC = () => {
     title: string;
     summary: string;
     cover?: string;
+    tags: string[];
   } | null>(null);
   const [chapterIds, setChapterIds] = useState<string[]>([]);
   const [chapters, setChapters] = useState<Record<string, ChapterEvent>>({});
@@ -30,6 +32,7 @@ export const BookDetailScreen: React.FC = () => {
     id?: string;
     number: number;
   } | null>(null);
+  const [editMeta, setEditMeta] = useState(false);
   const canEdit = pubkey && authorPubkey && pubkey === authorPubkey;
 
   useEffect(() => {
@@ -52,6 +55,7 @@ export const BookDetailScreen: React.FC = () => {
           title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
           summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
           cover: evt.tags.find((t) => t[0] === 'image')?.[1],
+          tags: evt.tags.filter((t) => t[0] === 't').map((t) => t[1]),
         });
       },
     );
@@ -112,7 +116,13 @@ export const BookDetailScreen: React.FC = () => {
         </div>
       )}
       {canEdit && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => setEditMeta(true)}
+            className="rounded border px-3 py-1"
+          >
+            Edit Book
+          </button>
           <button
             onClick={() =>
               setModalData({ number: chapterIds.length + 1 })
@@ -175,6 +185,14 @@ export const BookDetailScreen: React.FC = () => {
           chapterId={modalData.id}
           authorPubkey={authorPubkey ?? ''}
           onClose={() => setModalData(null)}
+        />
+      )}
+      {editMeta && meta && bookId && (
+        <BookMetadataEditor
+          bookId={bookId}
+          authorPubkey={authorPubkey ?? ''}
+          meta={meta}
+          onClose={() => setEditMeta(false)}
         />
       )}
     </div>
