@@ -17,10 +17,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const theme = useSettings((s) => s.theme);
   const setTheme = useSettings((s) => s.setTheme);
+  const textSize = useSettings((s) => s.textSize);
+  const reduceMotion = useSettings((s) => s.reduceMotion);
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  React.useEffect(() => {
+    document.documentElement.style.fontSize = `${textSize}px`;
+  }, [textSize]);
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute(
+      'data-reduce-motion',
+      reduceMotion ? 'true' : 'false',
+    );
+  }, [reduceMotion]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
