@@ -6,7 +6,41 @@ export interface Suggestion {
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 
-export async function search(q: string): Promise<Suggestion[]> {
+const HISTORY_KEY = 'search-history';
+
+function getHistory(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function addHistory(q: string) {
+  if (!q) return;
+  const hist = getHistory().filter((h) => h !== q);
+  hist.unshift(q);
+  if (hist.length > 10) hist.length = 10;
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getSearchHistory(): string[] {
+  return getHistory();
+}
+
+export function clearSearchHistory(): void {
+  try {
+    localStorage.removeItem(HISTORY_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+async function fetchSuggestions(q: string): Promise<Suggestion[]> {
   if (!q) return [];
   try {
     const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`);
@@ -31,4 +65,20 @@ export async function search(q: string): Promise<Suggestion[]> {
   } catch {
     return [];
   }
+}
+
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+let pending: Array<(v: Suggestion[]) => void> = [];
+
+export async function search(q: string): Promise<Suggestion[]> {
+  return new Promise((resolve) => {
+    pending.push(resolve);
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(async () => {
+      const res = await fetchSuggestions(q);
+      if (q.trim()) addHistory(q.trim());
+      pending.forEach((fn) => fn(res));
+      pending = [];
+    }, 300);
+  });
 }
