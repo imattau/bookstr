@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 import { useNostr, sendGroupDM, getPrivKey } from '../nostr';
+import { OnboardingTooltip } from './OnboardingTooltip';
 
 interface Message {
   id: string;
@@ -88,12 +89,14 @@ export const GroupChatModal: React.FC<GroupChatModalProps> = ({
             className="flex-1 rounded border p-2"
             placeholder="Message"
           />
-          <button
-            onClick={handleSend}
-            className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-          >
-            Send
-          </button>
+          <OnboardingTooltip storageKey="group-send" text="Send to group">
+            <button
+              onClick={handleSend}
+              className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            >
+              Send
+            </button>
+          </OnboardingTooltip>
         </div>
       </div>
     </div>

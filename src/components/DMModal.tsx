@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { useNostr, sendDM, getPrivKey } from '../nostr';
+import { OnboardingTooltip } from './OnboardingTooltip';
 
 interface Message {
   id: string;
@@ -86,13 +87,15 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
             placeholder="Message"
             aria-label="Message"
           />
-          <button
-            onClick={handleSend}
-            aria-label="Send message"
-            className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
-          >
-            Send
-          </button>
+          <OnboardingTooltip storageKey="dm-send" text="Send a direct message">
+            <button
+              onClick={handleSend}
+              aria-label="Send message"
+              className="rounded bg-primary-600 px-3 py-1 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+            >
+              Send
+            </button>
+          </OnboardingTooltip>
         </div>
       </div>
     </div>
