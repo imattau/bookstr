@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNostr, publishLongPost } from '../nostr';
+import { queueOfflineEdit } from '../lib/offlineSync';
 import { useToast } from './ToastProvider';
 
 interface Props {
@@ -55,17 +56,30 @@ export const ChapterEditorModal: React.FC<Props> = ({
       .split(',')
       .map((t) => t.trim())
       .filter(Boolean);
-    const evt = await publishLongPost(
-      ctx,
-      {
-        title,
-        summary: summary || undefined,
-        content,
-        cover: cover || undefined,
-        extraTags: baseTags,
-        tags: tTags,
-      },
-    );
+    const data = {
+      title,
+      summary: summary || undefined,
+      content,
+      cover: cover || undefined,
+      extraTags: baseTags,
+      tags: tTags,
+      bookId,
+      chapterNumber,
+    };
+    let evt: any;
+    try {
+      if (!navigator.onLine) throw new Error('offline');
+      evt = await publishLongPost(ctx, data);
+    } catch {
+      await queueOfflineEdit({
+        id: Math.random().toString(36).slice(2),
+        type: 'chapter',
+        data,
+      });
+      toast('Saved offline, will sync later');
+      onClose();
+      return;
+    }
 
     let listEvt: any = null;
     if (pubkey) {
