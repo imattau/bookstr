@@ -1,10 +1,12 @@
 const path = require('path');
 const express = require('express');
-const { SimplePool } = require('nostr-tools');
+const { SimplePool, verifyEvent } = require('nostr-tools');
 const { relays, prunePolicy } = require('./config');
 const app = express();
 const pool = new SimplePool();
 const fallbackVersions = {};
+
+const REPLACEABLE_KINDS = new Set([41, 30001, 30023, 30033]);
 
 const PORT = process.env.PORT || 3000;
 const API_BASE = process.env.API_BASE || '/api';
@@ -14,6 +16,17 @@ app.use(express.json());
 async function actionHandler(req, res) {
   console.log('action', req.body);
   const event = req.body;
+
+  if (REPLACEABLE_KINDS.has(event.kind)) {
+    if (!req.user || req.user.pubkey !== event.pubkey) {
+      res.status(400).json({ error: 'pubkey mismatch' });
+      return;
+    }
+    if (!verifyEvent(event)) {
+      res.status(400).json({ error: 'invalid signature' });
+      return;
+    }
+  }
 
   const activeRelays = relays.filter(
     (r) => r.retentionDays >= prunePolicy.minimumDays,
@@ -44,19 +57,34 @@ async function actionHandler(req, res) {
 
 app.post(`${API_BASE}/action`, actionHandler);
 
-app.post(`${API_BASE}/event`, async (req, res) => {
+async function eventHandler(req, res) {
   console.log('event', req.body);
+  const event = req.body;
+
+  if (REPLACEABLE_KINDS.has(event.kind)) {
+    if (!req.user || req.user.pubkey !== event.pubkey) {
+      res.status(400).json({ error: 'pubkey mismatch' });
+      return;
+    }
+    if (!verifyEvent(event)) {
+      res.status(400).json({ error: 'invalid signature' });
+      return;
+    }
+  }
+
   const targets = relays
     .filter((r) => r.supportsNip27 && r.retentionDays >= prunePolicy.minimumDays)
     .map((r) => r.url);
   try {
-    await pool.publish(targets, req.body);
+    await pool.publish(targets, event);
     res.json({ status: 'ok' });
   } catch (err) {
     console.error('publish failed', err);
     res.status(500).json({ error: 'publish failed' });
   }
-});
+}
+
+app.post(`${API_BASE}/event`, eventHandler);
 
 app.post(`${API_BASE}/subscribe`, (req, res) => {
   console.log('subscribe', req.body);
@@ -81,4 +109,10 @@ if (require.main === module) {
   });
 }
 
-module.exports = { app, actionHandler, fallbackVersions, pool };
+module.exports = {
+  app,
+  actionHandler,
+  eventHandler,
+  fallbackVersions,
+  pool,
+};
