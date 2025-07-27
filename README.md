@@ -21,6 +21,15 @@ specification but functionality is limited.
 - **Service worker** – `src/sw.ts` provides offline caching and background sync
   for a Progressive Web App.
 
+## Settings
+
+Open the profile settings from the library screen to configure the app:
+
+- **Theme** – pick one of the preset palettes via the theme selector.
+- **Yearly reading goal** – store your annual goal which updates progress in the library view.
+- **Clear Cached Books** – remove any books saved for offline reading.
+
+
 ## Getting Started
 
 1. Install dependencies

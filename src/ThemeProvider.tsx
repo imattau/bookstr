@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSettings } from './useSettings';
 
 export type Theme = 'default' | 'dark' | 'earthy' | 'vibrant' | 'pastel';
 
@@ -14,14 +15,11 @@ const ThemeContext = React.createContext<ThemeContextValue | undefined>(
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = React.useState<Theme>(() => {
-    const stored = localStorage.getItem('theme') as Theme | null;
-    return stored ?? 'default';
-  });
+  const theme = useSettings((s) => s.theme);
+  const setTheme = useSettings((s) => s.setTheme);
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
   return (
