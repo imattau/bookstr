@@ -126,7 +126,7 @@ export const BookListScreen: React.FC = () => {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-[var(--space-4)] space-y-[var(--space-4)]">
       <div className="flex items-center justify-between">
         <select
           value={sort}
@@ -172,7 +172,7 @@ export const BookListScreen: React.FC = () => {
       </div>
       {show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="space-y-2 rounded bg-[color:var(--clr-surface)] p-4 w-full max-w-sm">
+          <div className="space-y-2 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)] w-full max-w-sm">
             <BookPublishWizard onPublish={handlePublished} />
             <div className="flex justify-end pt-2">
               <button

@@ -93,7 +93,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   return (
     <div
       ref={ref}
-      className={`overflow-y-auto p-4 ${className ?? ''}`}
+      className={`overflow-y-auto p-[var(--space-4)] ${className ?? ''}`}
       style={style}
       dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       data-testid={dataTestId}

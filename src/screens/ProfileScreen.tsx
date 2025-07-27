@@ -70,7 +70,7 @@ export const ProfileScreen: React.FC = () => {
           />
         )}
         <div className="flex-1 space-y-1">
-          <h2 className="text-lg font-semibold">{meta?.name || pubkey}</h2>
+          <h2 className="text-xl font-semibold">{meta?.name || pubkey}</h2>
           {meta?.about && <p className="text-sm text-gray-600">{meta.about}</p>}
           <p className="text-sm text-gray-600">{followers} followers</p>
         </div>

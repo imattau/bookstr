@@ -126,7 +126,7 @@ export const BookDetailScreen: React.FC = () => {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-[var(--space-4)] space-y-[var(--space-4)]">
       {meta && (
         <div className="space-y-2">
           {meta.cover && (
@@ -142,7 +142,7 @@ export const BookDetailScreen: React.FC = () => {
             <div>
               <button
                 onClick={() => navigate(`/read/${bookId}`)}
-                className="mt-2 rounded border px-3 py-1"
+                className="mt-[var(--space-2)] rounded border px-3 py-1"
               >
                 Read Book
               </button>

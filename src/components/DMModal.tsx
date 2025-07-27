@@ -95,7 +95,7 @@ export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]">
       <div className="flex w-full max-h-screen flex-col bg-[color:var(--clr-surface)] sm:max-w-[360px] sm:rounded-modal">
         <div className="flex items-center justify-between border-b p-[var(--space-2)]">
-          <h2 className="text-lg font-medium">Chat</h2>
+          <h2 className="text-xl font-medium">Chat</h2>
           {onClose && (
             <button
               onClick={onClose}

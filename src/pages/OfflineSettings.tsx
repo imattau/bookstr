@@ -57,7 +57,7 @@ const OfflineSettingsPage: React.FC = () => {
         {lastSynced && (
           <p>Last synced: {new Date(lastSynced).toLocaleString()}</p>
         )}
-        <button onClick={handleClear} className="rounded border px-3 py-1 mt-2">
+        <button onClick={handleClear} className="rounded border px-3 py-1 mt-[var(--space-2)]">
           Clear Cached Books
         </button>
       </div>

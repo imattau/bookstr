@@ -170,7 +170,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
       )}
       {step === 4 && (
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <h2 className="text-xl font-semibold">{title}</h2>
           {cover && (
             <img
               src={cover}

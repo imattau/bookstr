@@ -57,7 +57,7 @@ export const ReaderScreen: React.FC = () => {
         className="flex-1"
         style={{ fontSize }}
       />
-      <div className="p-4">
+      <div className="p-[var(--space-4)]">
         <button
           onClick={() => {
             finishBook(bookId);

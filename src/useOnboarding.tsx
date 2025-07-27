@@ -19,7 +19,7 @@ export function useOnboarding(key: string, text: string) {
 
   const Tooltip =
     show && ref.current ? (
-      <div className="pointer-events-none absolute z-10 mt-1 whitespace-nowrap rounded bg-primary-600 px-2 py-1 text-[12px] text-white shadow">
+      <div className="pointer-events-none absolute z-10 mt-[var(--space-1)] whitespace-nowrap rounded bg-primary-600 px-2 py-1 text-[12px] text-white shadow">
         {text}
       </div>
     ) : null;
