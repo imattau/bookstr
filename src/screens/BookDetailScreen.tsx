@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   DragDropContext,
   Droppable,
@@ -21,6 +21,7 @@ interface ChapterEvent {
 
 export const BookDetailScreen: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
+  const navigate = useNavigate();
   const ctx = useNostr();
   const { subscribe, publish, list, pubkey } = ctx;
   const [authorPubkey, setAuthorPubkey] = useState<string | null>(null);
@@ -137,6 +138,16 @@ export const BookDetailScreen: React.FC = () => {
           )}
           <h2 className="text-xl font-semibold">{meta.title}</h2>
           {meta.summary && <p>{meta.summary}</p>}
+          {bookId && (
+            <div>
+              <button
+                onClick={() => navigate(`/read/${bookId}`)}
+                className="mt-2 rounded border px-3 py-1"
+              >
+                Read Book
+              </button>
+            </div>
+          )}
         </div>
       )}
       {canEdit && (
