@@ -19,6 +19,7 @@ import { BookDetailScreen } from './screens/BookDetailScreen';
 import { ReaderScreen } from './screens/ReaderScreen';
 import { Discover } from './components/Discover';
 import LibraryPage from './pages/Library';
+import ManageChaptersPage from './pages/ManageChapters';
 import { BookPublishWizard } from './components/BookPublishWizard';
 import { NotificationFeed } from './components/NotificationFeed';
 import ProfileSettingsPage from './pages/ProfileSettings';
@@ -92,6 +93,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/profile/settings" element={<ProfileSettingsPage />} />
           <Route path="/books" element={<BookListScreen />} />
           <Route path="/book/:bookId" element={<BookDetailScreen />} />
+          <Route path="/book/:bookId/chapters" element={<ManageChaptersPage />} />
           <Route path="/read/:bookId" element={<ReaderScreen />} />
           <Route path="*" element={<Navigate to="/discover" />} />
         </Routes>

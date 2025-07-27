@@ -9,7 +9,10 @@ interface Props {
   chapterId?: string;
   authorPubkey: string;
   onClose: () => void;
+  viaApi?: boolean;
 }
+
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 
 export const ChapterEditorModal: React.FC<Props> = ({
   bookId,
@@ -17,6 +20,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
   chapterId,
   authorPubkey,
   onClose,
+  viaApi,
 }) => {
   const ctx = useNostr();
   const { publish, subscribe, list, pubkey } = ctx;
@@ -70,6 +74,13 @@ export const ChapterEditorModal: React.FC<Props> = ({
     try {
       if (!navigator.onLine) throw new Error('offline');
       evt = await publishLongPost(ctx, data);
+      if (viaApi) {
+        await fetch(`${API_BASE}/event`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(evt),
+        });
+      }
     } catch {
       await queueOfflineEdit({
         id: Math.random().toString(36).slice(2),
@@ -108,7 +119,14 @@ export const ChapterEditorModal: React.FC<Props> = ({
       ids[chapterNumber - 1] = evt.id;
     }
     const tagsOut = [['d', bookId], ...ids.map((i: string) => ['e', i])];
-    await publish({ kind: 30001, content: '', tags: tagsOut });
+    const listEvent = await publish({ kind: 30001, content: '', tags: tagsOut });
+    if (viaApi) {
+      await fetch(`${API_BASE}/event`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(listEvent),
+      });
+    }
     onClose();
   };
 

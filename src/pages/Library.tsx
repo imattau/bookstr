@@ -154,7 +154,7 @@ const LibraryPage: React.FC = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() => navigate(`/book/${b.id}`)}
+                          onClick={() => navigate(`/book/${b.id}/chapters`)}
                           className="rounded border px-2 py-1"
                         >
                           Manage Chapters
