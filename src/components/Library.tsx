@@ -43,7 +43,7 @@ export const Library: React.FC = () => {
         >
           <button
             aria-label="Settings"
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/profile/settings')}
             className="text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50"
           >
             ⚙
