@@ -11,11 +11,11 @@ Open the "Write" screen or choose **Publish Book** from the library. The wizard 
 1. **Title & Summary** – Fill in the title and a short summary then press **Next**.
 2. **Cover Image** – Paste a URL for the cover artwork (optional). Continue with **Next**.
 3. **Tags** – Enter comma separated tags and press **Next**.
-4. **Content** – Write the book using Markdown. Press **Next** once more to preview.
+4. **Content** – Write the book using Markdown. Only a small set of HTML tags is allowed. See [allowed_html.md](allowed_html.md) for details. Press **Next** once more to preview.
 
 ## 3. Proof‑of‑Work and Publishing
 
-On the final screen you can review the preview. Tick **Enable proof-of-work** if desired to add a small PoW to the event before clicking **Publish**. Successful publishing calls `reportBookPublished()` and unlocks the *First Book Published* achievement.
+On the final screen you can review the preview. Tick **Enable proof-of-work** if desired to add a small PoW to the event before clicking **Publish**. Successful publishing calls `reportBookPublished()` and unlocks the _First Book Published_ achievement.
 
 ## 4. Locating the Event
 

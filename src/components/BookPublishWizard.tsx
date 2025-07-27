@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
 import { useNostr, publishLongPost } from '../nostr';
 import { useToast } from './ToastProvider';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';
 
 export interface BookPublishWizardProps {
@@ -21,7 +21,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const [content, setContent] = useState('');
   const [pow, setPow] = useState(false);
   const previewHtml = useMemo(
-    () => DOMPurify.sanitize(marked.parse(content)),
+    () => sanitizeHtml(marked.parse(content)),
     [content],
   );
 

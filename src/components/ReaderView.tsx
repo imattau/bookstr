@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { cacheBookHtml, getCachedBookHtml } from '../htmlCache';
 import { saveOfflineBook } from '../offlineStore';
 import { logEvent } from '../analytics';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '../sanitizeHtml';
 
 export interface ReaderViewProps {
   bookId: string;
@@ -35,7 +35,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState(html);
-  const sanitizedContent = useMemo(() => DOMPurify.sanitize(content), [content]);
+  const sanitizedContent = useMemo(() => sanitizeHtml(content), [content]);
 
   useEffect(() => {
     setContent(html);
