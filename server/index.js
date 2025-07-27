@@ -1,6 +1,9 @@
 const path = require('path');
 const express = require('express');
+const { SimplePool } = require('nostr-tools');
+const { relays, prunePolicy } = require('./config');
 const app = express();
+const pool = new SimplePool();
 
 const PORT = process.env.PORT || 3000;
 const API_BASE = process.env.API_BASE || '/api';
@@ -12,9 +15,18 @@ app.post(`${API_BASE}/action`, (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.post(`${API_BASE}/event`, (req, res) => {
+app.post(`${API_BASE}/event`, async (req, res) => {
   console.log('event', req.body);
-  res.json({ status: 'ok' });
+  const targets = relays
+    .filter((r) => r.supportsNip27 && r.retentionDays >= prunePolicy.minimumDays)
+    .map((r) => r.url);
+  try {
+    await pool.publish(targets, req.body);
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('publish failed', err);
+    res.status(500).json({ error: 'publish failed' });
+  }
 });
 
 app.post(`${API_BASE}/subscribe`, (req, res) => {

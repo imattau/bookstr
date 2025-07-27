@@ -126,6 +126,13 @@ docker run -e PORT=8080 -p 8080:8080 bookstr:latest
 This starts the API server on port 8080 while still serving the compiled web
 app.
 
+Relay and pruning settings for the server live in `server/config.js`. Each relay
+entry specifies its `url`, whether it `supportsNip27`, and how many
+`retentionDays` of history it keeps. The `prunePolicy` object defines the minimum
+number of days to keep when forwarding events. Only relays that support NIP‑27
+and whose retention is greater than or equal to `prunePolicy.minimumDays` will
+receive published events.
+
 ### Environment Variables
 
 The frontend reads certain configuration from Vite environment variables:
