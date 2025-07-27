@@ -52,6 +52,9 @@ Open the profile settings from the library screen to configure the app:
 4. If no NIP‑07 wallet is detected, you can still log in by pasting your
    private key into the login screen to sign events manually.
 
+For a step-by-step guide on using the book publishing wizard, see
+[docs/first_publish.md](docs/first_publish.md).
+
 The build setup is now complete and consists of the following steps:
 
 1. Run `npm test` to execute the unit tests.
