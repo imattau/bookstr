@@ -31,6 +31,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   >
     {items.map(({ key, label, Icon }) => (
       <button
+        type="button"
         key={key}
         onClick={() => onChange(key)}
         aria-pressed={active === key}

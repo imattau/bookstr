@@ -146,6 +146,8 @@ export const Discover: React.FC = () => {
           <button
             key={t}
             onClick={() => setTag(t)}
+            aria-pressed={tag === t}
+            aria-label={t}
             className={`btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] ${
               tag === t
                 ? 'bg-primary-600 text-white'
