@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { Header } from './components/Header';
+import { LoginModal } from './components/LoginModal';
 import { search, Suggestion } from './search';
 import { BottomNav } from './components/BottomNav';
 import { ThemeProvider } from './ThemeProvider';
@@ -48,6 +49,7 @@ const AppRoutes: React.FC = () => {
     return 'discover';
   }, [location.pathname]);
   const [chatOpen, setChatOpen] = React.useState(false);
+  const [loginOpen, setLoginOpen] = React.useState(false);
   const { contacts } = useNostr();
   const [suggestions, setSuggestions] = React.useState<Suggestion[]>([]);
 
@@ -77,6 +79,7 @@ const AppRoutes: React.FC = () => {
         onSearch={handleSearch}
         suggestions={suggestions}
         onSelectSuggestion={handleSelectSuggestion}
+        onLogin={() => setLoginOpen(true)}
       >
         <button
           onClick={() => setChatOpen(true)}
@@ -115,6 +118,7 @@ const AppRoutes: React.FC = () => {
       {chatOpen && contacts[0] && (
         <DMModal to={contacts[0]} onClose={() => setChatOpen(false)} />
       )}
+      {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
     </AppShell>
   );
 };
