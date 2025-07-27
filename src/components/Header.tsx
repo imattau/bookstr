@@ -11,6 +11,7 @@ export interface HeaderProps {
   children?: React.ReactNode;
   className?: string;
   'data-testid'?: string;
+  onLogin?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectSuggestion,
   children,
   className,
+  onLogin,
   'data-testid': dataTestId,
 }) => {
   const [q, setQ] = React.useState('');
@@ -80,6 +82,14 @@ export const Header: React.FC<HeaderProps> = ({
         </ul>
       )}
       {children}
+      {onLogin && (
+        <button
+          onClick={onLogin}
+          className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+        >
+          Login
+        </button>
+      )}
     </header>
   );
 };
