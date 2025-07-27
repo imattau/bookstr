@@ -46,6 +46,14 @@ html {
   }
 }
 
+[data-reduce-motion='true'] .skeleton::after {
+  animation: none;
+}
+[data-reduce-motion='true'] .btn-tap,
+[data-reduce-motion='true'] .card-hover {
+  transition: none;
+}
+
 .btn-tap {
   @apply transition-transform duration-150 active:scale-110 focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)];
 }
