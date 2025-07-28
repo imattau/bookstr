@@ -27,6 +27,7 @@ const path = require('path');
     },
     module,
     exports: module.exports,
+    TextEncoder,
   };
   vm.runInNewContext(code, sandbox, { filename: 'BookListScreen.js' });
   const { BookListScreen } = module.exports;

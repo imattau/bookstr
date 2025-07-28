@@ -37,6 +37,7 @@ const path = require('path');
     },
     module,
     exports: module.exports,
+    TextEncoder,
     React,
   };
   vm.runInNewContext(code, sandbox, { filename: 'ChapterEditorModal.js' });

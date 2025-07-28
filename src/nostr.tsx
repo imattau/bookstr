@@ -1,5 +1,3 @@
-import { TextEncoder as UtilTextEncoder } from "util";
-if (typeof globalThis.TextEncoder === "undefined") { (globalThis as any).TextEncoder = UtilTextEncoder; }
 import React, {
   createContext,
   useContext,
@@ -40,7 +38,7 @@ const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
       .map((r) => r.trim())
       .filter(Boolean)
   : ['wss://relay.damus.io', 'wss://relay.primal.net', 'wss://nostr.wine'];
-const encoder = typeof TextEncoder === "undefined" ? new UtilTextEncoder() : new TextEncoder();
+const encoder = new TextEncoder();
 
 // Maximum size for long-form event content in bytes
 export let MAX_EVENT_SIZE = 1000;

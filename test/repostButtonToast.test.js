@@ -16,7 +16,7 @@ const path = require('path');
     external: [
       'react',
       'react-icons/fa',
-      './src/nostr.tsx','./src/nostr/events.ts',
+      './src/nostr.tsx',
       './src/components/ToastProvider.tsx',
     ],
   });
@@ -25,24 +25,28 @@ const path = require('path');
   const calls = [];
   const sandbox = {
     require: (p) => {
-      if (p === "./src/nostr.tsx") {
-        return { useNostr: () => ({}) };
+      if (p === './src/nostr.tsx') {
+        return {
+          useNostr: () => ({}),
+          publishRepost: async () => { throw new Error('fail'); },
+        };
       }
-      if (p === "./src/nostr/events.ts") {
-        return { publishRepost: async () => { throw new Error("fail"); } };
-      }
-      if (p === "./src/components/ToastProvider.tsx") {
+      if (p === './src/components/ToastProvider.tsx') {
         return { useToast: () => (msg) => calls.push(msg) };
       }
-      if (p === "react-icons/fa") {
-        return { FaRetweet: () => React.createElement("div") };
+      if (p === 'react-icons/fa') {
+        return { FaRetweet: () => React.createElement('div') };
       }
       return require(p);
     },
     module,
     exports: module.exports,
+    TextEncoder,
     React,
   };
+  vm.runInNewContext(code, sandbox, { filename: 'RepostButton.js' });
+  const { RepostButton } = module.exports;
+
   let renderer;
   await TestRenderer.act(async () => {
     renderer = TestRenderer.create(React.createElement(RepostButton, { target: '1' }));
