@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import type { Event as NostrEvent, Filter } from 'nostr-tools';
+import React, { useEffect, useState, useMemo } from 'react';
+import type { Event as NostrEvent } from 'nostr-tools';
+import { useDiscoverBooks } from '../hooks/useDiscoverBooks';
 import { useNostr } from '../nostr';
-import { addEvent } from '../store/events';
 import { useSearchParams } from 'react-router-dom';
 import { BookCard } from './BookCard';
 import { BookCardSkeleton } from './BookCardSkeleton';
@@ -12,13 +12,10 @@ import { Illustration } from './Illustration';
 
 
 export const Discover: React.FC = () => {
-  const { subscribe, contacts } = useNostr();
+  const { books: bookEvents, trending, newReleases, removeBook } =
+    useDiscoverBooks();
+  const { contacts } = useNostr();
   const [params, setParams] = useSearchParams();
-  const [events, setEvents] = useState<
-    (NostrEvent & { repostedBy?: string })[]
-  >([]);
-  const [votes, setVotes] = useState<Record<string, number>>({});
-  const voteIds = useRef(new Set<string>());
   const [search, setSearch] = useState(params.get('q') || '');
   const [tag, setTag] = useState('All');
 
@@ -38,62 +35,6 @@ export const Discover: React.FC = () => {
   useEffect(() => {
     logEvent('view_discover');
   }, []);
-
-  useEffect(() => {
-    const filters: Filter[] = [{ kinds: [30023], limit: 50 }];
-    if (contacts.length) filters[0].authors = contacts;
-    const offMain = subscribe(filters, (evt) => {
-      addEvent(evt);
-      setEvents((e) => {
-        if (e.find((x) => x.id === evt.id)) return e;
-        return [...e, evt];
-      });
-    });
-    const repostFilter: Filter = { kinds: [6], limit: 50 };
-    if (contacts.length) repostFilter.authors = contacts;
-    const offReposts = subscribe([repostFilter], (evt) => {
-      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
-      if (!target) return;
-      const offTarget = subscribe([{ ids: [target] }], (orig) => {
-        addEvent(orig);
-        setEvents((e) => {
-          const idx = e.findIndex((x) => x.id === orig.id);
-          if (idx !== -1) {
-            const copy = [...e];
-            copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
-            return copy;
-          }
-          return [...e, { ...orig, repostedBy: evt.pubkey }];
-        });
-        offTarget();
-      });
-    });
-    return () => {
-      offMain();
-      offReposts();
-    };
-  }, [subscribe, contacts]);
-
-  // aggregate votes for known events
-  useEffect(() => {
-    if (!events.length) return;
-    const ids = events.map((e) => e.id);
-    const off = subscribe([{ kinds: [7], '#e': ids }], (evt) => {
-      addEvent(evt);
-      if (voteIds.current.has(evt.id)) return;
-      voteIds.current.add(evt.id);
-      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
-      // only count publishVote events ('+' content)
-      if (target && evt.content === '+') {
-        setVotes((v) => ({ ...v, [target]: (v[target] ?? 0) + 1 }));
-      }
-    });
-    return off;
-  }, [events, subscribe]);
-
-  const bookEvents = events.filter(
-    (evt) => !evt.tags.some((t) => t[0] === 'book'),
-  );
 
   const tagOptions = useMemo(() => {
     const set = new Set<string>();
@@ -128,14 +69,6 @@ export const Discover: React.FC = () => {
     }
     return ok;
   });
-
-  const trending = [...bookEvents]
-    .sort((a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0))
-    .slice(0, 6);
-
-  const newReleases = [...bookEvents]
-    .sort((a, b) => (b.created_at ?? 0) - (a.created_at ?? 0))
-    .slice(0, 6);
 
   const recommended = filtered.slice(0, 6);
   const noResults = search.trim() !== '' && recommended.length === 0;
@@ -191,9 +124,7 @@ export const Discover: React.FC = () => {
                 <BookCard
                   key={e.id}
                   event={e as NostrEvent}
-                  onDelete={(id) =>
-                    setEvents((evts) => evts.filter((x) => x.id !== id))
-                  }
+                  onDelete={(id) => removeBook(id)}
                 />
               ))}
         </div>
@@ -209,9 +140,7 @@ export const Discover: React.FC = () => {
                 <BookCard
                   key={e.id}
                   event={e as NostrEvent}
-                  onDelete={(id) =>
-                    setEvents((evts) => evts.filter((x) => x.id !== id))
-                  }
+                  onDelete={(id) => removeBook(id)}
                 />
               ))}
         </div>
@@ -232,9 +161,7 @@ export const Discover: React.FC = () => {
               <BookCard
                 key={e.id}
                 event={e as NostrEvent}
-                onDelete={(id) =>
-                  setEvents((evts) => evts.filter((x) => x.id !== id))
-                }
+                onDelete={(id) => removeBook(id)}
               />
             ))
           )}
