@@ -12,6 +12,7 @@ import { hexToBytes } from '@noble/hashes/utils';
 import { useNostr } from '../nostr';
 import { getPrivKey } from '../nostr/auth';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
+import { Button } from '../components/ui';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 
@@ -110,12 +111,9 @@ const ManageChaptersPage: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button
-          onClick={() => setModal({ number: chapterIds.length + 1 })}
-          className="rounded bg-primary-600 px-3 py-1 text-white"
-        >
+        <Button variant="primary" onClick={() => setModal({ number: chapterIds.length + 1 })}>
           New Draft
-        </button>
+        </Button>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="chapters">
@@ -144,18 +142,18 @@ const ManageChaptersPage: React.FC = () => {
                           {ch?.summary && <p className="text-sm">{ch.summary}</p>}
                         </div>
                         <div className="flex gap-1">
-                          <button
+                          <Button
                             onClick={() => setModal({ id, number: index + 1 })}
-                            className="rounded border px-2 py-1 text-sm"
+                            className="px-2 py-1 text-sm"
                           >
                             Edit
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => handleDelete(id)}
-                            className="rounded border px-2 py-1 text-sm"
+                            className="px-2 py-1 text-sm"
                           >
                             Delete
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     )}

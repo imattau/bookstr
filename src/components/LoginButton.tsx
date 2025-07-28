@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNostr, connectNostrWallet, nostrLogin } from '../nostr';
+import { useNostr } from '../nostr';
+import { connectNostrWallet, nostrLogin } from '../nostr/auth';
 
 export const LoginButton: React.FC = () => {
   const ctx = useNostr();

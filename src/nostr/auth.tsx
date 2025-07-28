@@ -1,8 +1,6 @@
 import type { Event, EventTemplate } from 'nostr-tools';
 import type { NostrContextValue } from '../nostr';
-import { TextEncoder as UtilTextEncoder } from "util";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
-if (typeof globalThis.TextEncoder === "undefined") { (globalThis as any).TextEncoder = UtilTextEncoder; }
 import { schnorr } from "@noble/curves/secp256k1";
 import { sha256 } from "@noble/hashes/sha256";
 

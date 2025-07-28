@@ -1,5 +1,3 @@
-import { TextEncoder as UtilTextEncoder } from 'util';
-if (typeof globalThis.TextEncoder === "undefined") { (globalThis as any).TextEncoder = UtilTextEncoder; }
 import type { Event as NostrEvent } from 'nostr-tools';
 import { getPublicKey } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
@@ -7,7 +5,7 @@ import type { NostrContextValue } from '../nostr';
 import { MAX_EVENT_SIZE } from '../nostr';
 import { getPrivKey } from './auth';
 
-const encoder = typeof TextEncoder === 'undefined' ? new UtilTextEncoder() : new TextEncoder();
+const encoder = new TextEncoder();
 
 export async function publishLongPost(
   ctx: NostrContextValue,

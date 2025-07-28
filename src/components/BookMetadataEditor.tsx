@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNostr, publishBookMeta } from '../nostr';
+import { useNostr } from '../nostr';
+import { publishBookMeta } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 

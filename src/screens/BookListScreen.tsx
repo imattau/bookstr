@@ -15,6 +15,7 @@ import { useNostr } from '../nostr';
 import { addEvents } from '../store/events';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { BookPublishWizard } from '../components/BookPublishWizard';
+import { Button, Modal } from '../components/ui';
 
 interface BookMeta {
   id: string;
@@ -138,12 +139,9 @@ export const BookListScreen: React.FC = () => {
           <option value="zapped">Most Zapped</option>
         </select>
         {pubkey && (
-          <button
-            onClick={() => setShow(true)}
-            className="rounded bg-primary-600 px-3 py-1 text-white"
-          >
+          <Button variant="primary" onClick={() => setShow(true)} className="px-3 py-1">
             Create Book
-          </button>
+          </Button>
         )}
       </div>
       <div className="space-y-2">
@@ -161,29 +159,22 @@ export const BookListScreen: React.FC = () => {
           </FixedSizeList>
         )}
         <div className="pt-2">
-          <button
-            onClick={loadPage}
-            disabled={loading}
-            className="rounded border px-3 py-1 disabled:opacity-50"
-          >
+          <Button onClick={loadPage} disabled={loading} className="px-3 py-1 disabled:opacity-50">
             {loading ? 'Loading...' : 'Load more'}
-          </button>
+          </Button>
         </div>
       </div>
       {show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="space-y-2 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)] w-full max-w-sm">
+        <Modal onClose={() => setShow(false)}>
+          <div className="space-y-2">
             <BookPublishWizard onPublish={handlePublished} />
             <div className="flex justify-end pt-2">
-              <button
-                onClick={() => setShow(false)}
-                className="rounded border px-3 py-1"
-              >
+              <Button onClick={() => setShow(false)} className="px-3 py-1">
                 Close
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

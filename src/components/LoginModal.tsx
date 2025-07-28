@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNostr, connectNostrWallet, nostrLogin } from '../nostr';
+import { useNostr } from '../nostr';
+import { connectNostrWallet, nostrLogin } from '../nostr/auth';
 import { importKey, validatePrivKey } from '../lib/keys';
 import { isValidUrl } from '../validators';
 

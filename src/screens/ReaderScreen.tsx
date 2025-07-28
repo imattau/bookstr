@@ -5,6 +5,7 @@ import { fetchLongPostParts } from '../nostr/events';
 import { ReaderToolbar } from '../components/ReaderToolbar';
 import { ProgressBar } from '../components/ProgressBar';
 import { ReaderView } from '../components/ReaderView';
+import { Button } from '../components/ui';
 import { useTheme } from '../ThemeProvider';
 import { useReadingStore } from '../store';
 
@@ -59,15 +60,15 @@ export const ReaderScreen: React.FC = () => {
         style={{ fontSize }}
       />
       <div className="p-[var(--space-4)]">
-        <button
+        <Button
           onClick={() => {
             finishBook(bookId);
             navigate(-1);
           }}
-          className="w-full rounded border px-3 py-2"
+          className="w-full px-3 py-2"
         >
           Mark as finished
-        </button>
+        </Button>
       </div>
     </div>
   );

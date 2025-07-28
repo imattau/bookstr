@@ -12,6 +12,7 @@ import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { BookMetadataEditor } from '../components/BookMetadataEditor';
 import { DeleteButton } from '../components/DeleteButton';
 import { BookHistory } from '../components/BookHistory';
+import { Button, Modal } from '../components/ui';
 
 interface ChapterEvent {
   id: string;
@@ -141,44 +142,31 @@ export const BookDetailScreen: React.FC = () => {
           {meta.summary && <p>{meta.summary}</p>}
           {bookId && (
             <div>
-              <button
-                onClick={() => navigate(`/read/${bookId}`)}
-                className="mt-[var(--space-2)] rounded border px-3 py-1"
-              >
+              <Button onClick={() => navigate(`/read/${bookId}`)} className="mt-[var(--space-2)] px-3 py-1">
                 Read Book
-              </button>
+              </Button>
             </div>
           )}
         </div>
       )}
       {canEdit && (
         <div className="flex justify-end gap-2">
-          <button
-            onClick={() => setEditMeta(true)}
-            className="rounded border px-3 py-1"
-          >
+          <Button onClick={() => setEditMeta(true)} className="px-3 py-1">
             Edit Book
-          </button>
-          <button
-            onClick={() =>
-              setModalData({ number: chapterIds.length + 1 })
-            }
-            className="rounded bg-primary-600 px-3 py-1 text-white"
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => setModalData({ number: chapterIds.length + 1 })}
+            className="px-3 py-1"
           >
             Add Chapter
-          </button>
-          <button
-            onClick={() => setShowHistory(true)}
-            className="rounded border px-3 py-1"
-          >
+          </Button>
+          <Button onClick={() => setShowHistory(true)} className="px-3 py-1">
             Versions
-          </button>
-          <button
-            onClick={handleDeleteBook}
-            className="rounded border px-3 py-1 text-red-600"
-          >
+          </Button>
+          <Button onClick={handleDeleteBook} className="px-3 py-1 text-red-600">
             Delete Book
-          </button>
+          </Button>
         </div>
       )}
       <DragDropContext onDragEnd={canEdit ? handleDragEnd : () => {}}>
