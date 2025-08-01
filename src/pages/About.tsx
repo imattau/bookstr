@@ -7,7 +7,7 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-1 text-sm text-gray-600">
+      <div className="space-y-1 text-sm text-text-muted">
         <p>Version: {version}</p>
         <p>Commit: {sha}</p>
         <p>Built: {buildDate}</p>

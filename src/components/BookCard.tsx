@@ -61,7 +61,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   return (
     <div className="rounded-[var(--radius-card)] border p-[var(--space-2)]">
       {event.repostedBy && (
-        <p className="mb-[var(--space-1)] text-xs text-gray-500">
+        <p className="mb-[var(--space-1)] text-xs text-text-muted">
           Reposted by {event.repostedBy}
         </p>
       )}
@@ -73,7 +73,7 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
         />
       )}
       <h3 className="font-semibold">{title}</h3>
-      {summary && <p className="text-sm text-gray-500">{summary}</p>}
+      {summary && <p className="text-sm text-text-muted">{summary}</p>}
       {attachments.map((a) => (
         <a
           key={a.id}

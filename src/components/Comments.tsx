@@ -94,7 +94,7 @@ export const Comments: React.FC<CommentsProps> = ({
   return (
     <div className={`${parentEventId ? 'ml-4' : ''} space-y-2`}>
       {replies.length === 0 && !parentEventId && (
-        <p className="text-gray-500">No comments yet – be the first to reply!</p>
+        <p className="text-text-muted">No comments yet – be the first to reply!</p>
       )}
       {visibleReplies.map((c) => (
         <CommentItem key={c.id} comment={c} />
