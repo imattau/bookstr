@@ -260,6 +260,8 @@ type Listener = (evt: NostrEvent) => void;
 
 const pool = new SimplePool();
 const subs = new Map<string, { sub: any; listeners: Set<Listener> }>();
+// Keep latest long-form events keyed by pubkey + d tag
+const longFormMap = new Map<string, NostrEvent>();
 
 function makeKey(relays: string[], filters: Filter[]): string {
   return JSON.stringify({ relays: relays.slice().sort(), filters });
@@ -275,8 +277,23 @@ export function sharedSubscribe(
   if (!entry) {
     const sub = pool.subscribeMany(relays, filters, {
       onevent: (evt: NostrEvent) => {
-        const en = subs.get(key);
-        if (en) en.listeners.forEach((fn) => fn(evt));
+        let deliver = true;
+        if (evt.kind === 30023) {
+          const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+          if (d) {
+            const mapKey = `${evt.pubkey}:${d}`;
+            const existing = longFormMap.get(mapKey);
+            if (existing && existing.created_at > evt.created_at) {
+              deliver = false;
+            } else {
+              longFormMap.set(mapKey, evt);
+            }
+          }
+        }
+        if (deliver) {
+          const en = subs.get(key);
+          if (en) en.listeners.forEach((fn) => fn(evt));
+        }
       },
     });
     entry = { sub, listeners: new Set() };

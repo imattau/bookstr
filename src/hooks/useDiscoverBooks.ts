@@ -33,6 +33,21 @@ export function useDiscoverBooks(): UseDiscoverBooksResult {
   useSubscribe(mainFilter, (evt) => {
     addEvent(evt);
     setEvents((e) => {
+      const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+      if (d) {
+        const idx = e.findIndex(
+          (x) =>
+            x.kind === 30023 &&
+            x.pubkey === evt.pubkey &&
+            x.tags.find((t) => t[0] === 'd')?.[1] === d,
+        );
+        if (idx !== -1) {
+          if (e[idx].created_at >= evt.created_at) return e;
+          const copy = [...e];
+          copy[idx] = evt;
+          return copy;
+        }
+      }
       if (e.find((x) => x.id === evt.id)) return e;
       return [...e, evt];
     });
@@ -51,6 +66,25 @@ export function useDiscoverBooks(): UseDiscoverBooksResult {
     const offTarget = sharedSubscribe(relays, [{ ids: [target] }], (orig) => {
       addEvent(orig);
       setEvents((e) => {
+        const d = orig.tags.find((t) => t[0] === 'd')?.[1];
+        if (d) {
+          const idx = e.findIndex(
+            (x) =>
+              x.kind === 30023 &&
+              x.pubkey === orig.pubkey &&
+              x.tags.find((t) => t[0] === 'd')?.[1] === d,
+          );
+          if (idx !== -1) {
+            if (e[idx].created_at >= orig.created_at) {
+              const copy = [...e];
+              copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
+              return copy;
+            }
+            const copy = [...e];
+            copy[idx] = { ...orig, repostedBy: evt.pubkey };
+            return copy;
+          }
+        }
         const idx = e.findIndex((x) => x.id === orig.id);
         if (idx !== -1) {
           const copy = [...e];
