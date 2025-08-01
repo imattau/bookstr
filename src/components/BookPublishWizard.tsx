@@ -5,6 +5,7 @@ import { publishLongPost, publishBookMeta } from '../nostr/events';
 import { useToast } from './ToastProvider';
 import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';
+import { logError } from '../lib/logger';
 
 export interface BookPublishWizardProps {
   onPublish?: (id: string) => void;
@@ -75,7 +76,8 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
       toast(
         `Book published! <a href="/book/${evt.id}">View book</a>`,
       );
-    } catch {
+    } catch (err) {
+      logError(err);
       toast('Failed to publish book.');
     } finally {
       setPublishing(false);

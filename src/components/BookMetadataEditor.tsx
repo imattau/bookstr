@@ -3,6 +3,7 @@ import { useNostr } from '../nostr';
 import { publishBookMeta } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
+import { logError } from '../lib/logger';
 
 export interface BookMetadataEditorProps {
   bookId: string;
@@ -49,7 +50,8 @@ export const BookMetadataEditor: React.FC<BookMetadataEditorProps> = ({
       if (!navigator.onLine) throw new Error('offline');
       await publishBookMeta(ctx, bookId, data);
       onClose();
-    } catch {
+    } catch (err) {
+      logError(err);
       await queueOfflineEdit({
         id: Math.random().toString(36).slice(2),
         type: 'meta',

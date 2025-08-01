@@ -4,6 +4,7 @@ import { useNostr } from '../nostr';
 import { publishRepost } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
+import { logError } from '../lib/logger';
 
 export interface RepostButtonProps {
   target: string;
@@ -29,7 +30,8 @@ export const RepostButton: React.FC<RepostButtonProps> = ({
         return;
       }
       await publishRepost(ctx, target);
-    } catch {
+    } catch (err) {
+      logError(err);
       toast('Action failed', { type: 'error' });
     }
   };
