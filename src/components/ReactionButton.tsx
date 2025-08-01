@@ -4,6 +4,7 @@ import { useNostr } from '../nostr';
 import { publishVote, publishFavourite } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
+import { logError } from '../lib/logger';
 import type { Event as NostrEvent } from 'nostr-tools';
 
 export interface ReactionButtonProps {
@@ -58,7 +59,8 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
         await publishFavourite(ctx, target);
       }
       setActive(true);
-    } catch {
+    } catch (err) {
+      logError(err);
       toast('Action failed', { type: 'error' });
     }
   };

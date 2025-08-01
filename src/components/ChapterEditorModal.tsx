@@ -3,6 +3,7 @@ import { useNostr } from '../nostr';
 import { publishLongPost } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
+import { logError } from '../lib/logger';
 
 interface Props {
   bookId: string;
@@ -82,7 +83,8 @@ export const ChapterEditorModal: React.FC<Props> = ({
           body: JSON.stringify(evt),
         });
       }
-    } catch {
+    } catch (err) {
+      logError(err);
       await queueOfflineEdit({
         id: Math.random().toString(36).slice(2),
         type: 'chapter',

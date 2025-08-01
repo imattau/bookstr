@@ -2,6 +2,7 @@ import React from 'react';
 import { FaTrash } from 'react-icons/fa';
 import { useNostr } from '../nostr';
 import { useToast } from './ToastProvider';
+import { logError } from '../lib/logger';
 
 export interface DeleteButtonProps {
   target: string;
@@ -21,7 +22,8 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
     try {
       await publish({ kind: 5, content: '', tags: [['e', target]] });
       onDelete?.();
-    } catch {
+    } catch (err) {
+      logError(err);
       toast('Action failed', { type: 'error' });
     }
   };
