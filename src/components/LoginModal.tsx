@@ -23,6 +23,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
 
   const hasWallet = React.useMemo(() => Boolean((window as any).nostr), []);
 
+  React.useEffect(() => {
+    const url = localStorage.getItem('remoteSignerUrl');
+    if (url) setRemoteUrl(url);
+    const token = localStorage.getItem('remoteSignerToken');
+    if (token) setRemoteToken(token);
+  }, []);
+
+  React.useEffect(() => {
+    setPrivError(null);
+    setRemoteError(null);
+  }, [tab]);
+
   const handlePrivLogin = () => {
     const key = importKey(privInput);
     if (!key || !validatePrivKey(key)) {
@@ -162,6 +174,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
               className="w-full rounded border p-[var(--space-2)]"
             />
             <input
+              type="password"
               value={remoteToken}
               onChange={(e) => setRemoteToken(e.target.value)}
               placeholder="Auth token"
