@@ -28,6 +28,7 @@ Open the profile settings from the library screen to configure the app:
 - **Theme** – pick one of the preset palettes via the theme selector.
 - **Yearly reading goal** – store your annual goal which updates progress in the library view.
 - **Clear Cached Books** – remove any books saved for offline reading.
+- **Relays** – open the new relay settings screen to add or remove relay URLs.
 
 ## Getting Started
 
@@ -62,6 +63,18 @@ For details on the HTML permitted in Markdown, see
 
 Read about managing relays, creating delegation tags and using the chat modals in
 [docs/nostr_features.md](docs/nostr_features.md).
+
+Bookstr looks for a user's published lists to discover more of their content:
+
+- **kind `10002`** lists the relays a user writes to.
+- **kind `10003`** stores bookmarks.
+- **kind `30004`** captures their curation sets.
+The app loads these when viewing a profile so your library includes books and
+relays the author recommends.
+
+Long‑form posts (`kind:30023`) are deduplicated by the `d` tag per
+[NIP‑23](https://github.com/nostr-protocol/nips/blob/master/23.md) so only the
+newest version of a piece appears in feeds.
 
 The build setup is now complete and consists of the following steps:
 
