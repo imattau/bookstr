@@ -8,6 +8,11 @@ interface AchievementState {
   unlock: (id: AchievementId) => void;
 }
 
+/**
+ * Zustand store tracking which achievement badges the user has unlocked.
+ *
+ * Data persists in `localStorage` via the `persist` middleware.
+ */
 export const useAchievements = create<AchievementState>()(
   persist(
     (set) => ({

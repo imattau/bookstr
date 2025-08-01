@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * Simple onboarding tooltip helper.
+ *
+ * Shows a small tooltip next to the referenced element until the user
+ * dismisses it. Dismissal state is stored in `localStorage` keyed by the
+ * provided identifier.
+ */
 export function useOnboarding(key: string, text: string) {
   const [show, setShow] = React.useState(false);
   const ref = React.useRef<HTMLElement | null>(null);

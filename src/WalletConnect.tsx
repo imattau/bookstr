@@ -52,6 +52,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+/**
+ * Access the WebLN wallet helper functions from `WalletProvider`.
+ */
 export function useWallet() {
   const ctx = useContext(WalletContext);
   if (!ctx) throw new Error('useWallet must be used within WalletProvider');

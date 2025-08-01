@@ -1,3 +1,6 @@
+/**
+ * Lightweight analytics module for recording custom events.
+ */
 interface EventRecord {
   name: string;
   params: Record<string, unknown>;
@@ -10,6 +13,10 @@ export async function logEvent(
   name: string,
   params: Record<string, unknown> = {},
 ): Promise<void> {
+  /**
+   * Sends the event to the server and stores a local copy if the network
+   * request fails.
+   */
   const record: EventRecord = { name, params, ts: Date.now() };
 
   try {

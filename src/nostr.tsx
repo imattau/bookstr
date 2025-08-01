@@ -647,6 +647,9 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+/**
+ * Access the Nostr API context provided by `NostrProvider`.
+ */
 export function useNostr() {
   const ctx = useContext(NostrContext);
   if (!ctx) throw new Error('useNostr must be used within NostrProvider');

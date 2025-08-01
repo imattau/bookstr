@@ -13,6 +13,11 @@ export interface PaymentSettingsState {
   hydrate: (data: Partial<Pick<PaymentSettingsState, 'minZap' | 'maxZap' | 'address' | 'autoPayThreshold'>>) => void;
 }
 
+/**
+ * Persisted Lightning payment preferences such as zap range and address.
+ *
+ * Stored in `localStorage` via the zustand `persist` middleware.
+ */
 export const usePaymentSettings = create<PaymentSettingsState>()(
   persist(
     (set) => ({

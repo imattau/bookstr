@@ -50,6 +50,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+/**
+ * Access the current theme and updater from `ThemeProvider`.
+ */
 export function useTheme() {
   const ctx = React.useContext(ThemeContext);
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider');

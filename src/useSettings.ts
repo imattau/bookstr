@@ -40,6 +40,12 @@ export interface SettingsState {
   ) => void;
 }
 
+/**
+ * Global application preferences such as font size and theme.
+ *
+ * This zustand store persists values to `localStorage` so settings survive
+ * across sessions.
+ */
 export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
