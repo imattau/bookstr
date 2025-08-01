@@ -4,6 +4,9 @@ export interface Suggestion {
   type: 'book' | 'author' | 'tag';
 }
 
+import { SimplePool } from 'nostr-tools';
+import { getSearchRelays } from './nostr';
+
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 
 const HISTORY_KEY = 'search-history';
@@ -67,6 +70,36 @@ async function fetchSuggestions(q: string): Promise<Suggestion[]> {
   }
 }
 
+let searchRelaysPromise: Promise<string[]> | null = null;
+
+async function fetchRelaySuggestions(q: string): Promise<Suggestion[]> {
+  if (!q) return [];
+  const pub = localStorage.getItem('pubKey');
+  if (!pub) return [];
+  try {
+    if (!searchRelaysPromise) searchRelaysPromise = getSearchRelays(pub);
+    const relays = await searchRelaysPromise;
+    if (!relays.length) return [];
+    const pool = new SimplePool();
+    try {
+      const events = (await pool.list(relays, [
+        { search: q, limit: 20 },
+      ])) as any[];
+      return events.map((e) => ({
+        id: e.tags?.find((t: any) => t[0] === 'd')?.[1] ?? e.id,
+        label:
+          e.tags?.find((t: any) => t[0] === 'title')?.[1] ??
+          (e.content || '').slice(0, 80),
+        type: 'book' as const,
+      }));
+    } finally {
+      if (relays.length) pool.close(relays);
+    }
+  } catch {
+    return [];
+  }
+}
+
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 let pending: Array<(v: Suggestion[]) => void> = [];
 
@@ -75,7 +108,13 @@ export async function search(q: string): Promise<Suggestion[]> {
     pending.push(resolve);
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
-      const res = await fetchSuggestions(q);
+      const apiRes = await fetchSuggestions(q);
+      const relayRes = await fetchRelaySuggestions(q);
+      const map = new Map<string, Suggestion>();
+      for (const s of [...apiRes, ...relayRes]) {
+        map.set(`${s.type}:${s.id}`, s);
+      }
+      const res = Array.from(map.values());
       if (q.trim()) addHistory(q.trim());
       pending.forEach((fn) => fn(res));
       pending = [];
