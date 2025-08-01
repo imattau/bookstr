@@ -72,19 +72,23 @@ export const ProfileScreen: React.FC = () => {
         )}
         <div className="flex-1 space-y-1">
           <h2 className="text-xl font-semibold">{meta?.name || pubkey}</h2>
-          {meta?.about && <p className="text-sm text-text-muted">{meta.about}</p>}
+          {meta?.about && (
+            <p className="text-sm text-text-muted">{meta.about}</p>
+          )}
           <p className="text-sm text-text-muted">{followers} followers</p>
         </div>
         {pubkey !== loggedPubkey && <FollowButton pubkey={pubkey} />}
       </div>
-      <div className="space-y-2">
+      <ul role="list" className="space-y-2">
         {books.map((evt) => (
-          <BookCard key={evt.id} event={evt} />
+          <li key={evt.id} role="listitem">
+            <BookCard event={evt} />
+          </li>
         ))}
         {books.length === 0 && (
           <p className="text-center text-text-muted">No books found.</p>
         )}
-      </div>
+      </ul>
     </div>
   );
 };

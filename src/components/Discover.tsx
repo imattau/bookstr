@@ -10,7 +10,6 @@ import { logEvent } from '../analytics';
 import { CommunityFeed } from './CommunityFeed';
 import { Illustration } from './Illustration';
 
-
 export const Discover: React.FC = () => {
   const {
     books: bookEvents,
@@ -120,57 +119,77 @@ export const Discover: React.FC = () => {
       </div>
       <section className="p-[var(--space-4)]">
         <h2 className="mb-[var(--space-2)] font-semibold">Trending Books</h2>
-        <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
+        <ul
+          role="list"
+          className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+        >
           {loading && trending.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
-                <BookCardSkeleton key={i} />
+                <li key={i} role="listitem">
+                  <BookCardSkeleton />
+                </li>
               ))
             : trending.map((e) => (
-                <BookCard
-                  key={e.id}
-                  event={e as NostrEvent}
-                  onDelete={(id) => removeBook(id)}
-                />
+                <li key={e.id} role="listitem">
+                  <BookCard
+                    event={e as NostrEvent}
+                    onDelete={(id) => removeBook(id)}
+                  />
+                </li>
               ))}
-        </div>
+        </ul>
       </section>
       <section className="p-[var(--space-4)]">
         <h2 className="mb-[var(--space-2)] font-semibold">New Releases</h2>
-        <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
+        <ul
+          role="list"
+          className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+        >
           {loading && newReleases.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
-                <BookCardSkeleton key={i} />
+                <li key={i} role="listitem">
+                  <BookCardSkeleton />
+                </li>
               ))
             : newReleases.map((e) => (
-                <BookCard
-                  key={e.id}
-                  event={e as NostrEvent}
-                  onDelete={(id) => removeBook(id)}
-                />
+                <li key={e.id} role="listitem">
+                  <BookCard
+                    event={e as NostrEvent}
+                    onDelete={(id) => removeBook(id)}
+                  />
+                </li>
               ))}
-        </div>
+        </ul>
       </section>
       <section className="p-[var(--space-4)]">
-        <h2 className="mb-[var(--space-2)] font-semibold">Recommended for You</h2>
-        <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
+        <h2 className="mb-[var(--space-2)] font-semibold">
+          Recommended for You
+        </h2>
+        <ul
+          role="list"
+          className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+        >
           {noResults ? (
             <div className="col-span-full">
               <Illustration text="No matching books found." />
             </div>
           ) : loading && recommended.length === 0 ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <BookCardSkeleton key={i} />
+              <li key={i} role="listitem">
+                <BookCardSkeleton />
+              </li>
             ))
           ) : (
             recommended.map((e) => (
-              <BookCard
-                key={e.id}
-                event={e as NostrEvent}
-                onDelete={(id) => removeBook(id)}
-              />
+              <li key={e.id} role="listitem">
+                <BookCard
+                  event={e as NostrEvent}
+                  onDelete={(id) => removeBook(id)}
+                />
+              </li>
             ))
           )}
-        </div>
+        </ul>
       </section>
       <section className="p-[var(--space-4)]">
         <h2 className="mb-[var(--space-2)] font-semibold">Communities</h2>

@@ -63,10 +63,16 @@ html {
 }
 
 button:focus-visible,
-[role="button"]:focus-visible,
+[role='button']:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   @apply outline-none ring-2 ring-offset-2 ring-primary-600/50;
+}
+
+ul[role='list'] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
