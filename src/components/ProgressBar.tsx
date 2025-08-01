@@ -7,6 +7,9 @@ export interface ProgressBarProps {
   'data-testid'?: string;
 }
 
+/**
+ * Horizontal progress bar showing completion percentage.
+ */
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
   'aria-label': ariaLabel,

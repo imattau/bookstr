@@ -11,6 +11,9 @@ export interface RepostButtonProps {
   className?: string;
 }
 
+/**
+ * Button to repost a book event, saving offline if needed.
+ */
 export const RepostButton: React.FC<RepostButtonProps> = ({
   target,
   className,

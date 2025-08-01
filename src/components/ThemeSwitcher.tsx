@@ -1,6 +1,9 @@
 import React from 'react';
 import { useTheme, THEMES, Theme } from '../ThemeProvider';
 
+/**
+ * Dropdown to select light or dark theme.
+ */
 export const ThemeSwitcher: React.FC = () => {
   const { theme, setTheme } = useTheme();
   return (

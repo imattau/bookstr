@@ -11,6 +11,9 @@ import {
 } from '../achievements';
 import { FaPen, FaTrophy } from 'react-icons/fa';
 
+/**
+ * User library with tabs for want, reading, finished and following.
+ */
 export const Library: React.FC = () => {
   const { contacts } = useNostr();
   const books = useReadingStore((s) => s.books);

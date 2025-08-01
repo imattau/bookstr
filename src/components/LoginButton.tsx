@@ -2,6 +2,9 @@ import React from 'react';
 import { useNostr } from '../nostr';
 import { connectNostrWallet, nostrLogin } from '../nostr/auth';
 
+/**
+ * Login button supporting NIP-07 wallets and manual keys.
+ */
 export const LoginButton: React.FC = () => {
   const ctx = useNostr();
   const { pubkey, login, logout } = ctx;

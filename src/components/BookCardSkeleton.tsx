@@ -1,6 +1,9 @@
 import React from 'react';
 import { Skeleton, TextSkeleton } from './Skeleton';
 
+/**
+ * Placeholder skeleton displayed while book content loads.
+ */
 export const BookCardSkeleton: React.FC = () => (
   <div className="rounded-[var(--radius-card)] border p-[var(--space-2)] space-y-[var(--space-2)]">
     <Skeleton className="h-32 w-24" />

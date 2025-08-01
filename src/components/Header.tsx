@@ -16,6 +16,9 @@ export interface HeaderProps {
   onLogin?: () => void;
 }
 
+/**
+ * Top application header with search box and back navigation.
+ */
 export const Header: React.FC<HeaderProps> = ({
   onSearch,
   suggestions,

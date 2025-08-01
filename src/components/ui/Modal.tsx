@@ -6,6 +6,9 @@ export interface ModalProps {
   onClose?: () => void;
 }
 
+/**
+ * Simple modal overlay that closes on outside click.
+ */
 export const Modal: React.FC<ModalProps> = ({ children, className, onClose }) => (
   <div
     className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]"

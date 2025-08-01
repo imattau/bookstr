@@ -5,6 +5,9 @@ import { BookCardSkeleton } from './BookCardSkeleton';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { useEventStore } from '../store/events';
 
+/**
+ * Feed showing recent book publications from followed relays.
+ */
 export const BookFeed: React.FC = () => {
   const { subscribe } = useNostr();
   const addEvent = useEventStore((s) => s.addEvent);

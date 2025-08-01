@@ -2,6 +2,9 @@ import React from 'react';
 import { useNostr } from '../nostr';
 import { Button, Input } from './ui';
 
+/**
+ * Simple login form for manual private key entry.
+ */
 export const Login: React.FC = () => {
   const { pubkey, login, logout } = useNostr();
   const [priv, setPriv] = React.useState('');

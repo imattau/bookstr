@@ -10,6 +10,9 @@ export interface DeleteButtonProps {
   className?: string;
 }
 
+/**
+ * Button to delete an event by id and trigger optional callback.
+ */
 export const DeleteButton: React.FC<DeleteButtonProps> = ({
   target,
   onDelete,

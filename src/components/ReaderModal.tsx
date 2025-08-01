@@ -12,6 +12,9 @@ interface ReaderModalProps {
   onClose: () => void;
 }
 
+/**
+ * Full-screen reader modal with progress tracking and theming.
+ */
 export const ReaderModal: React.FC<ReaderModalProps> = ({
   bookId,
   title,

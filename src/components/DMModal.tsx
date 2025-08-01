@@ -27,6 +27,9 @@ export interface DMModalProps {
   onClose?: () => void;
 }
 
+/**
+ * Modal dialog for private messaging another user.
+ */
 export const DMModal: React.FC<DMModalProps> = ({ to, onClose }) => {
   const ctx = useNostr();
   const { pubkey, subscribe } = ctx;

@@ -10,6 +10,9 @@ export interface BookPublishWizardProps {
   onPublish?: (id: string) => void;
 }
 
+/**
+ * Multi-step wizard for publishing a new book.
+ */
 export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   onPublish,
 }) => {

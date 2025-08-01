@@ -4,6 +4,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: 'primary' | 'outline';
 }
 
+/**
+ * Styled button supporting primary and outline variants.
+ */
 export const Button: React.FC<ButtonProps> = ({ variant = 'outline', className, ...props }) => (
   <button
     {...props}
