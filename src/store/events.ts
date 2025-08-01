@@ -1,8 +1,21 @@
 import { create } from 'zustand';
 import type { Event as NostrEvent } from 'nostr-tools';
 
-// Components should access store methods via selectors, e.g.
-// const addEvent = useEventStore(s => s.addEvent);
+/**
+ * Central Nostr event store used throughout the app.
+ *
+ * - `events` holds the raw events keyed by their `id`.
+ * - `paramIndex` maps `"kind:pubkey:dTag"` to an event `id` for parametric
+ *   replaceable events.
+ *
+ * Components should retrieve methods or values via selectors to avoid
+ * unnecessary rerenders, e.g.:
+ *
+ * ```ts
+ * const addEvent = useEventStore(s => s.addEvent);
+ * const event = useEventStore(s => s.events[id]);
+ * ```
+ */
 
 function paramKey(evt: NostrEvent): string | null {
   const d = evt.tags.find((t) => t[0] === 'd')?.[1];
@@ -27,7 +40,8 @@ interface EventsState {
 
 /**
  * Central store of Nostr events keyed by id with helper methods to add new
- * events. Components should access methods via selectors.
+ * events. `paramIndex` enables easy lookup of parametric events by the
+ * `"kind:pubkey:dTag"` tuple. Access values with selectors.
  */
 export const useEventStore = create<EventsState>((set, get) => ({
   events: {},
