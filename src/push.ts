@@ -1,3 +1,6 @@
+/**
+ * Helpers for managing browser push notification subscriptions.
+ */
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 const PUBLIC_KEY = (import.meta as any).env?.VITE_VAPID_PUBLIC_KEY;
 

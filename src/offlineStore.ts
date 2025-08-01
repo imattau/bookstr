@@ -1,3 +1,6 @@
+/**
+ * Manages offline book storage and related settings.
+ */
 import { get, set, del } from 'idb-keyval';
 import { useSettings } from './useSettings';
 

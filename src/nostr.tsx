@@ -1,3 +1,6 @@
+/**
+ * Provides Nostr integration with login, relay sync and event helpers.
+ */
 import React, {
   createContext,
   useContext,

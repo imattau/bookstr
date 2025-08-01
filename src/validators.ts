@@ -1,3 +1,6 @@
+/**
+ * Simple validation helpers for URLs and other inputs.
+ */
 export function isValidUrl(url: string): boolean {
   try {
     const u = new URL(url);

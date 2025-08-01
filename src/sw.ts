@@ -1,3 +1,6 @@
+/**
+ * Service worker script handling caching and background sync.
+ */
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import {

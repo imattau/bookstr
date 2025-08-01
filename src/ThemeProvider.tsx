@@ -1,3 +1,6 @@
+/**
+ * Provides theme and UI preference context to the application.
+ */
 import React from 'react';
 import { useSettings } from './useSettings';
 

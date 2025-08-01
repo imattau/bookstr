@@ -1,3 +1,6 @@
+/**
+ * Client-side search utilities and history helpers.
+ */
 export interface Suggestion {
   id: string;
   label: string;

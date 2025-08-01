@@ -1,3 +1,6 @@
+/**
+ * DOMPurify configuration used to sanitize user HTML input.
+ */
 import DOMPurify, { Config } from 'dompurify';
 
 export const SANITIZE_CONFIG: Config = {
