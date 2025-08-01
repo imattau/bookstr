@@ -88,7 +88,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     };
     el.addEventListener('scroll', handle);
     return () => el.removeEventListener('scroll', handle);
-  }, [scrollSync, onPercentChange, onFinish]);
+  }, [scrollSync, onPercentChange, onFinish, bookId]);
 
   return (
     <div
