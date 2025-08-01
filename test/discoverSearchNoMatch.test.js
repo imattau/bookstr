@@ -30,7 +30,7 @@ const path = require('path');
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
-        return { useNostr: () => ({ subscribe: () => () => {}, contacts: [] }) };
+        return { useNostr: () => ({ subscribe: () => () => {}, contacts: [], relays: [] }) };
       }
       if (p.endsWith('BookCard') || p.endsWith('BookCard.tsx')) {
         return { BookCard: () => React.createElement('div') };
@@ -52,6 +52,7 @@ const path = require('path');
     module,
     exports: module.exports,
     TextEncoder,
+    TextDecoder,
     React,
   };
   vm.runInNewContext(code, sandbox, { filename: 'Discover.js' });

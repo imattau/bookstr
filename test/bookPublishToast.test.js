@@ -47,6 +47,7 @@ const path = require('path');
     module,
     exports: module.exports,
     TextEncoder,
+    TextDecoder,
     React,
   };
   vm.runInNewContext(code, sandbox, { filename: 'BookPublishWizard.js' });

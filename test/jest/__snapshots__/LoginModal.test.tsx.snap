@@ -29,11 +29,23 @@ exports[`LoginModal matches snapshot 1`] = `
     <div
       class="space-y-2"
     >
-      <input
-        class="w-full rounded border p-[var(--space-2)]"
-        placeholder="nsec or hex"
-        value=""
-      />
+      <div
+        class="flex gap-2"
+      >
+        <input
+          class="flex-1 rounded border p-[var(--space-2)]"
+          placeholder="nsec or hex"
+          type="password"
+          value=""
+        />
+        <button
+          aria-label="Show private key"
+          class="rounded border px-[var(--space-2)]"
+          type="button"
+        >
+          Show
+        </button>
+      </div>
       <button
         class="w-full rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white disabled:opacity-50"
         disabled=""
