@@ -12,7 +12,7 @@ if (typeof window === 'undefined') {
 }
 import { useNavigate } from 'react-router-dom';
 import { useNostr } from '../nostr';
-import { addEvents } from '../store/events';
+import { useEventStore } from '../store/events';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { BookPublishWizard } from '../components/BookPublishWizard';
 import { Button, Modal } from '../components/ui';
@@ -28,6 +28,7 @@ interface BookMeta {
 
 export const BookListScreen: React.FC = () => {
   const { subscribe, list, pubkey } = useNostr();
+  const addEvents = useEventStore((s) => s.addEvents);
   const [books, setBooks] = useState<BookMeta[]>([]);
   const [cursor, setCursor] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);

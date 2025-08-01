@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import type { Event as NostrEvent } from 'nostr-tools';
 
+// Components should access store methods via selectors, e.g.
+// const addEvent = useEventStore(s => s.addEvent);
+
 function paramKey(evt: NostrEvent): string | null {
   const d = evt.tags.find((t) => t[0] === 'd')?.[1];
   if (d && evt.kind >= 30000 && evt.kind < 40000) {

@@ -13,7 +13,10 @@ import { FaPen, FaTrophy } from 'react-icons/fa';
 
 export const Library: React.FC = () => {
   const { contacts } = useNostr();
-  const { books, finishBook, yearlyGoal, finishedCount } = useReadingStore();
+  const books = useReadingStore((s) => s.books);
+  const finishBook = useReadingStore((s) => s.finishBook);
+  const yearlyGoal = useReadingStore((s) => s.yearlyGoal);
+  const finishedCount = useReadingStore((s) => s.finishedCount);
   const navigate = useNavigate();
   const { unlocked } = useAchievements();
   const iconMap: Record<AchievementId, JSX.Element> = {

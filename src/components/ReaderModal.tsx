@@ -21,7 +21,8 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
   const [fontSize, setFontSize] = React.useState(16);
   const [percent, setPercent] = React.useState(0);
   const { theme, setTheme } = useTheme();
-  const { updateProgress, finishBook } = useReadingStore();
+  const updateProgress = useReadingStore((s) => s.updateProgress);
+  const finishBook = useReadingStore((s) => s.finishBook);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
