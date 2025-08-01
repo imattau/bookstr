@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
+import { useSubscribe, sharedSubscribe } from '../nostr/events';
 import { useEventStore } from '../store/events';
 
 export interface DiscoverBook extends NostrEvent {
@@ -16,63 +17,66 @@ export interface UseDiscoverBooksResult {
 }
 
 export function useDiscoverBooks(): UseDiscoverBooksResult {
-  const { subscribe, contacts } = useNostr();
+  const { contacts, relays } = useNostr();
   const addEvent = useEventStore((s) => s.addEvent);
   const [events, setEvents] = useState<DiscoverBook[]>([]);
   const [votes, setVotes] = useState<Record<string, number>>({});
   const voteIds = useRef(new Set<string>());
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const filters: Filter[] = [{ kinds: [30023], limit: 50 }];
-    if (contacts.length) filters[0].authors = contacts;
-    const offMain = subscribe(filters, (evt) => {
-      addEvent(evt);
-      setEvents((e) => {
-        if (e.find((x) => x.id === evt.id)) return e;
-        return [...e, evt];
-      });
-      setLoading(false);
-    });
-    const repostFilter: Filter = { kinds: [6], limit: 50 };
-    if (contacts.length) repostFilter.authors = contacts;
-    const offReposts = subscribe([repostFilter], (evt) => {
-      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
-      if (!target) return;
-      const offTarget = subscribe([{ ids: [target] }], (orig) => {
-        addEvent(orig);
-        setEvents((e) => {
-          const idx = e.findIndex((x) => x.id === orig.id);
-          if (idx !== -1) {
-            const copy = [...e];
-            copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
-            return copy;
-          }
-          return [...e, { ...orig, repostedBy: evt.pubkey }];
-        });
-        offTarget();
-      });
-    });
-    return () => {
-      offMain();
-      offReposts();
-    };
-  }, [subscribe, contacts]);
+  const mainFilter = useMemo(() => {
+    const f: Filter = { kinds: [30023], limit: 50 };
+    if (contacts.length) f.authors = contacts;
+    return [f];
+  }, [contacts]);
 
-  useEffect(() => {
-    if (!events.length) return;
-    const ids = events.map((e) => e.id);
-    const off = subscribe([{ kinds: [7], '#e': ids }], (evt) => {
-      addEvent(evt);
-      if (voteIds.current.has(evt.id)) return;
-      voteIds.current.add(evt.id);
-      const target = evt.tags.find((t) => t[0] === 'e')?.[1];
-      if (target && evt.content === '+') {
-        setVotes((v) => ({ ...v, [target]: (v[target] ?? 0) + 1 }));
-      }
+  useSubscribe(mainFilter, (evt) => {
+    addEvent(evt);
+    setEvents((e) => {
+      if (e.find((x) => x.id === evt.id)) return e;
+      return [...e, evt];
     });
-    return off;
-  }, [events, subscribe]);
+    setLoading(false);
+  });
+
+  const repostFilter = useMemo(() => {
+    const f: Filter = { kinds: [6], limit: 50 };
+    if (contacts.length) f.authors = contacts;
+    return [f];
+  }, [contacts]);
+
+  useSubscribe(repostFilter, (evt) => {
+    const target = evt.tags.find((t) => t[0] === 'e')?.[1];
+    if (!target) return;
+    const offTarget = sharedSubscribe(relays, [{ ids: [target] }], (orig) => {
+      addEvent(orig);
+      setEvents((e) => {
+        const idx = e.findIndex((x) => x.id === orig.id);
+        if (idx !== -1) {
+          const copy = [...e];
+          copy[idx] = { ...copy[idx], repostedBy: evt.pubkey };
+          return copy;
+        }
+        return [...e, { ...orig, repostedBy: evt.pubkey }];
+      });
+      offTarget();
+    });
+  });
+
+  const voteFilter = useMemo(
+    () => [{ kinds: [7], '#e': events.map((e) => e.id) }],
+    [events],
+  );
+
+  useSubscribe(voteFilter, (evt) => {
+    addEvent(evt);
+    if (voteIds.current.has(evt.id)) return;
+    voteIds.current.add(evt.id);
+    const target = evt.tags.find((t) => t[0] === 'e')?.[1];
+    if (target && evt.content === '+') {
+      setVotes((v) => ({ ...v, [target]: (v[target] ?? 0) + 1 }));
+    }
+  });
 
   const books = useMemo(
     () => events.filter((evt) => !evt.tags.some((t) => t[0] === 'book')),
