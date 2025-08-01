@@ -1,3 +1,9 @@
+/**
+ * Edit the user's profile metadata such as name, avatar and NIP-05 address.
+ *
+ * Uses `useNostr` to publish profile events and `useNavigate` to return to the
+ * profile screen.
+ */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Event as NostrEvent, EventTemplate } from 'nostr-tools';

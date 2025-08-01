@@ -1,3 +1,8 @@
+/**
+ * Displays application build information and open source links.
+ *
+ * This page does not use any route params or custom hooks.
+ */
 import React from 'react';
 
 const AboutPage: React.FC = () => {

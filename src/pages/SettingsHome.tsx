@@ -1,3 +1,8 @@
+/**
+ * Root settings page listing links to individual settings sections.
+ *
+ * Utilises `Link` from `react-router-dom` for client-side navigation.
+ */
 import React from 'react';
 import { Link } from 'react-router-dom';
 

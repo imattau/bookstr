@@ -1,3 +1,12 @@
+/**
+ * Full screen reader for viewing a book's content and tracking progress.
+ *
+ * Route params:
+ * - `bookId` – retrieved via `useParams` to load the desired book.
+ *
+ * Hooks: uses `useNostr` to fetch chapters, `useTheme` and `useReadingStore`
+ * for reader preferences and progress.
+ */
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNostr } from '../nostr';

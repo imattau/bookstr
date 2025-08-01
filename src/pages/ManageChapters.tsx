@@ -1,3 +1,12 @@
+/**
+ * Page for managing chapters of a specific book.
+ *
+ * Route params:
+ * - `bookId` – obtained via `useParams` to load and update chapter metadata.
+ *
+ * Hooks: `useNostr` for relays and publishing events, `useEffect` for data
+ * loading and `useState` for local state.
+ */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
