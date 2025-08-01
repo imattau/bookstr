@@ -168,7 +168,7 @@ export const ProfileSettingsPage: React.FC = () => {
           )}
           <div className="flex-1 space-y-1">
             <h3 className="font-semibold">{form.name || pubkey}</h3>
-            {form.about && <p className="text-sm text-gray-600">{form.about}</p>}
+            {form.about && <p className="text-sm text-text-muted">{form.about}</p>}
           </div>
         </div>
       </div>
