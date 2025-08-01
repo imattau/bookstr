@@ -62,6 +62,7 @@ const path = require('path');
     module,
     exports: module.exports,
     TextEncoder,
+    TextDecoder,
     React,
     fetch: async (_u, opts) => { published = JSON.parse(opts.body); return { ok: true }; },
   };

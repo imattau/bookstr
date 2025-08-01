@@ -23,6 +23,7 @@ const path = require('path');
         return {
           useNostr: () => ({
             contacts: [],
+            relays: [],
             subscribe: (filters, cb) => {
               const kinds = (filters[0].kinds || []);
               if (kinds.includes(30023)) {
@@ -47,6 +48,7 @@ const path = require('path');
     module,
     exports: module.exports,
     TextEncoder,
+    TextDecoder,
     React,
     process,
   };

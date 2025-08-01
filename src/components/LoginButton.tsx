@@ -30,7 +30,7 @@ export const LoginButton: React.FC = () => {
       login(priv);
       setError(null);
     } catch {
-      setError('Invalid private key');
+      setError('Invalid private key (64-char hex or nsec)');
     }
   };
 

@@ -14,6 +14,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   const [tab, setTab] = React.useState<'priv' | 'nip07' | 'remote'>('priv');
 
   const [privInput, setPrivInput] = React.useState('');
+  const [showPriv, setShowPriv] = React.useState(false);
   const [privError, setPrivError] = React.useState<string | null>(null);
 
   const [remoteUrl, setRemoteUrl] = React.useState('');
@@ -38,7 +39,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   const handlePrivLogin = () => {
     const key = importKey(privInput);
     if (!key || !validatePrivKey(key)) {
-      setPrivError('Invalid private key');
+      setPrivError('Invalid private key (64-char hex or nsec)');
       return;
     }
     try {
@@ -46,7 +47,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
       setPrivError(null);
       onClose();
     } catch {
-      setPrivError('Invalid private key');
+      setPrivError('Invalid private key (64-char hex or nsec)');
     }
   };
 
@@ -136,12 +137,23 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
         </div>
         {tab === 'priv' && (
           <div className="space-y-2">
-            <input
-              value={privInput}
-              onChange={(e) => setPrivInput(e.target.value)}
-              placeholder="nsec or hex"
-              className="w-full rounded border p-[var(--space-2)]"
-            />
+            <div className="flex gap-2">
+              <input
+                type={showPriv ? 'text' : 'password'}
+                value={privInput}
+                onChange={(e) => setPrivInput(e.target.value)}
+                placeholder="nsec or hex"
+                className="flex-1 rounded border p-[var(--space-2)]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPriv((v) => !v)}
+                aria-label={showPriv ? 'Hide private key' : 'Show private key'}
+                className="rounded border px-[var(--space-2)]"
+              >
+                {showPriv ? 'Hide' : 'Show'}
+              </button>
+            </div>
             {privError && <p className="text-red-600 text-sm">{privError}</p>}
             <button
               onClick={handlePrivLogin}

@@ -42,6 +42,7 @@ const path = require('path');
     module,
     exports: module.exports,
     TextEncoder,
+    TextDecoder,
     React,
     fetch: async (url, opts) => { saved = JSON.parse(opts.body); return { ok: true }; },
   };
