@@ -16,6 +16,7 @@ import { useEventStore } from '../store/events';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { BookPublishWizard } from '../components/BookPublishWizard';
 import { Button, Modal } from '../components/ui';
+import { useToast } from '../components/ToastProvider';
 
 interface BookMeta {
   id: string;
@@ -35,6 +36,7 @@ export const BookListScreen: React.FC = () => {
   const [sort, setSort] = useState<'newest' | 'oldest' | 'zapped'>('newest');
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const sortBooks = (arr: BookMeta[], mode: typeof sort) => {
     const copy = [...arr];
@@ -47,49 +49,54 @@ export const BookListScreen: React.FC = () => {
   const loadPage = useCallback(async () => {
     if (loading) return;
     setLoading(true);
-    const filters: Filter[] = [{ kinds: [41], limit: 10 }];
-    if (cursor) filters[0].until = cursor;
-    const events = (await list(filters)) as NostrEvent[];
-    addEvents(events);
-    if (!events.length) {
-      setLoading(false);
-      return;
-    }
-    const ids = events
-      .map((e) => e.tags.find((t) => t[0] === 'd')?.[1])
-      .filter(Boolean) as string[];
-    const zapEvents = await list([{ kinds: [9735], '#e': ids }]);
-    addEvents(zapEvents as NostrEvent[]);
-    const zapCount: Record<string, number> = {};
-    zapEvents.forEach((e) => {
-      const id = e.tags.find((t) => t[0] === 'e')?.[1];
-      if (id) zapCount[id] = (zapCount[id] || 0) + 1;
-    });
-    const newBooks = events
-      .map((evt) => {
-        const bookId = evt.tags.find((t) => t[0] === 'd')?.[1];
-        if (!bookId) return null;
-        return {
-          id: bookId,
-          title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
-          summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
-          cover: evt.tags.find((t) => t[0] === 'image')?.[1],
-          created: evt.created_at,
-          zaps: zapCount[bookId] || 0,
-        } as BookMeta;
-      })
-      .filter(Boolean) as BookMeta[];
-
-    setCursor(events[events.length - 1].created_at - 1);
-    setBooks((bs) => {
-      const merged = [...bs];
-      for (const b of newBooks) {
-        if (!merged.find((x) => x.id === b.id)) merged.push(b);
+    try {
+      const filters: Filter[] = [{ kinds: [41], limit: 10 }];
+      if (cursor) filters[0].until = cursor;
+      const events = (await list(filters)) as NostrEvent[];
+      addEvents(events);
+      if (!events.length) {
+        setLoading(false);
+        return;
       }
-      return sortBooks(merged, sort);
-    });
-    setLoading(false);
-  }, [cursor, list, loading, sort]);
+      const ids = events
+        .map((e) => e.tags.find((t) => t[0] === 'd')?.[1])
+        .filter(Boolean) as string[];
+      const zapEvents = await list([{ kinds: [9735], '#e': ids }]);
+      addEvents(zapEvents as NostrEvent[]);
+      const zapCount: Record<string, number> = {};
+      zapEvents.forEach((e) => {
+        const id = e.tags.find((t) => t[0] === 'e')?.[1];
+        if (id) zapCount[id] = (zapCount[id] || 0) + 1;
+      });
+      const newBooks = events
+        .map((evt) => {
+          const bookId = evt.tags.find((t) => t[0] === 'd')?.[1];
+          if (!bookId) return null;
+          return {
+            id: bookId,
+            title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
+            summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
+            cover: evt.tags.find((t) => t[0] === 'image')?.[1],
+            created: evt.created_at,
+            zaps: zapCount[bookId] || 0,
+          } as BookMeta;
+        })
+        .filter(Boolean) as BookMeta[];
+
+      setCursor(events[events.length - 1].created_at - 1);
+      setBooks((bs) => {
+        const merged = [...bs];
+        for (const b of newBooks) {
+          if (!merged.find((x) => x.id === b.id)) merged.push(b);
+        }
+        return sortBooks(merged, sort);
+      });
+    } catch {
+      toast('Failed to load books', { type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  }, [cursor, list, loading, sort, toast]);
 
   useEffect(() => {
     setBooks([]);
@@ -140,7 +147,11 @@ export const BookListScreen: React.FC = () => {
           <option value="zapped">Most Zapped</option>
         </select>
         {pubkey && (
-          <Button variant="primary" onClick={() => setShow(true)} className="px-3 py-1">
+          <Button
+            variant="primary"
+            onClick={() => setShow(true)}
+            className="px-3 py-1"
+          >
             Create Book
           </Button>
         )}
@@ -160,7 +171,11 @@ export const BookListScreen: React.FC = () => {
           </FixedSizeList>
         )}
         <div className="pt-2">
-          <Button onClick={loadPage} disabled={loading} className="px-3 py-1 disabled:opacity-50">
+          <Button
+            onClick={loadPage}
+            disabled={loading}
+            className="px-3 py-1 disabled:opacity-50"
+          >
             {loading ? 'Loading...' : 'Load more'}
           </Button>
         </div>

@@ -14,14 +14,24 @@ const path = require('path');
     format: 'cjs',
     platform: 'node',
     write: false,
-    external: ['react', 'react-router-dom', './src/nostr.tsx'],
+    external: [
+      'react',
+      'react-router-dom',
+      './src/nostr.tsx',
+      './src/components/ToastProvider.tsx',
+    ],
   });
   const code = build.outputFiles[0].text;
   const module = { exports: {} };
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
-        return { useNostr: () => ({ subscribe: () => () => {}, list: async () => [] }) };
+        return {
+          useNostr: () => ({ subscribe: () => () => {}, list: async () => [] }),
+        };
+      }
+      if (p === './src/components/ToastProvider.tsx') {
+        return { useToast: () => () => {} };
       }
       return require(p);
     },
@@ -39,14 +49,17 @@ const path = require('path');
       React.createElement(
         MemoryRouter,
         null,
-        React.createElement(BookListScreen)
-      )
+        React.createElement(BookListScreen),
+      ),
     );
     await Promise.resolve();
   });
 
   const json = renderer.toJSON();
   const text = JSON.stringify(json);
-  assert.ok(text.includes('No books found.'), 'Placeholder text should be present');
+  assert.ok(
+    text.includes('No books found.'),
+    'Placeholder text should be present',
+  );
   console.log('All tests passed.');
 })();

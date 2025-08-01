@@ -3,6 +3,7 @@ import { useNostr } from '../nostr';
 import { connectNostrWallet, nostrLogin } from '../nostr/auth';
 import { importKey, validatePrivKey } from '../lib/keys';
 import { isValidUrl } from '../validators';
+import { useToast } from './ToastProvider';
 
 export interface LoginModalProps {
   onClose: () => void;
@@ -21,6 +22,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   const [remoteToken, setRemoteToken] = React.useState('');
   const [remoteError, setRemoteError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const toast = useToast();
 
   const hasWallet = React.useMemo(() => Boolean((window as any).nostr), []);
 
@@ -86,6 +88,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
       onClose();
     } catch (err: any) {
       setRemoteError(err.message);
+      toast('Network error', { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -96,14 +99,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
 
   if (pubkey) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]">
-          <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]">
+        <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
           <p className="text-sm break-all">Logged in as {pubkey}</p>
           <div className="flex justify-end gap-2">
-              <button onClick={logout} className="rounded border px-[var(--space-3)] py-[var(--space-1)]">
+            <button
+              onClick={logout}
+              className="rounded border px-[var(--space-3)] py-[var(--space-1)]"
+            >
               Logout
             </button>
-              <button onClick={onClose} className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white">
+            <button
+              onClick={onClose}
+              className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white"
+            >
               Close
             </button>
           </div>
@@ -113,8 +122,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   }
 
   return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]">
-        <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]">
+      <div className="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
         <div className="flex gap-2">
           <button
             onClick={() => setTab('priv')}
@@ -166,7 +175,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
         )}
         {tab === 'nip07' && (
           <div className="space-y-2">
-            {!hasWallet && <p className="text-sm">Nostr wallet not detected.</p>}
+            {!hasWallet && (
+              <p className="text-sm">Nostr wallet not detected.</p>
+            )}
             {privError && <p className="text-red-600 text-sm">{privError}</p>}
             <button
               onClick={handleWalletLogin}
@@ -192,7 +203,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
               placeholder="Auth token"
               className="w-full rounded border p-[var(--space-2)]"
             />
-            {remoteError && <p className="text-red-600 text-sm">{remoteError}</p>}
+            {remoteError && (
+              <p className="text-red-600 text-sm">{remoteError}</p>
+            )}
             <button
               onClick={handleRemoteLogin}
               disabled={!isRemoteValid || loading}
@@ -203,7 +216,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
           </div>
         )}
         <div className="flex justify-end">
-          <button onClick={onClose} className="rounded px-[var(--space-3)] py-[var(--space-1)] border">
+          <button
+            onClick={onClose}
+            className="rounded px-[var(--space-3)] py-[var(--space-1)] border"
+          >
             Close
           </button>
         </div>
