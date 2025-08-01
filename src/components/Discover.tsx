@@ -12,8 +12,13 @@ import { Illustration } from './Illustration';
 
 
 export const Discover: React.FC = () => {
-  const { books: bookEvents, trending, newReleases, removeBook } =
-    useDiscoverBooks();
+  const {
+    books: bookEvents,
+    trending,
+    newReleases,
+    loading,
+    removeBook,
+  } = useDiscoverBooks();
   const { contacts } = useNostr();
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState(params.get('q') || '');
@@ -116,7 +121,7 @@ export const Discover: React.FC = () => {
       <section className="p-[var(--space-4)]">
         <h2 className="mb-[var(--space-2)] font-semibold">Trending Books</h2>
         <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
-          {trending.length === 0
+          {loading && trending.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
               ))
@@ -132,7 +137,7 @@ export const Discover: React.FC = () => {
       <section className="p-[var(--space-4)]">
         <h2 className="mb-[var(--space-2)] font-semibold">New Releases</h2>
         <div className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4">
-          {newReleases.length === 0
+          {loading && newReleases.length === 0
             ? Array.from({ length: 6 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
               ))
@@ -152,7 +157,7 @@ export const Discover: React.FC = () => {
             <div className="col-span-full">
               <Illustration text="No matching books found." />
             </div>
-          ) : recommended.length === 0 ? (
+          ) : loading && recommended.length === 0 ? (
             Array.from({ length: 6 }).map((_, i) => (
               <BookCardSkeleton key={i} />
             ))

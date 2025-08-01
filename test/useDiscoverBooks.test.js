@@ -61,10 +61,14 @@ const path = require('path');
 
   await TestRenderer.act(async () => {
     TestRenderer.create(React.createElement(TestComp));
+  });
+  assert.strictEqual(result.loading, true);
+  await TestRenderer.act(async () => {
     await Promise.resolve();
     await Promise.resolve();
   });
-
+  assert.strictEqual(result.loading, false);
+  assert.strictEqual(result.books.length, 2);
   const trendIds = Array.from(result.trending, (b) => b.id);
   const newIds = Array.from(result.newReleases, (b) => b.id);
   assert.deepStrictEqual(trendIds, ['1', '2']);
