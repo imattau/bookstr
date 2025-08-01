@@ -34,6 +34,16 @@ registerRoute(
   new StaleWhileRevalidate({ cacheName: 'api' }),
 );
 
+// Cache event list responses separately so they can be reused while a
+// background refresh runs. This applies to both API endpoints and relay
+// HTTP gateways.
+registerRoute(
+  ({ request, url }) =>
+    request.method === 'GET' &&
+    (url.pathname.startsWith(`${API_BASE}/event`) || /relay/i.test(url.hostname)),
+  new StaleWhileRevalidate({ cacheName: 'events' }),
+);
+
 const bgSync = new BackgroundSyncPlugin('actions', {
   maxRetentionTime: 24 * 60,
 });

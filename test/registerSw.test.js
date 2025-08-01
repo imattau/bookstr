@@ -13,5 +13,10 @@ const { registerServiceWorker } = require('../src/registerSw');
   delete navigator.serviceWorker;
   registerServiceWorker();
 
+  const fs = require('fs');
+  const path = require('path');
+  const swSrc = fs.readFileSync(path.join(__dirname, '../src/sw.ts'), 'utf8');
+  assert(swSrc.includes("cacheName: 'events'"), 'events cache route missing');
+
   console.log('All tests passed.');
 })();
