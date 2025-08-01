@@ -1,3 +1,8 @@
+/**
+ * Configure offline behaviour including caching and background sync.
+ *
+ * Uses helper functions from `offlineStore` to query and update offline state.
+ */
 import React from 'react';
 import {
   clearOfflineBooks,

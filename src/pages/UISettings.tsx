@@ -1,3 +1,9 @@
+/**
+ * User interface and reading preferences settings.
+ *
+ * Utilises the `useSettings` store hook to read and update theme, goals and
+ * accessibility preferences.
+ */
 import React from 'react';
 import { useSettings } from '../useSettings';
 import type { Theme } from '../ThemeProvider';

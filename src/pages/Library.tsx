@@ -1,3 +1,9 @@
+/**
+ * Shows the user's library list and allows archiving or reordering books.
+ *
+ * Hooks: `useNostr` for Nostr interactions, `useNavigate` for navigation and
+ * multiple `useState`/`useEffect` hooks to keep list state in sync.
+ */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {

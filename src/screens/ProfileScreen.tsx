@@ -1,3 +1,13 @@
+/**
+ * Displays a user's profile and a list of their published books.
+ *
+ * Route params:
+ * - `pubkey` – optional; if omitted the logged in user's profile is shown.
+ *
+ * Hooks: `useNostr` for network calls and `useParams` to determine which
+ * profile to show.
+ */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';

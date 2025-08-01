@@ -1,3 +1,13 @@
+/**
+ * Detailed view of a book showing metadata and chapter ordering.
+ *
+ * Route params:
+ * - `bookId` – retrieved via `useParams` to load the book contents.
+ *
+ * Hooks: uses `useNostr` for nostr interactions, `useNavigate` for routing and
+ * multiple `useEffect` hooks to fetch chapters and metadata.
+ */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {

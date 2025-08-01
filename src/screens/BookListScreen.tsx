@@ -1,3 +1,9 @@
+/**
+ * Lists available books with sorting options and a publish wizard.
+ *
+ * Hooks: `useNostr` for fetching books, `useNavigate` for navigation and
+ * `useState`/`useEffect` for pagination and sorting.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import type {
   ListChildComponentProps,
