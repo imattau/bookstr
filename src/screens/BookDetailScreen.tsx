@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   DragDropContext,
@@ -6,8 +6,10 @@ import {
   Draggable,
   DropResult,
 } from '@hello-pangea/dnd';
+import { SimplePool } from 'nostr-tools';
+import type { Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
-import { fetchLongPostParts } from '../nostr/events';
+import { fetchUserRelays } from '../nostr/relays';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { BookMetadataEditor } from '../components/BookMetadataEditor';
 import { DeleteButton } from '../components/DeleteButton';
@@ -25,7 +27,30 @@ export const BookDetailScreen: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
   const ctx = useNostr();
-  const { subscribe, publish, list, pubkey } = ctx;
+  const { publish, pubkey, relays: ctxRelays = [] } = ctx as any;
+  const poolRef = useRef(new SimplePool());
+  const [extraRelays, setExtraRelays] = useState<string[]>([]);
+  const relaysRef = useRef<string[]>([]);
+  const subscribeWithExtras = (filters: Filter[], cb: (evt: any) => void) => {
+    const offMain = ctx.subscribe ? ctx.subscribe(filters, cb) : () => {};
+    let subExtra: any = null;
+    if (extraRelays.length) {
+      subExtra = poolRef.current.subscribeMany(extraRelays, filters, {
+        onevent: cb,
+      });
+    }
+    return () => {
+      offMain?.();
+      if (subExtra) (subExtra as any).close();
+    };
+  };
+
+  const listWithExtras = async (filters: Filter[]) => {
+    const main = ctx.list ? await ctx.list(filters) : [];
+    if (!extraRelays.length) return main;
+    const extra = (await poolRef.current.list(extraRelays, filters)) as any[];
+    return [...main, ...extra];
+  };
   const [authorPubkey, setAuthorPubkey] = useState<string | null>(null);
   const [meta, setMeta] = useState<{
     title: string;
@@ -45,19 +70,43 @@ export const BookDetailScreen: React.FC = () => {
   const canEdit = pubkey && authorPubkey && pubkey === authorPubkey;
 
   useEffect(() => {
+    relaysRef.current = extraRelays;
+  }, [extraRelays]);
+
+  useEffect(() => {
+    return () => {
+      poolRef.current.close(relaysRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authorPubkey) {
+      setExtraRelays([]);
+      return;
+    }
+    let stopped = false;
+    fetchUserRelays(authorPubkey).then((r) => {
+      if (!stopped) setExtraRelays(r);
+    });
+    return () => {
+      stopped = true;
+    };
+  }, [authorPubkey]);
+
+  useEffect(() => {
     if (!bookId) return undefined;
-    const off = subscribe(
+    const off = subscribeWithExtras(
       [{ kinds: [30023], ids: [bookId], limit: 1 }],
       (evt) => {
         setAuthorPubkey(evt.pubkey);
       },
     );
     return off;
-  }, [subscribe, bookId]);
+  }, [bookId, ctxRelays, extraRelays]);
 
   useEffect(() => {
     if (!bookId || !authorPubkey) return undefined;
-    const off = subscribe(
+    const off = subscribeWithExtras(
       [{ kinds: [41], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
       (evt) => {
         setMeta({
@@ -69,11 +118,11 @@ export const BookDetailScreen: React.FC = () => {
       },
     );
     return off;
-  }, [subscribe, bookId, authorPubkey]);
+  }, [bookId, authorPubkey, ctxRelays, extraRelays]);
 
   useEffect(() => {
     if (!bookId || !authorPubkey) return undefined;
-    const off = subscribe(
+    const off = subscribeWithExtras(
       [{ kinds: [30001], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
       (evt) => {
         const ids = evt.tags.filter((t) => t[0] === 'e').map((t) => t[1]);
@@ -82,12 +131,30 @@ export const BookDetailScreen: React.FC = () => {
       },
     );
     return off;
-  }, [subscribe, bookId, authorPubkey]);
+  }, [bookId, authorPubkey, ctxRelays, extraRelays]);
 
   useEffect(() => {
     if (!chapterIds.length) return undefined;
-    const off = subscribe([{ ids: chapterIds }], async (evt) => {
-      const content = await fetchLongPostParts(ctx, evt);
+    const off = subscribeWithExtras([{ ids: chapterIds }], async (evt) => {
+      const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+      let content = evt.content;
+      if (d) {
+        const parts = (await listWithExtras([
+          { kinds: [evt.kind], '#d': [d], authors: [evt.pubkey] },
+        ])) as any[];
+        const sorted = parts.sort((a, b) => {
+          const pa = parseInt(
+            a.tags.find((t) => t[0] === 'part')?.[1] ?? '1',
+            10,
+          );
+          const pb = parseInt(
+            b.tags.find((t) => t[0] === 'part')?.[1] ?? '1',
+            10,
+          );
+          return pa - pb;
+        });
+        content = sorted.map((p) => p.content).join('');
+      }
       setChapters((c) => ({
         ...c,
         [evt.id]: {
@@ -99,7 +166,7 @@ export const BookDetailScreen: React.FC = () => {
       }));
     });
     return off;
-  }, [subscribe, chapterIds, ctx]);
+  }, [chapterIds, ctxRelays, extraRelays]);
 
   const handleDragEnd = async (res: DropResult) => {
     if (pubkey !== authorPubkey) return;
@@ -142,7 +209,10 @@ export const BookDetailScreen: React.FC = () => {
           {meta.summary && <p>{meta.summary}</p>}
           {bookId && (
             <div>
-              <Button onClick={() => navigate(`/read/${bookId}`)} className="mt-[var(--space-2)] px-3 py-1">
+              <Button
+                onClick={() => navigate(`/read/${bookId}`)}
+                className="mt-[var(--space-2)] px-3 py-1"
+              >
                 Read Book
               </Button>
             </div>
@@ -196,15 +266,16 @@ export const BookDetailScreen: React.FC = () => {
                         {...p.dragHandleProps}
                         className={`rounded border p-2 flex items-start gap-2${canEdit ? ' cursor-pointer' : ''}`}
                         onClick={() =>
-                          canEdit &&
-                          setModalData({ id, number: index + 1 })
+                          canEdit && setModalData({ id, number: index + 1 })
                         }
                       >
                         <div className="flex-1">
                           <h3 className="font-semibold">
                             {ch?.title || 'Chapter'}
                           </h3>
-                          {ch?.summary && <p className="text-sm">{ch.summary}</p>}
+                          {ch?.summary && (
+                            <p className="text-sm">{ch.summary}</p>
+                          )}
                         </div>
                         {canEdit && (
                           <div onClick={(e) => e.stopPropagation()}>

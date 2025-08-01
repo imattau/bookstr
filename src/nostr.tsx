@@ -26,7 +26,7 @@ import {
 import { initOfflineSync } from './nostr/offline';
 import { savePointer, getPointer } from './lib/cache';
 
-const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
+export const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
   | string
   | undefined)
   ? ((import.meta as any).env.VITE_RELAY_URLS as string)
@@ -57,7 +57,6 @@ export function setMaxEventSize(size: number) {
   }
 }
 
-
 function checkDelegationConditions(
   cond: string,
   kind: number,
@@ -75,7 +74,6 @@ function checkDelegationConditions(
   }
   return true;
 }
-
 
 export interface NostrContextValue {
   pubkey: string | null;
@@ -285,32 +283,32 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!priv && !(nostr && typeof nostr.signEvent === 'function')) {
         throw new Error('not logged in');
       }
-    const now = Math.floor(Date.now() / 1000);
-    const del = tpl.tags?.find((t) => t[0] === 'delegation');
-    if (del && priv) {
-      const [, delegator, cond, sig] = del;
-      const str = `nostr:delegation:${getPublicKey(hexToBytes(priv))}:${cond}`;
-      const hash = sha256(encoder.encode(str));
-      const okSig = schnorr.verify(sig, hash, delegator);
-      const okCond = checkDelegationConditions(cond, tpl.kind, now);
-      if (!okSig || !okCond) throw new Error('invalid delegation');
-    }
-    let tags = tpl.tags ? [...tpl.tags] : [];
-    let eventTemplate: EventTemplate & { created_at: number } = {
-      ...tpl,
-      tags,
-      created_at: now,
-    };
-    if (pow > 0) {
-      const { applyPow } = await import('./pow');
-      eventTemplate = await applyPow(tpl, now, pow);
-    }
-    let event: NostrEvent;
-    if (priv) {
-      event = finalizeEvent(eventTemplate as any, hexToBytes(priv));
-    } else {
-      event = await nostr.signEvent(eventTemplate as any);
-    }
+      const now = Math.floor(Date.now() / 1000);
+      const del = tpl.tags?.find((t) => t[0] === 'delegation');
+      if (del && priv) {
+        const [, delegator, cond, sig] = del;
+        const str = `nostr:delegation:${getPublicKey(hexToBytes(priv))}:${cond}`;
+        const hash = sha256(encoder.encode(str));
+        const okSig = schnorr.verify(sig, hash, delegator);
+        const okCond = checkDelegationConditions(cond, tpl.kind, now);
+        if (!okSig || !okCond) throw new Error('invalid delegation');
+      }
+      let tags = tpl.tags ? [...tpl.tags] : [];
+      let eventTemplate: EventTemplate & { created_at: number } = {
+        ...tpl,
+        tags,
+        created_at: now,
+      };
+      if (pow > 0) {
+        const { applyPow } = await import('./pow');
+        eventTemplate = await applyPow(tpl, now, pow);
+      }
+      let event: NostrEvent;
+      if (priv) {
+        event = finalizeEvent(eventTemplate as any, hexToBytes(priv));
+      } else {
+        event = await nostr.signEvent(eventTemplate as any);
+      }
       const targets = relaysOverride ?? relaysRef.current;
       await poolRef.current.publish(targets, event);
       return event;
@@ -463,10 +461,13 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     await publish({ kind: 1, content: text, tags });
   };
 
-  const sendEvent = useCallback(async (event: NostrEvent, relaysOverride?: string[]) => {
-    const targets = relaysOverride ?? relaysRef.current;
-    await poolRef.current.publish(targets, event);
-  }, []);
+  const sendEvent = useCallback(
+    async (event: NostrEvent, relaysOverride?: string[]) => {
+      const targets = relaysOverride ?? relaysRef.current;
+      await poolRef.current.publish(targets, event);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!pubkey) return;
