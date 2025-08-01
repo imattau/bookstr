@@ -1,9 +1,11 @@
-import type { Event as NostrEvent } from 'nostr-tools';
-import { getPublicKey } from 'nostr-tools';
+import type { Event as NostrEvent, Filter } from 'nostr-tools';
+import { getPublicKey, SimplePool } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 import type { NostrContextValue } from '../nostr';
 import { MAX_EVENT_SIZE } from '../nostr';
 import { getPrivKey } from './auth';
+import { useEffect } from 'react';
+import { useNostr } from '../nostr';
 
 const encoder = new TextEncoder();
 
@@ -248,4 +250,51 @@ export async function zap(
       resolve();
     }, 30000);
   });
+}
+
+// ---------------------------------------------------------------------------
+// Subscription manager
+// ---------------------------------------------------------------------------
+
+type Listener = (evt: NostrEvent) => void;
+
+const pool = new SimplePool();
+const subs = new Map<string, { sub: any; listeners: Set<Listener> }>();
+
+function makeKey(relays: string[], filters: Filter[]): string {
+  return JSON.stringify({ relays: relays.slice().sort(), filters });
+}
+
+export function sharedSubscribe(
+  relays: string[],
+  filters: Filter[],
+  cb: Listener,
+): () => void {
+  const key = makeKey(relays, filters);
+  let entry = subs.get(key);
+  if (!entry) {
+    const sub = pool.subscribeMany(relays, filters, {
+      onevent: (evt: NostrEvent) => {
+        const en = subs.get(key);
+        if (en) en.listeners.forEach((fn) => fn(evt));
+      },
+    });
+    entry = { sub, listeners: new Set() };
+    subs.set(key, entry);
+  }
+  entry.listeners.add(cb);
+  return () => {
+    const en = subs.get(key);
+    if (!en) return;
+    en.listeners.delete(cb);
+    if (en.listeners.size === 0) {
+      (en.sub as any).unsub();
+      subs.delete(key);
+    }
+  };
+}
+
+export function useSubscribe(filters: Filter[], cb: Listener) {
+  const { relays } = useNostr();
+  useEffect(() => sharedSubscribe(relays, filters, cb), [cb, relays, filters]);
 }

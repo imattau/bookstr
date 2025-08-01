@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FaAt, FaReply, FaUserPlus, FaBolt } from 'react-icons/fa';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { useNostr } from '../nostr';
+import { useSubscribe } from '../nostr/events';
 import { useEventStore } from '../store/events';
 
 type Notification = {
@@ -13,68 +14,59 @@ type Notification = {
 };
 
 export const NotificationFeed: React.FC = () => {
-  const { pubkey, subscribe } = useNostr();
+  const { pubkey } = useNostr();
   const addEvent = useEventStore((s) => s.addEvent);
   const [items, setItems] = useState<Notification[]>([]);
 
-  useEffect(() => {
-    if (!pubkey) return;
-    const offs: Array<() => void> = [];
-
-    // Mentions and replies
-    offs.push(
-      subscribe([{ kinds: [1], '#p': [pubkey], limit: 20 }], (evt) => {
-        if (evt.pubkey === pubkey) return;
-        addEvent(evt);
-        const isReply = evt.tags.some((t) => t[0] === 'e' && t[3] === 'reply');
-        const bookId =
-          evt.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1] ??
-          evt.tags.find((t) => t[0] === 'e')?.[1];
-        const link = bookId ? `/book/${bookId}` : undefined;
-        const type = isReply ? 'reply' : 'mention';
-        setItems((n) =>
-          n.find((x) => x.id === evt.id)
-            ? n
-            : [...n, { id: evt.id, type, event: evt, link }],
-        );
-      }),
+  const mentionFilter = useMemo(
+    () => (pubkey ? [{ kinds: [1], '#p': [pubkey], limit: 20 }] : []),
+    [pubkey],
+  );
+  useSubscribe(mentionFilter, (evt) => {
+    if (!pubkey || evt.pubkey === pubkey) return;
+    addEvent(evt);
+    const isReply = evt.tags.some((t) => t[0] === 'e' && t[3] === 'reply');
+    const bookId =
+      evt.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1] ??
+      evt.tags.find((t) => t[0] === 'e')?.[1];
+    const link = bookId ? `/book/${bookId}` : undefined;
+    const type = isReply ? 'reply' : 'mention';
+    setItems((n) =>
+      n.find((x) => x.id === evt.id)
+        ? n
+        : [...n, { id: evt.id, type, event: evt, link }],
     );
+  });
 
-    // Follows
-    offs.push(
-      subscribe([{ kinds: [3], '#p': [pubkey], limit: 20 }], (evt) => {
-        if (evt.pubkey === pubkey) return;
-        addEvent(evt);
-        setItems((n) =>
-          n.find((x) => x.id === evt.id)
-            ? n
-            : [
-                ...n,
-                { id: evt.id, type: 'follow', event: evt, link: '/profile' },
-              ],
-        );
-      }),
+  const followFilter = useMemo(
+    () => (pubkey ? [{ kinds: [3], '#p': [pubkey], limit: 20 }] : []),
+    [pubkey],
+  );
+  useSubscribe(followFilter, (evt) => {
+    if (!pubkey || evt.pubkey === pubkey) return;
+    addEvent(evt);
+    setItems((n) =>
+      n.find((x) => x.id === evt.id)
+        ? n
+        : [...n, { id: evt.id, type: 'follow', event: evt, link: '/profile' }],
     );
+  });
 
-    // Zaps
-    offs.push(
-      subscribe([{ kinds: [9735], '#p': [pubkey], limit: 20 }], (evt) => {
-        if (evt.pubkey === pubkey) return;
-        addEvent(evt);
-        const bookId = evt.tags.find((t) => t[0] === 'e')?.[1];
-        const link = bookId ? `/book/${bookId}` : undefined;
-        setItems((n) =>
-          n.find((x) => x.id === evt.id)
-            ? n
-            : [...n, { id: evt.id, type: 'zap', event: evt, link }],
-        );
-      }),
+  const zapFilter = useMemo(
+    () => (pubkey ? [{ kinds: [9735], '#p': [pubkey], limit: 20 }] : []),
+    [pubkey],
+  );
+  useSubscribe(zapFilter, (evt) => {
+    if (!pubkey || evt.pubkey === pubkey) return;
+    addEvent(evt);
+    const bookId = evt.tags.find((t) => t[0] === 'e')?.[1];
+    const link = bookId ? `/book/${bookId}` : undefined;
+    setItems((n) =>
+      n.find((x) => x.id === evt.id)
+        ? n
+        : [...n, { id: evt.id, type: 'zap', event: evt, link }],
     );
-
-    return () => {
-      offs.forEach((off) => off());
-    };
-  }, [subscribe, pubkey]);
+  });
 
   const iconMap = {
     mention: <FaAt aria-label="Mention" />,
