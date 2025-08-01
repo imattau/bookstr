@@ -84,9 +84,13 @@ export const NotificationFeed: React.FC = () => {
   } as const;
 
   return (
-    <div className="space-y-2">
+    <ul role="list" className="space-y-2">
       {items.map((n) => (
-        <div key={n.id} className="flex items-center gap-2 rounded border p-2">
+        <li
+          key={n.id}
+          role="listitem"
+          className="flex items-center gap-2 rounded border p-2"
+        >
           <span>{iconMap[n.type]}</span>
           {n.link ? (
             <Link to={n.link} className="text-blue-600 underline">
@@ -109,8 +113,8 @@ export const NotificationFeed: React.FC = () => {
                     : 'Mentioned you'}
             </span>
           )}
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };

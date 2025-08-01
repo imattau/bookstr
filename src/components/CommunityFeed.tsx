@@ -17,16 +17,16 @@ export const CommunityFeed: React.FC = () => {
   }, [subscribe]);
 
   return (
-    <div className="space-y-4">
+    <ul role="list" className="space-y-4">
       {events.map((evt) => {
         const name = evt.tags.find((t) => t[0] === 'name')?.[1] || 'Unnamed';
         return (
-          <div key={evt.id} className="rounded border p-2">
+          <li key={evt.id} role="listitem" className="rounded border p-2">
             <h3 className="font-semibold">{name}</h3>
             <p className="text-sm whitespace-pre-wrap">{evt.content}</p>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 };

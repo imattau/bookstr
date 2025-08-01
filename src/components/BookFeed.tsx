@@ -44,18 +44,23 @@ export const BookFeed: React.FC = () => {
   }, [subscribe]);
 
   return (
-    <div className="space-y-4">
+    <ul role="list" className="space-y-4">
       {events.length === 0
-        ? Array.from({ length: 3 }).map((_, i) => <BookCardSkeleton key={i} />)
+        ? Array.from({ length: 3 }).map((_, i) => (
+            <li key={i} role="listitem">
+              <BookCardSkeleton />
+            </li>
+          ))
         : events.map((e) => (
-            <BookCard
-              key={e.id}
-              event={e}
-              onDelete={(id) =>
-                setEvents((evts) => evts.filter((x) => x.id !== id))
-              }
-            />
+            <li key={e.id} role="listitem">
+              <BookCard
+                event={e}
+                onDelete={(id) =>
+                  setEvents((evts) => evts.filter((x) => x.id !== id))
+                }
+              />
+            </li>
           ))}
-    </div>
+    </ul>
   );
 };

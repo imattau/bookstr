@@ -7,7 +7,10 @@ export interface BookHistoryProps {
   onClose?: () => void;
 }
 
-export const BookHistory: React.FC<BookHistoryProps> = ({ bookId, onClose }) => {
+export const BookHistory: React.FC<BookHistoryProps> = ({
+  bookId,
+  onClose,
+}) => {
   const { list, publish } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -40,9 +43,13 @@ export const BookHistory: React.FC<BookHistoryProps> = ({ bookId, onClose }) => 
             </button>
           )}
         </div>
-        <div className="space-y-2">
+        <ul role="list" className="space-y-2">
           {events.map((e) => (
-            <div key={e.id} className="space-y-2 rounded border p-2">
+            <li
+              key={e.id}
+              role="listitem"
+              className="space-y-2 rounded border p-2"
+            >
               <div className="flex items-center justify-between gap-2">
                 <span>{new Date(e.created_at * 1000).toLocaleString()}</span>
                 <div className="flex gap-2">
@@ -65,9 +72,9 @@ export const BookHistory: React.FC<BookHistoryProps> = ({ bookId, onClose }) => 
                   {e.content || JSON.stringify(e.tags)}
                 </pre>
               )}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );

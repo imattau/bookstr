@@ -39,7 +39,9 @@ export const Library: React.FC = () => {
         className="flex items-center justify-between"
         style={{ height: 56 }}
       >
-        <h1 className="text-[20px] font-bold text-[color:var(--clr-primary-600)]">Bookstr</h1>
+        <h1 className="text-[20px] font-bold text-[color:var(--clr-primary-600)]">
+          Bookstr
+        </h1>
         <OnboardingTooltip
           storageKey="library-settings"
           text="Library settings"
@@ -58,7 +60,7 @@ export const Library: React.FC = () => {
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-              className={`pb-[var(--space-1)] text-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50 ${tab === t.key ? 'border-b-2 border-[color:var(--clr-primary-600)] text-[color:var(--clr-text)]' : 'text-text-muted'}`}
+            className={`pb-[var(--space-1)] text-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50 ${tab === t.key ? 'border-b-2 border-[color:var(--clr-primary-600)] text-[color:var(--clr-text)]' : 'text-text-muted'}`}
           >
             {t.label}
           </button>
@@ -85,7 +87,7 @@ export const Library: React.FC = () => {
           ))}
         </div>
       )}
-      <div className="mt-[var(--space-4)] space-y-2">
+      <ul role="list" className="mt-[var(--space-4)] space-y-2">
         {books
           .filter((item) => {
             if (tab === 'following') {
@@ -94,14 +96,15 @@ export const Library: React.FC = () => {
             return item.status === tab;
           })
           .map((item) => (
-            <div
+            <li
               key={item.id}
-                className="mb-[var(--space-2)] flex items-center gap-4 rounded-card bg-border p-[var(--space-3)]"
+              role="listitem"
+              className="mb-[var(--space-2)] flex items-center gap-4 rounded-card bg-border p-[var(--space-3)]"
             >
               <img
                 src={item.cover}
                 alt={`Cover image for ${item.title}`}
-                  className="h-[84px] w-[56px] rounded object-cover"
+                className="h-[84px] w-[56px] rounded object-cover"
               />
               <div className="flex-1 space-y-1">
                 <h3 className="text-[16px] font-semibold leading-6">
@@ -110,7 +113,7 @@ export const Library: React.FC = () => {
                 <p className="text-[14px] leading-5 text-text-muted">
                   {item.author}
                 </p>
-                  <span className="inline-block rounded bg-[color:var(--clr-surface-alt)] px-[var(--space-2)] py-[2px] text-[12px] text-text-muted">
+                <span className="inline-block rounded bg-[color:var(--clr-surface-alt)] px-[var(--space-2)] py-[2px] text-[12px] text-text-muted">
                   {item.genre}
                 </span>
                 <div className="mt-[var(--space-1)] h-1 rounded bg-border">
@@ -129,9 +132,9 @@ export const Library: React.FC = () => {
                 </button>
                 <span>{item.percent}%</span>
               </div>
-            </div>
+            </li>
           ))}
-      </div>
+      </ul>
     </div>
   );
 };
