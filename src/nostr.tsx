@@ -57,6 +57,23 @@ export function setMaxEventSize(size: number) {
   }
 }
 
+export async function getSearchRelays(pubkey: string): Promise<string[]> {
+  const pool = new SimplePool();
+  const relays = DEFAULT_RELAYS ?? [];
+  try {
+    const events = (await pool.list(relays, [
+      { kinds: [10007], authors: [pubkey], limit: 1 },
+    ])) as NostrEvent[];
+    const evt = events[0];
+    if (!evt) return [];
+    return evt.tags.filter((t) => t[0] === 'r').map((t) => t[1]);
+  } catch {
+    return [];
+  } finally {
+    if (relays.length) pool.close(relays);
+  }
+}
+
 function checkDelegationConditions(
   cond: string,
   kind: number,
