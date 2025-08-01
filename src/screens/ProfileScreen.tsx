@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
+import { SimplePool } from 'nostr-tools';
 import { useNostr } from '../nostr';
+import { fetchUserRelays } from '../nostr/relays';
 import { FollowButton } from '../components/FollowButton';
 import { BookCard } from '../components/BookCard';
 import { useEventStore } from '../store/events';
@@ -13,18 +15,77 @@ interface ProfileMeta {
 }
 
 export const ProfileScreen: React.FC = () => {
-  const { pubkey: loggedPubkey, subscribe, list } = useNostr();
+  const {
+    pubkey: loggedPubkey,
+    relays: ctxRelays = [],
+    subscribe,
+    list,
+  } = useNostr() as any;
   const addEvent = useEventStore((s) => s.addEvent);
+  const poolRef = useRef(new SimplePool());
+  const [extraRelays, setExtraRelays] = useState<string[]>([]);
   const params = useParams<{ pubkey?: string }>();
   const pubkey = params.pubkey || loggedPubkey;
 
   const [meta, setMeta] = useState<ProfileMeta | null>(null);
   const [followers, setFollowers] = useState(0);
   const [books, setBooks] = useState<NostrEvent[]>([]);
+  const relaysRef = useRef<string[]>([]);
+
+  const subscribeWithExtras = (
+    filters: Filter[],
+    cb: (evt: NostrEvent) => void,
+  ) => {
+    const offMain = subscribe(filters, cb);
+    let subExtra: any = null;
+    if (extraRelays.length) {
+      subExtra = poolRef.current.subscribeMany(extraRelays, filters, {
+        onevent: cb,
+      });
+    }
+    return () => {
+      offMain?.();
+      if (subExtra) (subExtra as any).close();
+    };
+  };
+
+  const listWithExtras = async (filters: Filter[]) => {
+    const main = await list(filters);
+    if (!extraRelays.length) return main;
+    const extra = (await poolRef.current.list(
+      extraRelays,
+      filters,
+    )) as NostrEvent[];
+    return [...main, ...extra];
+  };
+
+  useEffect(() => {
+    relaysRef.current = extraRelays;
+  }, [extraRelays]);
+
+  useEffect(() => {
+    return () => {
+      poolRef.current.close(relaysRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!pubkey) {
+      setExtraRelays([]);
+      return;
+    }
+    let stopped = false;
+    fetchUserRelays(pubkey).then((r) => {
+      if (!stopped) setExtraRelays(r);
+    });
+    return () => {
+      stopped = true;
+    };
+  }, [pubkey]);
 
   useEffect(() => {
     if (!pubkey) return;
-    let off = subscribe(
+    const off = subscribeWithExtras(
       [{ kinds: [0], authors: [pubkey], limit: 1 }],
       (evt) => {
         try {
@@ -35,28 +96,28 @@ export const ProfileScreen: React.FC = () => {
       },
     );
     return off;
-  }, [subscribe, pubkey]);
+  }, [pubkey, ctxRelays, extraRelays]);
 
   useEffect(() => {
     if (!pubkey) return;
-    list([{ kinds: [3], '#p': [pubkey] }]).then((evts) => {
+    listWithExtras([{ kinds: [3], '#p': [pubkey] }]).then((evts) => {
       const uniq = new Set<string>();
       evts.forEach((e) => uniq.add(e.pubkey));
       setFollowers(uniq.size);
     });
-  }, [list, pubkey]);
+  }, [pubkey, ctxRelays, extraRelays]);
 
   useEffect(() => {
     if (!pubkey) return;
     const filters: Filter[] = [
       { kinds: [30023], authors: [pubkey], limit: 20 },
     ];
-    const off = subscribe(filters, (evt) => {
+    const off = subscribeWithExtras(filters, (evt) => {
       addEvent(evt);
       setBooks((b) => (b.find((x) => x.id === evt.id) ? b : [...b, evt]));
     });
     return off;
-  }, [subscribe, pubkey, addEvent]);
+  }, [pubkey, addEvent, ctxRelays, extraRelays]);
 
   if (!pubkey) return null;
 
