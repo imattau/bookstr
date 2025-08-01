@@ -1,3 +1,6 @@
+/**
+ * Authentication helpers for Nostr sessions.
+ */
 import type { Event, EventTemplate } from 'nostr-tools';
 import type { NostrContextValue } from '../nostr';
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";

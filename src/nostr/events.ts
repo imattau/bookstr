@@ -1,3 +1,6 @@
+/**
+ * Helper functions and hooks for publishing and subscribing to Nostr events.
+ */
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { getPublicKey, SimplePool } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
@@ -311,6 +314,10 @@ export function sharedSubscribe(
   };
 }
 
+/**
+ * React hook wrapper around `sharedSubscribe` that automatically ties the
+ * subscription lifecycle to the component.
+ */
 export function useSubscribe(filters: Filter[], cb: Listener) {
   const { relays } = useNostr();
   useEffect(() => sharedSubscribe(relays, filters, cb), [cb, relays, filters]);

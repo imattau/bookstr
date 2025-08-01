@@ -25,6 +25,10 @@ interface EventsState {
   addEvents: (evts: NostrEvent[]) => void;
 }
 
+/**
+ * Central store of Nostr events keyed by id with helper methods to add new
+ * events. Components should access methods via selectors.
+ */
 export const useEventStore = create<EventsState>((set, get) => ({
   events: {},
   paramIndex: {},

@@ -50,6 +50,9 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
+/**
+ * Hook for displaying a temporary toast notification.
+ */
 export function useToast() {
   const ctx = React.useContext(ToastContext);
   if (!ctx) throw new Error('useToast must be used within ToastProvider');

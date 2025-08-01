@@ -1,3 +1,6 @@
+/**
+ * Functions for retrieving relay information from user profiles.
+ */
 import type { Event } from 'nostr-tools';
 import { SimplePool } from 'nostr-tools';
 import { DEFAULT_RELAYS } from '../nostr';

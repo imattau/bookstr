@@ -15,6 +15,12 @@ export interface NotificationSettingsState {
   ) => void;
 }
 
+/**
+ * Persistent store for user notification preferences.
+ *
+ * Settings are kept in `localStorage` via the `persist` middleware. Components
+ * can access and update the values through the returned zustand hook.
+ */
 export const useNotificationSettings = create<NotificationSettingsState>()(
   persist(
     (set) => ({

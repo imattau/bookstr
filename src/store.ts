@@ -54,6 +54,11 @@ const DEFAULT_BOOKS: Book[] = [
   },
 ];
 
+/**
+ * Store tracking the user's reading list and progress.
+ *
+ * Backed by `localStorage` through zustand's `persist` middleware.
+ */
 export const useReadingStore = create<ReadingState>()(
   persist(
     (set, get) => ({

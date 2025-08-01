@@ -1,3 +1,6 @@
+/**
+ * Utilities for queuing Nostr edits while offline and processing them later.
+ */
 import { get, set } from 'idb-keyval';
 import type { NostrContextValue } from '../nostr';
 import {

@@ -8,6 +8,7 @@ export interface DiscoverBook extends NostrEvent {
   repostedBy?: string;
 }
 
+
 export interface UseDiscoverBooksResult {
   books: DiscoverBook[];
   trending: DiscoverBook[];
@@ -15,6 +16,16 @@ export interface UseDiscoverBooksResult {
   loading: boolean;
   removeBook: (id: string) => void;
 }
+
+/**
+ * Hook for building the discovery feed.
+ *
+ * Subscribes to Nostr relays for long-form posts, reposts and votes from the
+ * user's contacts. Events are stored in the event store and used to generate
+ * trending and new release lists. State updates as events arrive.
+ *
+ * @returns Collections of discovered books and helper utilities.
+ */
 
 export function useDiscoverBooks(): UseDiscoverBooksResult {
   const { contacts, relays } = useNostr();
