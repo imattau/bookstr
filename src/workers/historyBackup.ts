@@ -1,3 +1,12 @@
+/**
+ * Worker that backs up the user's history.
+ *
+ * The worker fetches events from configured Nostr relays and stores them in
+ * IndexedDB using `idb-keyval`. It tracks the latest backed up event with a
+ * pointer so subsequent runs only fetch new history. The backup runs on a
+ * schedule using `setTimeout`, polling every minute while the worker is
+ * running.
+ */
 import { SimplePool } from 'nostr-tools';
 import { set } from 'idb-keyval';
 import { getPointer, savePointer } from '../lib/cache';
