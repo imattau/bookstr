@@ -61,3 +61,12 @@ html {
 .card-hover {
   @apply transition-shadow duration-150 ease-in-out hover:[box-shadow:var(--shadow-1)];
 }
+
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-primary-600/50;
+}
