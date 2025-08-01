@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
-import { addEvent } from '../store/events';
+import { useEventStore } from '../store/events';
 
 export interface DiscoverBook extends NostrEvent {
   repostedBy?: string;
@@ -17,6 +17,7 @@ export interface UseDiscoverBooksResult {
 
 export function useDiscoverBooks(): UseDiscoverBooksResult {
   const { subscribe, contacts } = useNostr();
+  const addEvent = useEventStore((s) => s.addEvent);
   const [events, setEvents] = useState<DiscoverBook[]>([]);
   const [votes, setVotes] = useState<Record<string, number>>({});
   const voteIds = useRef(new Set<string>());

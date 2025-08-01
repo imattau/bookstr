@@ -4,7 +4,7 @@ import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { FollowButton } from '../components/FollowButton';
 import { BookCard } from '../components/BookCard';
-import { addEvent } from '../store/events';
+import { useEventStore } from '../store/events';
 
 interface ProfileMeta {
   name?: string;
@@ -14,6 +14,7 @@ interface ProfileMeta {
 
 export const ProfileScreen: React.FC = () => {
   const { pubkey: loggedPubkey, subscribe, list } = useNostr();
+  const addEvent = useEventStore((s) => s.addEvent);
   const params = useParams<{ pubkey?: string }>();
   const pubkey = params.pubkey || loggedPubkey;
 

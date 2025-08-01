@@ -15,7 +15,8 @@ export const ReaderScreen: React.FC = () => {
   const ctx = useNostr();
   const { subscribe } = ctx;
   const { theme, setTheme } = useTheme();
-  const { updateProgress, finishBook } = useReadingStore();
+  const updateProgress = useReadingStore((s) => s.updateProgress);
+  const finishBook = useReadingStore((s) => s.finishBook);
   const [title, setTitle] = React.useState('');
   const [html, setHtml] = React.useState('');
   const [percent, setPercent] = React.useState(0);
