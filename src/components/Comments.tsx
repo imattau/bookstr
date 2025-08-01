@@ -35,7 +35,7 @@ export const Comments: React.FC<CommentsProps> = ({
       setEvents((c) => (c.find((e) => e.id === evt.id) ? c : [...c, evt]));
     });
     return off;
-  }, [subscribe, bookId, initialEvents]);
+  }, [subscribe, bookId, initialEvents, addEvent, addEvents]);
 
   const handleSend = async () => {
     const content = text.trim();

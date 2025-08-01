@@ -56,7 +56,7 @@ export const ProfileScreen: React.FC = () => {
       setBooks((b) => (b.find((x) => x.id === evt.id) ? b : [...b, evt]));
     });
     return off;
-  }, [subscribe, pubkey]);
+  }, [subscribe, pubkey, addEvent]);
 
   if (!pubkey) return null;
 

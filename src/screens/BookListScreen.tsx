@@ -35,16 +35,28 @@ export const BookListScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [sort, setSort] = useState<'newest' | 'oldest' | 'zapped'>('newest');
   const [show, setShow] = useState(false);
+  const HEADER_FOOTER_SPACE = 200;
+  const [dynamicHeight, setDynamicHeight] = useState(() =>
+    typeof window === 'undefined' ? 600 : window.innerHeight - HEADER_FOOTER_SPACE,
+  );
   const navigate = useNavigate();
   const toast = useToast();
 
-  const sortBooks = (arr: BookMeta[], mode: typeof sort) => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const handleResize = () => setDynamicHeight(window.innerHeight - HEADER_FOOTER_SPACE);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const sortBooks = useCallback((arr: BookMeta[], mode: typeof sort) => {
     const copy = [...arr];
     if (mode === 'newest') copy.sort((a, b) => b.created - a.created);
     else if (mode === 'oldest') copy.sort((a, b) => a.created - b.created);
     else copy.sort((a, b) => b.zaps - a.zaps);
     return copy;
-  };
+  }, []);
 
   const loadPage = useCallback(async () => {
     if (loading) return;
@@ -96,7 +108,7 @@ export const BookListScreen: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [cursor, list, loading, sort, toast]);
+  }, [addEvents, cursor, list, loading, sort, sortBooks, toast]);
 
   useEffect(() => {
     setBooks([]);
@@ -162,7 +174,7 @@ export const BookListScreen: React.FC = () => {
         )}
         {books.length > 0 && (
           <FixedSizeList
-            height={Math.min(600, books.length * (ITEM_HEIGHT + GAP))}
+            height={Math.min(dynamicHeight, books.length * (ITEM_HEIGHT + GAP))}
             itemCount={books.length}
             itemSize={ITEM_HEIGHT + GAP}
             width="100%"
