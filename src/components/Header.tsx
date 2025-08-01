@@ -35,16 +35,21 @@ export const Header: React.FC<HeaderProps> = ({
     if (!suggestions || suggestions.length === 0) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActive((a) => (a + 1) % suggestions.length);
+      setActive((a) => Math.min(a + 1, suggestions.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActive((a) => (a - 1 + suggestions.length) % suggestions.length);
+      setActive((a) => Math.max(0, a - 1));
     } else if (e.key === 'Enter' && active >= 0) {
       e.preventDefault();
       const s = suggestions[active];
       onSelectSuggestion?.(s.id, s.type);
     }
   };
+
+  React.useEffect(() => {
+    if (!suggestions) return;
+    setActive((a) => Math.min(Math.max(a, -1), suggestions.length - 1));
+  }, [suggestions]);
 
   return (
     <header className={className} data-testid={dataTestId} role="search">
@@ -72,6 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
             onSearch(val);
           }}
           onKeyDown={handleKeyDown}
+          aria-activedescendant={active >= 0 ? `suggestion-${active}` : undefined}
           className="flex-1 rounded border p-2"
           placeholder="Search"
         />
@@ -84,7 +90,9 @@ export const Header: React.FC<HeaderProps> = ({
           {suggestions.map((s, i) => (
             <li
               key={s.id}
+              id={`suggestion-${i}`}
               role="option"
+              aria-selected={active === i}
               className={`p-2 hover:bg-primary-300 cursor-pointer ${
                 active === i ? 'bg-primary-300' : ''
               }`}
