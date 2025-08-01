@@ -103,6 +103,10 @@ export interface NostrContextValue {
     parentPubkey?: string,
   ) => Promise<void>;
   sendEvent: (event: NostrEvent, relays?: string[]) => Promise<void>;
+  listBookLists: (author: string) => Promise<NostrEvent[]>;
+  getListBooks: (
+    author: string,
+  ) => Promise<{ ids: string[]; hasPrivate: boolean }>;
 }
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
@@ -469,6 +473,80 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     [],
   );
 
+  const listBookLists = useCallback(
+    (author: string) =>
+      list([
+        { kinds: [10003], authors: [author] },
+        { kinds: [30004], authors: [author] },
+      ]),
+    [list],
+  );
+
+  const getListBooks = useCallback(
+    async (
+      author: string,
+    ): Promise<{ ids: string[]; hasPrivate: boolean }> => {
+      const evts = (await listBookLists(author)) as NostrEvent[];
+      const ids = new Set<string>();
+      let hasPrivate = false;
+
+      const addTags = (tags: string[][]) => {
+        tags
+          .filter((t) => t[0] === 'a')
+          .forEach((t) => {
+            const parts = t[1].split(':');
+            if (parts[0] === '41' && parts[2]) ids.add(parts[2]);
+          });
+      };
+
+      for (const evt of evts) {
+        let tags = evt.tags;
+        if (!tags.some((t) => t[0] === 'a')) {
+          let parsed: any;
+          try {
+            parsed = JSON.parse(evt.content);
+          } catch {
+            let plain: string | null = null;
+            const priv = getPrivKey();
+            if (priv) {
+              try {
+                plain = await (
+                  await import('nostr-tools')
+                ).nip04.decrypt(priv, evt.pubkey, evt.content);
+              } catch {
+                plain = null;
+              }
+            } else {
+              const nostr = (window as any).nostr;
+              if (nostr?.nip04?.decrypt) {
+                try {
+                  plain = await nostr.nip04.decrypt(evt.pubkey, evt.content);
+                } catch {
+                  plain = null;
+                }
+              }
+            }
+            if (!plain) {
+              hasPrivate = true;
+              continue;
+            }
+            try {
+              parsed = JSON.parse(plain);
+            } catch {
+              hasPrivate = true;
+              continue;
+            }
+          }
+          if (Array.isArray(parsed?.tags)) tags = parsed.tags;
+        }
+        addTags(tags as any);
+      }
+
+      return { ids: Array.from(ids), hasPrivate };
+    },
+    [listBookLists],
+  );
+
   useEffect(() => {
     if (!pubkey) return;
     const off = initOfflineSync({
@@ -519,6 +597,8 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         toggleBookmark,
         publishComment,
         sendEvent,
+        listBookLists,
+        getListBooks,
       }}
     >
       {children}

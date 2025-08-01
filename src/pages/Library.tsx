@@ -18,29 +18,39 @@ interface BookItem {
 }
 
 const LibraryPage: React.FC = () => {
-  const { pubkey, subscribe, list, publish } = useNostr();
+  const { pubkey, subscribe, list, publish, getListBooks } = useNostr();
   const navigate = useNavigate();
   const [items, setItems] = useState<BookItem[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [privateNotice, setPrivateNotice] = useState(false);
 
   useEffect(() => {
     if (!pubkey) return;
     const off = subscribe(
       [{ kinds: [30001], authors: [pubkey], '#d': ['library'], limit: 1 }],
       (evt) => {
-        const ids = evt.tags
-          .filter((t) => t[0] === 'e')
-          .map((t) => ({ id: t[1], status: t[2] || 'want' }));
-        setItems(ids.map((i) => ({ ...i, title: i.id })));
+        (async () => {
+          const ids = evt.tags
+            .filter((t) => t[0] === 'e')
+            .map((t) => ({ id: t[1], status: t[2] || 'want' }));
+          const { ids: refs, hasPrivate } = await getListBooks(pubkey);
+          const map = new Map<string, BookItem>();
+          ids.forEach((i) => map.set(i.id, { ...i, title: i.id }));
+          refs.forEach((id) => {
+            if (!map.has(id)) map.set(id, { id, status: 'want', title: id });
+          });
+          setPrivateNotice(hasPrivate);
+          setItems(Array.from(map.values()));
+        })();
       },
     );
     return off;
-  }, [subscribe, pubkey]);
+  }, [subscribe, pubkey, getListBooks]);
 
   useEffect(() => {
     if (!pubkey || items.length === 0) return;
     const ids = items.map((b) => b.id);
-    list([{ kinds: [41], authors: [pubkey], '#d': ids }]).then((evts) => {
+    list([{ kinds: [41], '#d': ids }]).then((evts) => {
       setItems((bks) =>
         bks.map((b) => {
           const evt = (evts as NostrEvent[]).find((e) =>
@@ -113,6 +123,11 @@ const LibraryPage: React.FC = () => {
             Delete
           </button>
         </div>
+      )}
+      {privateNotice && (
+        <p className="text-sm text-text-muted">
+          Some entries are private and could not be displayed.
+        </p>
       )}
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="library">
