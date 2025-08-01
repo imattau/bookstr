@@ -7,6 +7,9 @@ export interface ReportButtonProps {
   className?: string;
 }
 
+/**
+ * Button allowing users to report inappropriate content.
+ */
 export const ReportButton: React.FC<ReportButtonProps> = ({
   target,
   className,

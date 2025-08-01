@@ -13,6 +13,9 @@ interface CommentsProps {
   events?: NostrEvent[];
 }
 
+/**
+ * Comment list and composer for a book event.
+ */
 export const Comments: React.FC<CommentsProps> = ({
   bookId,
   parentEventId,

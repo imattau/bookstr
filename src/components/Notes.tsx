@@ -5,6 +5,9 @@ interface NotesProps {
   bookId: string;
 }
 
+/**
+ * Simple note-taking widget stored locally per book.
+ */
 export const Notes: React.FC<NotesProps> = ({ bookId }) => {
   const { publish } = useNostr();
   const [notes, setNotes] = useState<string[]>([]);

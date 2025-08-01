@@ -12,6 +12,9 @@ export interface ReaderToolbarProps {
   'data-testid'?: string;
 }
 
+/**
+ * Toolbar for the reader view providing navigation controls.
+ */
 export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   title,
   percent,

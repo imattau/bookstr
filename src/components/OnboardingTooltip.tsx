@@ -7,6 +7,9 @@ interface OnboardingTooltipProps {
   children: React.ReactElement;
 }
 
+/**
+ * Wraps a child element to show a tooltip on first interaction.
+ */
 export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   storageKey,
   text,

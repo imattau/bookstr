@@ -22,6 +22,9 @@ function calcPercent(el: HTMLElement) {
   return Math.min(100, Math.max(0, (el.scrollTop / max) * 100));
 }
 
+/**
+ * Scrollable book content view with offline caching and progress events.
+ */
 export const ReaderView: React.FC<ReaderViewProps> = ({
   bookId,
   html,

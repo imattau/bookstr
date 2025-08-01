@@ -13,6 +13,9 @@ type Notification = {
   link?: string;
 };
 
+/**
+ * Feed of mentions, replies, follows and zap notifications.
+ */
 export const NotificationFeed: React.FC = () => {
   const { pubkey } = useNostr();
   const addEvent = useEventStore((s) => s.addEvent);

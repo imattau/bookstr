@@ -14,6 +14,9 @@ interface BookCardProps {
   event: NostrEvent & { repostedBy?: string };
   onDelete?: (id: string) => void;
 }
+/**
+ * Display a book event with reactions and an optional delete callback.
+ */
 
 export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   const title = event.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled';
@@ -121,3 +124,6 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
     </div>
   );
 };
+/**
+ * Display a book event with reactions and an optional delete callback.
+ */

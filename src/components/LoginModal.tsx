@@ -9,6 +9,9 @@ export interface LoginModalProps {
   onClose: () => void;
 }
 
+/**
+ * Modal with multiple login methods including NIP-07 and remote signer.
+ */
 export const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   const ctx = useNostr();
   const { login, logout, pubkey } = ctx;

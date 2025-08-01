@@ -12,6 +12,9 @@ export interface BookMetadataEditorProps {
   onClose: () => void;
 }
 
+/**
+ * Form for editing book title, summary, cover and tags.
+ */
 export const BookMetadataEditor: React.FC<BookMetadataEditorProps> = ({
   bookId,
   authorPubkey,

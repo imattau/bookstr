@@ -16,6 +16,9 @@ interface Props {
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 
+/**
+ * Modal for creating or editing a chapter's content and metadata.
+ */
 export const ChapterEditorModal: React.FC<Props> = ({
   bookId,
   chapterNumber,

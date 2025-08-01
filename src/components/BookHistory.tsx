@@ -7,6 +7,9 @@ export interface BookHistoryProps {
   onClose?: () => void;
 }
 
+/**
+ * Modal showing historical versions of a book with revert option.
+ */
 export const BookHistory: React.FC<BookHistoryProps> = ({
   bookId,
   onClose,

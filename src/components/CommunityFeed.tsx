@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNostr } from '../nostr';
 import type { Event as NostrEvent } from 'nostr-tools';
 
+/**
+ * Feed listing community posts from kind 172 events.
+ */
 export const CommunityFeed: React.FC = () => {
   const { subscribe } = useNostr();
   const [events, setEvents] = useState<NostrEvent[]>([]);

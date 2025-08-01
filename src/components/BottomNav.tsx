@@ -19,6 +19,9 @@ const items: Array<{ key: NavKey; label: string; Icon: IconType }> = [
   { key: 'profile', label: 'Profile', Icon: FaUser },
 ];
 
+/**
+ * Bottom navigation bar with five primary sections.
+ */
 export const BottomNav: React.FC<BottomNavProps> = ({
   active,
   onChange,

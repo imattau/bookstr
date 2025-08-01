@@ -13,6 +13,9 @@ export interface ReactionButtonProps {
   className?: string;
 }
 
+/**
+ * Button for voting or marking a post as favourite.
+ */
 export const ReactionButton: React.FC<ReactionButtonProps> = ({
   target,
   type,

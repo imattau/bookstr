@@ -10,6 +10,9 @@ import { logEvent } from '../analytics';
 import { CommunityFeed } from './CommunityFeed';
 import { Illustration } from './Illustration';
 
+/**
+ * Discover books with search and trending lists.
+ */
 export const Discover: React.FC = () => {
   const {
     books: bookEvents,
