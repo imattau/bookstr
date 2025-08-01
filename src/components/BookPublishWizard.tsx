@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
 import { useNostr } from '../nostr';
-import { publishLongPost, publishBookMeta } from '../nostr/events';
 import { useToast } from './ToastProvider';
 import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';
@@ -36,6 +35,11 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const handlePublish = async () => {
     setPublishing(true);
     try {
+      const { publishLongPost, publishBookMeta } =
+        await import('../nostr/events').catch(() =>
+          // Node tests can't handle TS ESM import
+          require('../nostr/events')
+        );
       const evt = await publishLongPost(
         ctx,
         {
