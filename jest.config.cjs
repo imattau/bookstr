@@ -12,4 +12,9 @@ module.exports = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  setupFilesAfterEnv: ['<rootDir>/test/jest/setupTests.ts'],
+  testMatch: [
+    '<rootDir>/test/jest/**/*.test.tsx',
+    '<rootDir>/test/accessibility.test.tsx',
+  ],
 };

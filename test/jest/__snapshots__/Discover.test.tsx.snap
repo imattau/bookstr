@@ -1,0 +1,187 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Discover desktop snapshot 1`] = `
+<div
+  class="pb-[var(--space-4)]"
+>
+  <header
+    class="flex items-center gap-[var(--space-2)] bg-[color:var(--clr-primary-600)] p-[var(--space-3)]"
+  >
+    <h1
+      class="text-[18px] font-semibold text-white"
+    >
+      Bookstr
+    </h1>
+    <div
+      class="flex flex-1 items-center gap-1 relative rounded ring-2 ring-primary-300"
+    >
+      <input
+        class="w-full rounded-[var(--radius-button)] border border-border p-[var(--space-2)] bg-[color:var(--clr-surface)] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)]"
+        placeholder="Search"
+        value=""
+      />
+      <div
+        class="pointer-events-none absolute z-10 mt-[var(--space-1)] whitespace-nowrap rounded bg-primary-600 px-2 py-1 text-[12px] text-white shadow"
+      >
+        Search for books
+      </div>
+    </div>
+  </header>
+  <div
+    class="flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]"
+  >
+    <button
+      aria-label="All"
+      aria-pressed="true"
+      class="btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+    >
+      All
+    </button>
+  </div>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      Trending Books
+    </h2>
+    <ul
+      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+      role="list"
+    />
+  </section>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      New Releases
+    </h2>
+    <ul
+      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+      role="list"
+    />
+  </section>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      Recommended for You
+    </h2>
+    <ul
+      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+      role="list"
+    />
+  </section>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      Communities
+    </h2>
+    <ul
+      class="space-y-4"
+      role="list"
+    />
+  </section>
+</div>
+`;
+
+exports[`Discover mobile snapshot 1`] = `
+<div
+  class="pb-[var(--space-4)]"
+>
+  <header
+    class="flex items-center gap-[var(--space-2)] bg-[color:var(--clr-primary-600)] p-[var(--space-3)]"
+  >
+    <h1
+      class="text-[18px] font-semibold text-white"
+    >
+      Bookstr
+    </h1>
+    <div
+      class="flex flex-1 items-center gap-1 relative rounded ring-2 ring-primary-300"
+    >
+      <input
+        class="w-full rounded-[var(--radius-button)] border border-border p-[var(--space-2)] bg-[color:var(--clr-surface)] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:[box-shadow:var(--focus-ring)]"
+        placeholder="Search"
+        value=""
+      />
+      <div
+        class="pointer-events-none absolute z-10 mt-[var(--space-1)] whitespace-nowrap rounded bg-primary-600 px-2 py-1 text-[12px] text-white shadow"
+      >
+        Search for books
+      </div>
+    </div>
+  </header>
+  <div
+    class="flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]"
+  >
+    <button
+      aria-label="All"
+      aria-pressed="true"
+      class="btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+    >
+      All
+    </button>
+  </div>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      Trending Books
+    </h2>
+    <ul
+      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+      role="list"
+    />
+  </section>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      New Releases
+    </h2>
+    <ul
+      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+      role="list"
+    />
+  </section>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      Recommended for You
+    </h2>
+    <ul
+      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+      role="list"
+    />
+  </section>
+  <section
+    class="p-[var(--space-4)]"
+  >
+    <h2
+      class="mb-[var(--space-2)] font-semibold"
+    >
+      Communities
+    </h2>
+    <ul
+      class="space-y-4"
+      role="list"
+    />
+  </section>
+</div>
+`;

@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`BookPublishWizard matches snapshot 1`] = `
+<div
+  class="space-y-4"
+>
+  <div
+    class="space-y-2"
+  >
+    <input
+      class="w-full rounded border p-[var(--space-2)]"
+      placeholder="Title"
+      value=""
+    />
+    <textarea
+      class="w-full rounded border p-2"
+      placeholder="Summary"
+    />
+    <button
+      class="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-4)] py-[var(--space-2)] text-white"
+    >
+      Next
+    </button>
+  </div>
+</div>
+`;

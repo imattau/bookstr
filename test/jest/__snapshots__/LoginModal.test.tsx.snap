@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`LoginModal matches snapshot 1`] = `
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-[var(--space-2)]"
+>
+  <div
+    class="w-full max-w-sm space-y-4 rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]"
+  >
+    <div
+      class="flex gap-2"
+    >
+      <button
+        class="flex-1 rounded border px-[var(--space-2)] py-[var(--space-1)] bg-border"
+      >
+        Private Key
+      </button>
+      <button
+        class="flex-1 rounded border px-[var(--space-2)] py-[var(--space-1)] "
+      >
+        NIP-07
+      </button>
+      <button
+        class="flex-1 rounded border px-[var(--space-2)] py-[var(--space-1)] "
+      >
+        Remote
+      </button>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <input
+        class="w-full rounded border p-[var(--space-2)]"
+        placeholder="nsec or hex"
+        value=""
+      />
+      <button
+        class="w-full rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white disabled:opacity-50"
+        disabled=""
+      >
+        Login
+      </button>
+    </div>
+    <div
+      class="flex justify-end"
+    >
+      <button
+        class="rounded px-[var(--space-3)] py-[var(--space-1)] border"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+`;

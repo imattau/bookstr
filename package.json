@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 3000",
-    "test:axe": "jest test/accessibility.test.tsx"
+    "test:axe": "jest test/accessibility.test.tsx",
+    "test:rtl": "jest"
   },
   "keywords": [],
   "author": "",
