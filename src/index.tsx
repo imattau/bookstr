@@ -1,3 +1,6 @@
+/**
+ * Defines the application routes and shared layout components.
+ */
 import React from 'react';
 import {
   BrowserRouter,

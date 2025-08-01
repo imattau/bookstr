@@ -1,3 +1,6 @@
+/**
+ * Context provider exposing basic WebLN wallet helpers.
+ */
 import React, { createContext, useContext, useState } from 'react';
 
 interface WalletContextValue {

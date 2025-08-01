@@ -1,3 +1,6 @@
+/**
+ * Proof-of-work helper for Nostr events.
+ */
 import type { EventTemplate } from 'nostr-tools';
 import { getEventHash } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';

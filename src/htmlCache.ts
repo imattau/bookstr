@@ -1,3 +1,6 @@
+/**
+ * Simple IndexedDB helpers for caching rendered book HTML.
+ */
 import { get, set } from 'idb-keyval';
 
 export async function cacheBookHtml(bookId: string, html: string): Promise<void> {

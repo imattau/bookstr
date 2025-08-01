@@ -1,3 +1,7 @@
+/**
+ * Wrapper component tracking offline status and queued actions.
+ * Displays alerts while rendering its children.
+ */
 import React, { useEffect, useState } from 'react';
 import { getOfflineEdits } from './nostr/offline';
 import { useToast } from './components/ToastProvider';
