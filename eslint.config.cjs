@@ -11,11 +11,25 @@ module.exports = [
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: parserTypeScript,
-      parserOptions: { ecmaVersion: 2020, sourceType: 'module', ecmaFeatures: { jsx: true } },
-      globals: { document: 'readonly', navigator: 'readonly', window: 'readonly' },
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        document: 'readonly',
+        navigator: 'readonly',
+        window: 'readonly',
+      },
     },
-    plugins: { '@typescript-eslint': pluginTypeScript, react: eslintPluginReact, 'react-hooks': eslintPluginReactHooks },
+    plugins: {
+      '@typescript-eslint': pluginTypeScript,
+      react: eslintPluginReact,
+      'react-hooks': eslintPluginReactHooks,
+    },
     settings: { react: { version: 'detect' } },
-    rules: {},
+    rules: {
+      'react-hooks/exhaustive-deps': 'error',
+    },
   },
 ];

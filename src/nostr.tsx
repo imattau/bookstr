@@ -19,7 +19,7 @@ import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
 import { buildCommentTags } from './commentUtils';
-import { getPrivKey, setPrivKey } from "./nostr/auth";
+import { getPrivKey, setPrivKey } from './nostr/auth';
 import {
   loadKey,
   importKey,
@@ -510,13 +510,14 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (!pubkey) return;
-    initOfflineSync({
+    const off = initOfflineSync({
       sendEvent,
       publish,
       list,
       pubkey,
     } as any);
-  }, [pubkey]);
+    return off;
+  }, [pubkey, sendEvent, publish, list]);
 
   const handleImportKey = () => {
     const input = prompt('Enter your private key');
@@ -593,5 +594,3 @@ export function useNostr() {
   if (!ctx) throw new Error('useNostr must be used within NostrProvider');
   return ctx;
 }
-
-

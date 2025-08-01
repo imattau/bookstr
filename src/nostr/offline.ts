@@ -5,7 +5,7 @@ import {
   publishLongPost,
   publishRepost,
   publishVote,
-} from "./events";
+} from './events';
 
 export interface OfflineEdit {
   id: string;
@@ -65,7 +65,10 @@ export async function getOfflineEdits(): Promise<OfflineEdit[]> {
   return loadEdits();
 }
 
-function showMergeModal(localText: string, remoteText: string): Promise<string> {
+function showMergeModal(
+  localText: string,
+  remoteText: string,
+): Promise<string> {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
@@ -120,7 +123,10 @@ function showMergeModal(localText: string, remoteText: string): Promise<string> 
   });
 }
 
-export async function processOfflineEdits(ctx: NostrContextValue, edits: OfflineEdit[]): Promise<void> {
+export async function processOfflineEdits(
+  ctx: NostrContextValue,
+  edits: OfflineEdit[],
+): Promise<void> {
   for (const edit of edits) {
     if (edit.type === 'publish') {
       try {
@@ -153,7 +159,12 @@ export async function processOfflineEdits(ctx: NostrContextValue, edits: Offline
     try {
       if (edit.type === 'meta') {
         const res = await ctx.list([
-          { kinds: [41], authors: [ctx.pubkey!], '#d': [edit.data.bookId], limit: 1 },
+          {
+            kinds: [41],
+            authors: [ctx.pubkey!],
+            '#d': [edit.data.bookId],
+            limit: 1,
+          },
         ]);
         remote = res[0];
       } else if (edit.type === 'chapter') {
@@ -185,10 +196,14 @@ export async function processOfflineEdits(ctx: NostrContextValue, edits: Offline
 }
 
 export function initOfflineSync(ctx: NostrContextValue) {
-  if (!navigator.serviceWorker) return;
-  navigator.serviceWorker.addEventListener('message', (event) => {
+  if (!navigator.serviceWorker) return () => {};
+  const handler = (event: MessageEvent) => {
     if (event.data?.type === 'pending-edits') {
       processOfflineEdits(ctx, event.data.edits);
     }
-  });
+  };
+  navigator.serviceWorker.addEventListener('message', handler);
+  return () => {
+    navigator.serviceWorker.removeEventListener('message', handler);
+  };
 }
