@@ -9,12 +9,7 @@ import { flushSync } from 'react-dom';
 import { useReadingStore, BookStatus } from './store';
 import { useSettings } from './useSettings';
 import type { Event as NostrEvent, EventTemplate, Filter } from 'nostr-tools';
-import {
-  SimplePool,
-  getPublicKey,
-  finalizeEvent,
-  getEventHash,
-} from 'nostr-tools';
+import { SimplePool, getPublicKey, finalizeEvent } from 'nostr-tools';
 import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
 import { schnorr } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
@@ -61,9 +56,6 @@ export function setMaxEventSize(size: number) {
   }
 }
 
-// Prevent endless proof-of-work loops from freezing the browser
-const MAX_POW_TIME_MS = 5000;
-const MAX_POW_ITERATIONS = 500000;
 
 function checkDelegationConditions(
   cond: string,
@@ -83,21 +75,6 @@ function checkDelegationConditions(
   return true;
 }
 
-function leadingZeroBits(bytes: Uint8Array) {
-  let count = 0;
-  for (const b of bytes) {
-    if (b === 0) {
-      count += 8;
-      continue;
-    }
-    for (let i = 7; i >= 0; i--) {
-      if ((b >> i) & 1) return count;
-      count++;
-    }
-    break;
-  }
-  return count;
-}
 
 export interface NostrContextValue {
   pubkey: string | null;
@@ -316,36 +293,15 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       const okCond = checkDelegationConditions(cond, tpl.kind, now);
       if (!okSig || !okCond) throw new Error('invalid delegation');
     }
-    const tags = tpl.tags ? [...tpl.tags] : [];
-    let nonceIndex = -1;
+    let tags = tpl.tags ? [...tpl.tags] : [];
+    let eventTemplate: EventTemplate & { created_at: number } = {
+      ...tpl,
+      tags,
+      created_at: now,
+    };
     if (pow > 0) {
-      nonceIndex = tags.findIndex((t) => t[0] === 'nonce');
-      if (nonceIndex === -1) {
-        tags.push(['nonce', '0', pow.toString()]);
-        nonceIndex = tags.length - 1;
-      } else {
-        tags[nonceIndex][1] = '0';
-        tags[nonceIndex][2] = pow.toString();
-      }
-    }
-    let eventTemplate = { ...tpl, tags, created_at: now };
-    if (pow > 0) {
-      let nonce = 0;
-      const start = Date.now();
-      while (true) {
-        if (
-          nonce > MAX_POW_ITERATIONS ||
-          Date.now() - start > MAX_POW_TIME_MS
-        ) {
-          throw new Error('proof-of-work timed out');
-        }
-        tags[nonceIndex][1] = nonce.toString();
-        eventTemplate = { ...tpl, tags, created_at: now };
-        const id = getEventHash(eventTemplate as any);
-        const bits = leadingZeroBits(hexToBytes(id));
-        if (bits >= pow) break;
-        nonce += 1;
-      }
+      const { applyPow } = await import('./pow');
+      eventTemplate = await applyPow(tpl, now, pow);
     }
     let event: NostrEvent;
     if (priv) {
