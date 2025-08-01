@@ -41,7 +41,7 @@ export const BookFeed: React.FC = () => {
       offMain();
       offRepost();
     };
-  }, [subscribe]);
+  }, [subscribe, addEvent]);
 
   return (
     <ul role="list" className="space-y-4">

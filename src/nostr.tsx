@@ -2,6 +2,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useCallback,
   useRef,
   useState,
 } from 'react';
@@ -238,7 +239,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
           }
         }
       });
-  }, [pubkey, relays]);
+  }, [pubkey, relays, loadStatuses, hydrateSettings]);
 
   const login = (raw: string) => {
     const priv = importKey(raw);
@@ -273,16 +274,17 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setNip07(false);
   };
 
-  const publish = async (
-    tpl: Omit<EventTemplate, 'created_at'>,
-    relaysOverride?: string[],
-    pow = 0,
-  ) => {
-    const priv = getPrivKey();
-    const nostr = (window as any).nostr;
-    if (!priv && !(nostr && typeof nostr.signEvent === 'function')) {
-      throw new Error('not logged in');
-    }
+  const publish = useCallback(
+    async (
+      tpl: Omit<EventTemplate, 'created_at'>,
+      relaysOverride?: string[],
+      pow = 0,
+    ) => {
+      const priv = getPrivKey();
+      const nostr = (window as any).nostr;
+      if (!priv && !(nostr && typeof nostr.signEvent === 'function')) {
+        throw new Error('not logged in');
+      }
     const now = Math.floor(Date.now() / 1000);
     const del = tpl.tags?.find((t) => t[0] === 'delegation');
     if (del && priv) {
@@ -309,10 +311,12 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       event = await nostr.signEvent(eventTemplate as any);
     }
-    const targets = relaysOverride ?? relaysRef.current;
-    await poolRef.current.publish(targets, event);
-    return event;
-  };
+      const targets = relaysOverride ?? relaysRef.current;
+      await poolRef.current.publish(targets, event);
+      return event;
+    },
+    [],
+  );
 
   const applyPointers = async (filters: Filter[]): Promise<Filter[]> => {
     return Promise.all(
@@ -334,7 +338,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
-  const list = async (filters: Filter[]) => {
+  const list = useCallback(async (filters: Filter[]) => {
     const final = await applyPointers(filters);
     const evts = (await poolRef.current.list(
       relaysRef.current,
@@ -345,7 +349,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
       if (d) savePointer(d, e.id);
     });
     return evts;
-  };
+  }, []);
 
   const subscribe = (filters: Filter[], cb: (evt: NostrEvent) => void) => {
     let unsub: (() => void) | null = null;
@@ -459,10 +463,10 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     await publish({ kind: 1, content: text, tags });
   };
 
-  const sendEvent = async (event: NostrEvent, relaysOverride?: string[]) => {
+  const sendEvent = useCallback(async (event: NostrEvent, relaysOverride?: string[]) => {
     const targets = relaysOverride ?? relaysRef.current;
     await poolRef.current.publish(targets, event);
-  };
+  }, []);
 
   useEffect(() => {
     if (!pubkey) return;

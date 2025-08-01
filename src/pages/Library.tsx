@@ -53,7 +53,7 @@ const LibraryPage: React.FC = () => {
         }),
       );
     });
-  }, [items.length, list, pubkey]);
+  }, [items, list, pubkey]);
 
   const persist = (books: BookItem[]) => {
     publish({
