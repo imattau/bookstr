@@ -1,3 +1,21 @@
+/**
+ * Node API server used in production.
+ *
+ * Routes:
+ *   POST `${API_BASE}/action`    – publish an action event to configured relays
+ *   POST `${API_BASE}/event`     – publish an arbitrary event to configured relays
+ *   POST `${API_BASE}/subscribe` – (placeholder) subscribe to updates
+ *   DELETE `${API_BASE}/subscribe` – (placeholder) cancel subscription
+ *
+ * Events are forwarded using `SimplePool` from `nostr-tools`. Targets are the
+ * relays listed in `server/config.js` whose retention meets `prunePolicy` and
+ * support NIP‑27. Non NIP‑27 relays receive versions suffixed with `-v<nr>`.
+ *
+ * Configuration options come from `server/config.js`:
+ *   - `relays`: array of relay definitions `{ url, supportsNip27, retentionDays }`
+ *   - `prunePolicy.minimumDays`: minimum retention required when forwarding
+ *                                 replaceable events
+ */
 const path = require('path');
 const express = require('express');
 const { SimplePool, verifyEvent } = require('nostr-tools');
