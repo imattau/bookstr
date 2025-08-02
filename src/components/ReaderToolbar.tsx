@@ -34,60 +34,64 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   'data-testid': dataTestId,
 }) => (
   <div
-    className={`flex items-center justify-between gap-2 p-[var(--space-2)] ${className ?? ''}`}
+    className={`flex items-center gap-2 p-[var(--space-2)] ${className ?? ''}`}
     data-testid={dataTestId}
   >
-    <button onClick={onBack} aria-label="Back" className="px-[var(--space-2)]">
-      Back
-    </button>
-    {onPrev && (
-      <button
-        onClick={onPrev}
-        aria-label="Previous chapter"
-        className="px-[var(--space-2)]"
-        disabled={!hasPrev}
-      >
-        Previous chapter
+    <div className="flex items-center gap-2">
+      <button onClick={onBack} aria-label="Back" className="px-[var(--space-2)]">
+        Back
       </button>
-    )}
-    {onNext && (
-      <button
-        onClick={onNext}
-        aria-label="Next chapter"
-        className="px-[var(--space-2)]"
-        disabled={!hasNext}
-      >
-        Next chapter
-      </button>
-    )}
+      {onPrev && (
+        <button
+          onClick={onPrev}
+          aria-label="Previous chapter"
+          className="px-[var(--space-2)]"
+          disabled={!hasPrev}
+        >
+          Previous chapter
+        </button>
+      )}
+      {onNext && (
+        <button
+          onClick={onNext}
+          aria-label="Next chapter"
+          className="px-[var(--space-2)]"
+          disabled={!hasNext}
+        >
+          Next chapter
+        </button>
+      )}
+      <span className="ml-2 text-sm text-text-muted">{Math.round(percent)}%</span>
+    </div>
     <div className="flex-1 text-center truncate">{title}</div>
-    <button
-      onClick={() => onFontSize(1)}
-      aria-label="Increase font"
-      className="px-[var(--space-2)]"
-    >
-      A+
-    </button>
-    <button
-      onClick={() => onFontSize(-1)}
-      aria-label="Decrease font"
-      className="px-[var(--space-2)]"
-    >
-      A-
-    </button>
-    <button onClick={onToggleTheme} aria-label="Toggle theme" className="px-[var(--space-2)]">
-      Theme
-    </button>
-    <button
-      onClick={() => {
-        logEvent('click_fav');
-        onBookmark();
-      }}
-      aria-label="Bookmark"
-      className="px-[var(--space-2)]"
-    >
-      ★
-    </button>
-    <span className="ml-2 text-sm text-text-muted">{Math.round(percent)}%</span>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => onFontSize(1)}
+        aria-label="Increase font"
+        className="px-[var(--space-2)]"
+      >
+        A+
+      </button>
+      <button
+        onClick={() => onFontSize(-1)}
+        aria-label="Decrease font"
+        className="px-[var(--space-2)]"
+      >
+        A-
+      </button>
+      <button onClick={onToggleTheme} aria-label="Toggle theme" className="px-[var(--space-2)]">
+        Theme
+      </button>
+      <button
+        onClick={() => {
+          logEvent('click_fav');
+          onBookmark();
+        }}
+        aria-label="Bookmark"
+        className="px-[var(--space-2)]"
+      >
+        ★
+      </button>
+    </div>
   </div>
 );
