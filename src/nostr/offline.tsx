@@ -2,6 +2,7 @@
  * Utilities for queuing Nostr edits while offline and processing them later.
  */
 import { get, set } from 'idb-keyval';
+import React from 'react';
 import type { NostrContextValue } from '../nostr';
 import {
   publishBookMeta,
@@ -68,63 +69,6 @@ export async function getOfflineEdits(): Promise<OfflineEdit[]> {
   return loadEdits();
 }
 
-function showMergeModal(
-  localText: string,
-  remoteText: string,
-): Promise<string> {
-  return new Promise((resolve) => {
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.inset = '0';
-    overlay.style.background = 'rgba(0,0,0,0.5)';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    const box = document.createElement('div');
-    box.style.background = '#fff';
-    box.style.padding = '1em';
-    box.style.maxWidth = '600px';
-    box.innerHTML = `
-      <h3 style="margin:0 0 0.5em 0">Offline Edit Conflict</h3>
-      <div style="display:flex;gap:4px">
-        <textarea style="width:50%" readonly>${remoteText}</textarea>
-        <textarea style="width:50%" readonly>${localText}</textarea>
-      </div>
-      <div style="margin-top:0.5em;text-align:right">
-        <button data-cmd="remote">Keep Remote</button>
-        <button data-cmd="local">Keep Local</button>
-        <button data-cmd="merge">Merge</button>
-      </div>
-    `;
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-    const done = (val: string) => {
-      document.body.removeChild(overlay);
-      resolve(val);
-    };
-    box.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      const cmd = target.getAttribute('data-cmd');
-      if (!cmd) return;
-      if (cmd === 'remote') done(remoteText);
-      else if (cmd === 'local') done(localText);
-      else if (cmd === 'merge') {
-        const ta = document.createElement('textarea');
-        ta.style.width = '100%';
-        ta.style.height = '200px';
-        ta.value = localText;
-        const wrap = document.createElement('div');
-        wrap.appendChild(ta);
-        const ok = document.createElement('button');
-        ok.textContent = 'Publish';
-        ok.onclick = () => done(ta.value);
-        wrap.appendChild(ok);
-        box.innerHTML = '';
-        box.appendChild(wrap);
-      }
-    });
-  });
-}
 
 export async function processOfflineEdits(
   ctx: NostrContextValue,
@@ -187,7 +131,21 @@ export async function processOfflineEdits(
     }
     let content = edit.data.content;
     if (remote && remote.content !== edit.data.content) {
-      content = await showMergeModal(edit.data.content, remote.content);
+      const { createRoot } = await import('react-dom/client');
+      const { OfflineMergeModal } = await import('../components/OfflineMergeModal');
+      content = await new Promise<string>((resolve) => {
+        const root = createRoot(document.createElement('div'));
+        root.render(
+          <OfflineMergeModal
+            localText={edit.data.content}
+            remoteText={remote.content}
+            onResolve={(val) => {
+              root.unmount();
+              resolve(val);
+            }}
+          />,
+        );
+      });
     }
     if (edit.type === 'meta') {
       await publishBookMeta(ctx, edit.data.bookId, { ...edit.data, content });
