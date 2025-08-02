@@ -13,43 +13,21 @@ const path = require('path');
     format: 'cjs',
     platform: 'node',
     write: false,
-    external: [
-      'react',
-      '../src/nostr.tsx',
-      '../src/nostr/relays.ts',
-      '../src/components/OnboardingTooltip.tsx',
-    ],
+    external: ['react', '../src/nostr.tsx'],
   });
   const code = build.outputFiles[0].text;
   const module = { exports: {} };
   let saved;
-  const calls = [];
   const sandbox = {
     require: (p) => {
       if (p.includes('nostr.tsx')) {
         return {
           useNostr: () => ({
             relays: ['wss://a'],
-            contacts: ['pk1', 'pk2'],
             saveRelays: (list) => {
               saved = list;
             },
           }),
-        };
-      }
-      if (p.includes('nostr/relays')) {
-        return {
-          fetchUserRelays: async (pk) => {
-            calls.push(pk);
-            if (pk === 'pk1') return ['wss://b'];
-            if (pk === 'pk2') return ['wss://a', 'wss://c'];
-            return [];
-          },
-        };
-      }
-      if (p.includes('OnboardingTooltip')) {
-        return {
-          OnboardingTooltip: ({ children }) => children,
         };
       }
       return require(p);
@@ -69,15 +47,38 @@ const path = require('path');
     await Promise.resolve();
   });
 
+  const inputs = renderer.root.findAllByType('input');
+  const textInput = inputs.find((i) => i.props.placeholder);
+
   await TestRenderer.act(async () => {
-    const btn = renderer.root.find(
-      (n) => n.type === 'button' && n.children.includes('Add relays from followed authors'),
+    textInput.props.onChange({ target: { value: 'wss://b' } });
+  });
+  await TestRenderer.act(async () => {
+    const addBtn = renderer.root.find(
+      (n) => n.type === 'button' && n.children.includes('Add'),
     );
-    await btn.props.onClick();
+    await addBtn.props.onClick();
     await Promise.resolve();
   });
+  assert.deepStrictEqual(saved, ['wss://a', 'wss://b']);
 
-  assert.deepStrictEqual(new Set(saved), new Set(['wss://a', 'wss://b', 'wss://c']));
-  assert.deepStrictEqual(calls, ['pk1', 'pk2']);
+  await TestRenderer.act(async () => {
+    const firstCheckbox = renderer.root.find(
+      (n) => n.type === 'input' && n.props.type === 'checkbox',
+    );
+    firstCheckbox.props.onChange({ target: { checked: false } });
+    await Promise.resolve();
+  });
+  assert.deepStrictEqual(saved, ['wss://a', 'wss://b']);
+
+  await TestRenderer.act(async () => {
+    const removeBtn = renderer.root.find(
+      (n) => n.type === 'button' && n.children.includes('Remove'),
+    );
+    await removeBtn.props.onClick();
+    await Promise.resolve();
+  });
+  assert.deepStrictEqual(saved, ['wss://b']);
+
   console.log('All tests passed.');
 })();
