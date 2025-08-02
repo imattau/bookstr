@@ -2,6 +2,10 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { LoginModal } from '../../src/components/LoginModal';
 
+jest.mock('../../src/components/ToastProvider', () => ({
+  useToast: () => jest.fn(),
+}));
+
 jest.mock('../../src/nostr', () => ({
   useNostr: () => ({
     login: jest.fn(),

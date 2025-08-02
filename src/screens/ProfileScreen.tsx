@@ -134,13 +134,14 @@ export const ProfileScreen: React.FC = () => {
   useEffect(() => {
     if (!pubkey) return;
     (async () => {
+      const kinds = pubkey === loggedPubkey ? [10003, 30004] : [30004];
       const evts = (await listWithExtras([
-        { kinds: [10003, 30004], authors: [pubkey] },
+        { kinds, authors: [pubkey] },
       ])) as NostrEvent[];
       evts.forEach(addEvent);
       setBookLists(evts);
     })();
-  }, [pubkey, addEvent, ctxRelays, extraRelays]);
+  }, [pubkey, loggedPubkey, addEvent, ctxRelays, extraRelays]);
 
   if (!pubkey) return null;
 
@@ -212,7 +213,10 @@ export const ProfileScreen: React.FC = () => {
                     <ListFollowButton author={evt.pubkey} d={d} />
                   )}
                   {d && pubkey === loggedPubkey && (
-                    <Link to="/lists/new" className="rounded border px-2 py-1">
+                    <Link
+                      to={`/lists/new?d=${encodeURIComponent(d)}`}
+                      className="rounded border px-2 py-1"
+                    >
                       Edit list
                     </Link>
                   )}
