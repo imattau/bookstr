@@ -38,6 +38,7 @@ import SettingsHome from './pages/SettingsHome';
 import StatsPage from './pages/Stats';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { ToastProvider } from './components/ToastProvider';
+import { PromptBanner } from './components/PromptBanner';
 
 const Layout: React.FC = () => {
   const navigate = useNavigate();
@@ -85,6 +86,10 @@ const Layout: React.FC = () => {
 
   return (
     <AppShell>
+      <PromptBanner
+        onLogin={() => setLoginOpen(true)}
+        onChat={() => setChatOpen(true)}
+      />
       <Header
         onSearch={handleSearch}
         suggestions={suggestions}
@@ -94,7 +99,7 @@ const Layout: React.FC = () => {
         <button
           onClick={() => setChatOpen(true)}
           aria-label="Chat"
-          className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          className="p-2 md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
         >
           💬
         </button>
