@@ -23,6 +23,7 @@ import { BookListScreen } from './screens/BookListScreen';
 import { BookDetailScreen } from './screens/BookDetailScreen';
 import { ReaderScreen } from './screens/ReaderScreen';
 import { Discover } from './components/Discover';
+import { HomeFeed } from './screens/HomeFeed';
 import LibraryPage from './pages/Library';
 import ManageChaptersPage from './pages/ManageChapters';
 import { BookPublishWizard } from './components/BookPublishWizard';
@@ -40,10 +41,11 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const active = React.useMemo<
-    'discover' | 'library' | 'write' | 'activity' | 'profile'
+    'home' | 'discover' | 'library' | 'write' | 'activity' | 'profile'
   >(() => {
     const key = location.pathname.split('/')[1];
     if (
+      key === 'home' ||
       key === 'discover' ||
       key === 'library' ||
       key === 'write' ||
@@ -110,7 +112,8 @@ const Layout: React.FC = () => {
 const AppRoutes: React.FC = () => (
   <Routes>
     <Route path="/" element={<Layout />}>
-      <Route index element={<Navigate to="discover" />} />
+      <Route index element={<Navigate to="home" />} />
+      <Route path="home" element={<HomeFeed />} />
       <Route path="discover" element={<Discover />} />
       <Route path="library" element={<LibraryPage />} />
       <Route path="write" element={<BookPublishWizard />} />
