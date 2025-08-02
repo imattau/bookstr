@@ -14,14 +14,33 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
   pubkey,
   className,
 }) => {
-  const { contacts, saveContacts } = useNostr();
+  const { contacts, relays, list, saveContacts, saveRelays } = useNostr();
   const following = contacts.includes(pubkey);
 
-  const toggle = () => {
-    const list = following
+  const toggle = async () => {
+    const next = following
       ? contacts.filter((p) => p !== pubkey)
       : [...contacts, pubkey];
-    saveContacts(list);
+
+    if (!following) {
+      try {
+        const evts = await list([
+          { authors: [pubkey], kinds: [10002], limit: 1 },
+        ]);
+        const newRelays = evts
+          .flatMap((e) =>
+            e.tags
+              .filter((t) => t[0] === 'r' && t[1])
+              .map((t) => t[1] as string),
+          );
+        const merged = Array.from(new Set([...relays, ...newRelays]));
+        if (merged.length > relays.length) saveRelays(merged);
+      } catch {
+        /* ignore */
+      }
+    }
+
+    saveContacts(next);
   };
 
   return (
