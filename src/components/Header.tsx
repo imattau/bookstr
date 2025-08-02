@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => navigate(-1)}
           aria-label="Back"
-          className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          className="p-2 lg:p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
         >
           <FaChevronLeft />
         </button>
@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
           e.preventDefault();
           onSelectSuggestion?.(q, 'search');
         }}
-        className="flex items-center gap-2 p-2"
+        className="flex items-center gap-2 p-2 lg:p-1"
       >
         <input
           value={q}
@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
       {onLogin && (
         <button
           onClick={onLogin}
-          className="p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
+          className="p-2 lg:p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B3AF7]/50"
         >
           Login
         </button>

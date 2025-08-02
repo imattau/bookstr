@@ -78,6 +78,7 @@ const path = require('path');
     const cls = g.props.className;
     assert.ok(cls.includes('md:grid-cols-2'), 'md:grid-cols-2 missing');
     assert.ok(cls.includes('lg:grid-cols-4'), 'lg:grid-cols-4 missing');
+    assert.ok(cls.includes('xl:grid-cols-6'), 'xl:grid-cols-6 missing');
   });
   console.log('All tests passed.');
 })();

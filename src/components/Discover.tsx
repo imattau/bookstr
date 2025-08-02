@@ -83,7 +83,7 @@ export const Discover: React.FC = () => {
 
   return (
     <div className="pb-[var(--space-4)]">
-      <header className="flex items-center gap-[var(--space-2)] bg-[color:var(--clr-primary-600)] p-[var(--space-3)]">
+      <header className="flex items-center gap-[var(--space-2)] bg-[color:var(--clr-primary-600)] p-[var(--space-3)] lg:p-[var(--space-2)]">
         <h1 className="text-[18px] font-semibold text-white">Bookstr</h1>
         <OnboardingTooltip storageKey="discover-search" text="Search for books">
           <div className="flex flex-1 items-center gap-1">
@@ -132,7 +132,7 @@ export const Discover: React.FC = () => {
             <h2 className="mb-[var(--space-2)] font-semibold">Trending Books</h2>
             <ul
               role="list"
-              className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+              className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6"
             >
               {loading && trending.length === 0
                 ? Array.from({ length: 6 }).map((_, i) => (
@@ -154,7 +154,7 @@ export const Discover: React.FC = () => {
             <h2 className="mb-[var(--space-2)] font-semibold">New Releases</h2>
             <ul
               role="list"
-              className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+              className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6"
             >
               {loading && newReleases.length === 0
                 ? Array.from({ length: 6 }).map((_, i) => (
@@ -176,7 +176,7 @@ export const Discover: React.FC = () => {
             <h2 className="mb-[var(--space-2)] font-semibold">Recommended for You</h2>
             <ul
               role="list"
-              className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+              className="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6"
             >
               {noResults ? (
                 <div className="col-span-full">
