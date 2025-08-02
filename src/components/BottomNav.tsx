@@ -1,8 +1,8 @@
 import React from 'react';
-import { FaCompass, FaBookOpen, FaPen, FaBell, FaUser } from 'react-icons/fa';
+import { FaCompass, FaBookOpen, FaPen, FaBell, FaUser, FaHome } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
 
-type NavKey = 'discover' | 'library' | 'write' | 'activity' | 'profile';
+type NavKey = 'home' | 'discover' | 'library' | 'write' | 'activity' | 'profile';
 
 export interface BottomNavProps {
   active: NavKey;
@@ -12,6 +12,7 @@ export interface BottomNavProps {
 }
 
 const items: Array<{ key: NavKey; label: string; Icon: IconType }> = [
+  { key: 'home', label: 'Home', Icon: FaHome },
   { key: 'discover', label: 'Discover', Icon: FaCompass },
   { key: 'library', label: 'Library', Icon: FaBookOpen },
   { key: 'write', label: 'Write', Icon: FaPen },
