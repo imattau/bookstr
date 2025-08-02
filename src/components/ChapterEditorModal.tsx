@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { marked } from 'marked';
 import { useNostr, publishAnnouncement } from '../nostr';
 import { publishChapter, listChapters, publishToc } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 import { logError } from '../lib/logger';
+import { sanitizeHtml } from '../sanitizeHtml';
 
 interface Props {
   bookId: string;
@@ -38,6 +40,11 @@ export const ChapterEditorModal: React.FC<Props> = ({
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [announce, setAnnounce] = useState(true);
+
+  const previewHtml = useMemo(
+    () => sanitizeHtml(marked.parse(content)),
+    [content],
+  );
 
   useEffect(() => {
     if (!chapterId) return;
@@ -125,58 +132,68 @@ export const ChapterEditorModal: React.FC<Props> = ({
   };
 
   return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]">
-      <div className="space-y-2 w-full max-w-sm max-h-screen overflow-y-auto rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-          className="w-full rounded border p-[var(--space-2)]"
-        />
-        <textarea
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          placeholder="Summary"
-          className="w-full rounded border p-[var(--space-2)]"
-        />
-        <input
-          value={cover}
-          onChange={(e) => setCover(e.target.value)}
-          placeholder="Cover"
-          className="w-full rounded border p-[var(--space-2)]"
-        />
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="Tags comma separated"
-          className="w-full rounded border p-[var(--space-2)]"
-        />
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Content"
-          className="w-full rounded border p-[var(--space-2)] min-h-[120px]"
-        />
-        {allowAnnouncement && !chapterId && (
-          <label className="flex items-center gap-2">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-[var(--space-2)] sm:p-[var(--space-4)]">
+      <div className="w-full max-w-sm sm:max-w-md lg:max-w-2xl max-h-screen overflow-y-auto rounded bg-[color:var(--clr-surface)] p-[var(--space-4)]">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="space-y-2">
             <input
-              type="checkbox"
-              checked={announce}
-              onChange={(e) => setAnnounce(e.target.checked)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title"
+              className="w-full rounded border p-[var(--space-2)]"
             />
-            Post announcement
-          </label>
-        )}
-        <div className="flex justify-end gap-2 pt-[var(--space-2)]">
-          <button onClick={onClose} className="rounded border px-[var(--space-3)] py-[var(--space-1)]">
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white"
-          >
-            Save
-          </button>
+            <textarea
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Summary"
+              className="w-full rounded border p-[var(--space-2)]"
+            />
+            <input
+              value={cover}
+              onChange={(e) => setCover(e.target.value)}
+              placeholder="Cover"
+              className="w-full rounded border p-[var(--space-2)]"
+            />
+            <input
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="Tags comma separated"
+              className="w-full rounded border p-[var(--space-2)]"
+            />
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Content"
+              className="w-full rounded border p-[var(--space-2)] min-h-[120px]"
+            />
+            {allowAnnouncement && !chapterId && (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={announce}
+                  onChange={(e) => setAnnounce(e.target.checked)}
+                />
+                Post announcement
+              </label>
+            )}
+            <div className="flex justify-end gap-2 pt-[var(--space-2)]">
+              <button onClick={onClose} className="rounded border px-[var(--space-3)] py-[var(--space-1)]">
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="rounded bg-[color:var(--clr-primary-600)] px-[var(--space-3)] py-[var(--space-1)] text-white"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          <div className="hidden lg:block overflow-y-auto rounded border p-[var(--space-2)]">
+            <div
+              className="prose max-w-none whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
+          </div>
         </div>
       </div>
     </div>
