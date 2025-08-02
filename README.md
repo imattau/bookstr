@@ -22,6 +22,9 @@ specification but functionality is limited.
   for a Progressive Web App.
 - **Book publishing** – the `BookPublishWizard` creates chapter events and a
   table-of-contents so books can be read one chapter at a time.
+- **Reading progress indicators** – the reader toolbar displays your current
+  percentage with **Previous chapter** and **Next chapter** controls, and book
+  cards show a small progress bar.
 - **List publishing** – create private (`kind 10003`) or public (`kind 30004`)
   book collections from `/lists/new`. Lists you own appear on your profile with
   quick links to edit them.
