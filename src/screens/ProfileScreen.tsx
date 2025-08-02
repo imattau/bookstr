@@ -9,13 +9,14 @@
  */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import type { Event as NostrEvent, Filter } from 'nostr-tools';
 import { SimplePool } from 'nostr-tools';
 import { useNostr } from '../nostr';
 import { fetchUserRelays } from '../nostr/relays';
 import { FollowButton } from '../components/FollowButton';
 import { BookCard } from '../components/BookCard';
+import { ListFollowButton } from '../components/ListFollowButton';
 import { useEventStore } from '../store/events';
 
 interface ProfileMeta {
@@ -40,6 +41,7 @@ export const ProfileScreen: React.FC = () => {
   const [meta, setMeta] = useState<ProfileMeta | null>(null);
   const [followers, setFollowers] = useState(0);
   const [books, setBooks] = useState<NostrEvent[]>([]);
+  const [bookLists, setBookLists] = useState<NostrEvent[]>([]);
   const relaysRef = useRef<string[]>([]);
 
   const subscribeWithExtras = (
@@ -129,6 +131,17 @@ export const ProfileScreen: React.FC = () => {
     return off;
   }, [pubkey, addEvent, ctxRelays, extraRelays]);
 
+  useEffect(() => {
+    if (!pubkey) return;
+    (async () => {
+      const evts = (await listWithExtras([
+        { kinds: [10003, 30004], authors: [pubkey] },
+      ])) as NostrEvent[];
+      evts.forEach(addEvent);
+      setBookLists(evts);
+    })();
+  }, [pubkey, addEvent, ctxRelays, extraRelays]);
+
   if (!pubkey) return null;
 
   return (
@@ -160,6 +173,55 @@ export const ProfileScreen: React.FC = () => {
           <p className="text-center text-text-muted">No books found.</p>
         )}
       </ul>
+      {pubkey === loggedPubkey && (
+        <div className="flex justify-end">
+          <Link to="/lists/new" className="rounded border px-2 py-1">
+            Create List
+          </Link>
+        </div>
+      )}
+      {bookLists.length > 0 && (
+        <div>
+          <h3 className="font-semibold">Lists</h3>
+          <ul role="list" className="space-y-2 mt-2">
+            {bookLists.map((evt) => {
+              const title =
+                evt.tags.find((t) => t[0] === 'title')?.[1] ||
+                evt.tags.find((t) => t[0] === 'd')?.[1] ||
+                evt.tags.find((t) => t[0] === 'name')?.[1] ||
+                'Untitled';
+              const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+              let count = 0;
+              let tags = evt.tags as string[][];
+              if (!tags.some((t) => t[0] === 'a')) {
+                try {
+                  const parsed = JSON.parse(evt.content);
+                  if (Array.isArray(parsed?.tags)) tags = parsed.tags;
+                } catch {
+                  /* ignore */
+                }
+              }
+              count = tags.filter((t) => t[0] === 'a').length;
+              return (
+                <li key={evt.id} className="flex items-center justify-between" role="listitem">
+                  <div>
+                    <p className="font-medium">{title}</p>
+                    <p className="text-sm text-text-muted">{count} books</p>
+                  </div>
+                  {d && pubkey !== loggedPubkey && (
+                    <ListFollowButton author={evt.pubkey} d={d} />
+                  )}
+                  {d && pubkey === loggedPubkey && (
+                    <Link to="/lists/new" className="rounded border px-2 py-1">
+                      Edit list
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
