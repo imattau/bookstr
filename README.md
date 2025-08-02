@@ -169,8 +169,21 @@ If you want to run the full setup with one command, execute:
 ```bash
 ./scripts/bootstrap.sh
 ```
+
 This installs dependencies with `npm ci`, creates the `.env` file if it does
 not exist, runs the tests and builds the production bundle.
+
+### Development with Docker Compose
+
+Launch the API server and Vite dev server together:
+
+```bash
+docker-compose up
+```
+
+The API server listens on <http://localhost:3000> while the frontend is served
+by Vite on <http://localhost:5173>. Source files are mounted so changes trigger
+live reload.
 
 ### Event History Cache
 
