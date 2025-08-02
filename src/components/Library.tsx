@@ -146,7 +146,7 @@ export const Library: React.FC = () => {
           ))}
         </div>
       )}
-      <div className="mt-[var(--space-4)] grid gap-4 lg:grid-cols-4">
+      <div className="mt-[var(--space-4)] grid gap-4 lg:grid-cols-4 xl:grid-cols-6">
         {groups.map((g) => (
           <section
             key={g.key}
