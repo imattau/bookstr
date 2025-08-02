@@ -61,7 +61,7 @@ For details on the HTML permitted in Markdown, see
 
 ## Nostr Features
 
-Read about managing relays, creating delegation tags and using the chat modals in
+Read about managing relays, creating delegation tags, configuring search relays and using the chat modals in
 [docs/nostr_features.md](docs/nostr_features.md).
 
 Bookstr looks for a user's published lists to discover more of their content:
@@ -69,6 +69,7 @@ Bookstr looks for a user's published lists to discover more of their content:
 - **kind `10002`** lists the relays a user writes to.
 - **kind `10003`** stores bookmarks.
 - **kind `30004`** captures their curation sets.
+- **kind `10007`** enumerates search relays. See the [Search Relays section](docs/nostr_features.md#search-relays).
 The app loads these when viewing a profile so your library includes books and
 relays the author recommends.
 

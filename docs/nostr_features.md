@@ -11,6 +11,16 @@ The **RelayListManager** component in the profile settings screen allows you to 
 
 All changes are stored as kind `10002` events so the new relay list is shared across devices.
 
+## Search Relays
+
+Preferred search relays are stored in `kind:10007` events. When the SearchRelayManager UI is added to the profile settings you will be able to:
+
+1. Enter a `wss://` URL and press **Add** to include it.
+2. Click **Remove** beside an address to delete it.
+
+The updated list is saved as a `kind:10007` event so other clients can reuse your search preferences.
+
+
 ## Delegations
 
 Use **DelegationManager** from the profile settings to generate delegation tags for another pubkey:
