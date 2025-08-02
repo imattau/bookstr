@@ -1,4 +1,6 @@
 @import './designTokens.css';
+@import '@uiw/react-md-editor/dist/mdeditor.css';
+@import '@uiw/react-markdown-preview/dist/markdown.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { marked } from 'marked';
+import React, { useState } from 'react';
+import MDEditor from '@uiw/react-md-editor';
+import MarkdownPreview from '@uiw/react-markdown-preview';
 import { useNostr, publishAnnouncement } from '../nostr';
 import { useToast } from './ToastProvider';
-import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';
 import { logError } from '../lib/logger';
 import { AuthoringLayout } from './AuthoringLayout';
@@ -27,10 +27,6 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const [pow, setPow] = useState(false);
   const [announce, setAnnounce] = useState(true);
   const [publishing, setPublishing] = useState(false);
-  const previewHtml = useMemo(
-    () => sanitizeHtml(marked.parse(content)),
-    [content],
-  );
 
   const next = () => setStep((s) => Math.min(4, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
@@ -185,11 +181,10 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
       {step === 3 && (
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="space-y-2">
-            <textarea
+            <MDEditor
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Markdown content"
-              className="w-full rounded border p-[var(--space-2)] min-h-[200px]"
+              onChange={(value) => setContent(value || '')}
+              height={200}
             />
             <div className="flex justify-between gap-2">
               <button onClick={back} className="rounded border px-[var(--space-4)] py-[var(--space-2)]">
@@ -203,9 +198,10 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
               </button>
             </div>
           </div>
-          <div className="prose max-w-none rounded border p-[var(--space-2)]">
-            <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-          </div>
+          <MarkdownPreview
+            className="prose max-w-none rounded border p-[var(--space-2)]"
+            source={content}
+          />
         </div>
       )}
       {step === 4 && (
@@ -269,10 +265,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
                   </span>
                 ))}
             </div>
-            <div
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
-            />
+            <MarkdownPreview className="prose max-w-none" source={content} />
           </div>
         </div>
       )}
