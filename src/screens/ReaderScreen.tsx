@@ -31,6 +31,8 @@ export const ReaderScreen: React.FC = () => {
   const [fontSize, setFontSize] = React.useState(16);
   const [chapters, setChapters] = React.useState<any[]>([]);
   const [idx, setIdx] = React.useState(0);
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const activeChapterRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     if (!bookId) return;
@@ -54,6 +56,10 @@ export const ReaderScreen: React.FC = () => {
       }
     })();
   }, [idx, chapters, ctx]);
+
+  React.useEffect(() => {
+    activeChapterRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [idx]);
 
   const handleFontSize = (d: 1 | -1) =>
     setFontSize((f) => Math.min(24, Math.max(12, f + d * 2)));
@@ -79,37 +85,69 @@ export const ReaderScreen: React.FC = () => {
         onToggleTheme={() => setTheme(theme === 'dark' ? 'default' : 'dark')}
         onFontSize={handleFontSize}
         onBookmark={() => {}}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+        sidebarVisible={sidebarOpen}
+        className="sticky top-0 z-10 bg-[color:var(--clr-surface)]"
         {...navProps}
       />
-      <ProgressBar value={percent} aria-label="Reading progress" />
-      <ReaderView
-        bookId={bookId}
-        html={html}
-        onPercentChange={(p) => {
-          setPercent(p);
-          updateProgress(bookId, p);
-        }}
-        className="flex-1"
-        style={{ fontSize }}
-      />
-      <div className="p-[var(--space-4)] flex flex-col gap-[var(--space-4)]">
-        {idx < chapters.length - 1 && percent >= 100 && (
-          <Button
-            onClick={() => setIdx((i) => Math.min(chapters.length - 1, i + 1))}
-            className="w-full px-3 py-2"
-          >
-            Next Chapter
-          </Button>
+      <div className="flex flex-1 overflow-hidden">
+        {sidebarOpen && (
+          <aside className="hidden w-48 overflow-y-auto border-r bg-[color:var(--clr-surface-alt)] lg:block">
+            <ul className="flex flex-col">
+              {chapters.map((ch, i) => {
+                const t = ch.tags.find((tt: any) => tt[0] === 'title')?.[1] ?? `Chapter ${i + 1}`;
+                return (
+                  <li key={ch.id ?? i}>
+                    <button
+                      ref={i === idx ? activeChapterRef : undefined}
+                      onClick={() => setIdx(i)}
+                      aria-current={i === idx ? 'true' : undefined}
+                      className={`block w-full text-left px-[var(--space-2)] py-[var(--space-1)] text-sm ${
+                        i === idx
+                          ? 'bg-[color:var(--clr-primary-600)] text-white'
+                          : 'hover:bg-[color:var(--clr-surface)]'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </aside>
         )}
-        <Button
-          onClick={() => {
-            finishBook(bookId);
-            navigate(-1);
-          }}
-          className="w-full px-3 py-2"
-        >
-          Mark as finished
-        </Button>
+        <div className="flex flex-1 flex-col">
+          <ProgressBar value={percent} aria-label="Reading progress" />
+          <ReaderView
+            bookId={bookId}
+            html={html}
+            onPercentChange={(p) => {
+              setPercent(p);
+              updateProgress(bookId, p);
+            }}
+            className="flex-1"
+            style={{ fontSize }}
+          />
+          <div className="flex flex-col gap-[var(--space-4)] p-[var(--space-4)]">
+            {idx < chapters.length - 1 && percent >= 100 && (
+              <Button
+                onClick={() => setIdx((i) => Math.min(chapters.length - 1, i + 1))}
+                className="w-full px-3 py-2"
+              >
+                Next Chapter
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                finishBook(bookId);
+                navigate(-1);
+              }}
+              className="w-full px-3 py-2"
+            >
+              Mark as finished
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
