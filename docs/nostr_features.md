@@ -4,10 +4,11 @@ This document gives a short overview of the extra Nostr capabilities exposed by 
 
 ## Relay Management
 
-The **RelayListManager** component in the profile settings screen allows you to modify the list of relays the app communicates with.
+The dedicated **Relay settings** page exposes the **RelayListManager** so you can edit the list of relays the app communicates with.
 
 1. Add a relay by entering a `wss://` URL and clicking **Add**.
 2. Remove a relay by pressing **Remove** next to its address.
+3. Click **Add relays from followed authors** to merge relay URLs advertised by people you follow. It uses `fetchUserRelays` to gather each contact's list and appends any unique addresses.
 
 All changes are stored as kind `10002` events so the new relay list is shared across devices.
 

@@ -13,7 +13,6 @@ import { useNostr } from '../nostr';
 import { verifyNip05 } from '../nostr/events';
 import { getPrivKey } from '../nostr/auth';
 import { Button, Input } from '../components/ui';
-import { RelayListManager } from '../components/RelayListManager';
 import { isValidUrl, isValidNip05 } from '../validators';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
@@ -179,7 +178,6 @@ export const ProfileSettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <RelayListManager />
       <div className="flex gap-2">
         <Button
           onClick={handleSave}

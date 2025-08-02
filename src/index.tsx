@@ -31,6 +31,7 @@ import { NotificationFeed } from './components/NotificationFeed';
 import ProfileSettingsPage from './pages/ProfileSettings';
 import UISettingsPage from './pages/UISettings';
 import OfflineSettingsPage from './pages/OfflineSettings';
+import RelaySettingsPage from './pages/RelaySettings';
 import SettingsHome from './pages/SettingsHome';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { ToastProvider } from './components/ToastProvider';
@@ -120,6 +121,7 @@ const AppRoutes: React.FC = () => (
       <Route path="settings/profile" element={<ProfileSettingsPage />} />
       <Route path="settings/ui" element={<UISettingsPage />} />
       <Route path="settings/offline" element={<OfflineSettingsPage />} />
+      <Route path="settings/relays" element={<RelaySettingsPage />} />
       <Route path="profile/settings" element={<Navigate replace to="/settings/profile" />} />
       <Route path="books" element={<BookListScreen />} />
       <Route path="book/:bookId" element={<BookDetailScreen />} />

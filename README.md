@@ -38,7 +38,7 @@ Open the profile settings from the library screen to configure the app:
 - **Theme** – pick one of the preset palettes via the theme selector.
 - **Yearly reading goal** – store your annual goal which updates progress in the library view.
 - **Clear Cached Books** – remove any books saved for offline reading.
-- **Relays** – open the new relay settings screen to add or remove relay URLs.
+- **Relays** – open the relay settings screen to add or remove relay URLs or bulk add them from followed authors.
 
 ## Getting Started
 
