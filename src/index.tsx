@@ -16,6 +16,7 @@ import { Header } from './components/Header';
 import { LoginModal } from './components/LoginModal';
 import { search, Suggestion } from './search';
 import { BottomNav } from './components/BottomNav';
+import { SideNav } from './components/SideNav';
 import { ThemeProvider } from './ThemeProvider';
 import { DMModal } from './components/DMModal';
 import { useNostr } from './nostr';
@@ -98,10 +99,19 @@ const Layout: React.FC = () => {
           💬
         </button>
       </Header>
-      <main id="main" className="p-[var(--space-4)]">
-        <Outlet />
-      </main>
-      <BottomNav active={active} onChange={handleChange} />
+      <div className="flex">
+        <SideNav
+          active={active}
+          onChange={handleChange}
+          className="hidden md:flex"
+        />
+        <main id="main" className="flex-1 p-[var(--space-4)]">
+          <Outlet />
+        </main>
+      </div>
+      <div className="md:hidden">
+        <BottomNav active={active} onChange={handleChange} />
+      </div>
       {chatOpen && contacts[0] && (
         <DMModal to={contacts[0]} onClose={() => setChatOpen(false)} />
       )}
