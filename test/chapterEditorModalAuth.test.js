@@ -28,6 +28,7 @@ const path = require('path');
             subscribe: () => () => {},
             pubkey: 'user',
           }),
+          publishAnnouncement: async () => {},
         };
       }
       if (p === './src/components/ToastProvider.tsx') {

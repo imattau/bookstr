@@ -187,6 +187,7 @@ const ManageChaptersPage: React.FC = () => {
             load();
           }}
           viaApi
+          allowAnnouncement={!modal.id}
         />
       )}
     </div>

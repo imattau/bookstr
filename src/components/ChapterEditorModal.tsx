@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNostr } from '../nostr';
+import { useNostr, publishAnnouncement } from '../nostr';
 import { publishChapter, listChapters, publishToc } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
@@ -12,6 +12,7 @@ interface Props {
   authorPubkey: string;
   onClose: () => void;
   viaApi?: boolean;
+  allowAnnouncement?: boolean;
 }
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
@@ -26,6 +27,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
   authorPubkey,
   onClose,
   viaApi,
+  allowAnnouncement,
 }) => {
   const ctx = useNostr();
   const { subscribe, pubkey } = ctx;
@@ -35,6 +37,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
   const [cover, setCover] = useState('');
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
+  const [announce, setAnnounce] = useState(true);
 
   useEffect(() => {
     if (!chapterId) return;
@@ -72,6 +75,12 @@ export const ChapterEditorModal: React.FC<Props> = ({
     try {
       if (!navigator.onLine) throw new Error('offline');
       evt = await publishChapter(ctx, bookId, chapterNumber, data);
+      if (allowAnnouncement && announce && !chapterId) {
+        await publishAnnouncement(
+          ctx,
+          `📚 New chapter: ${title} nostr:naddr/${evt.id}`,
+        );
+      }
       if (viaApi) {
         await fetch(`${API_BASE}/event`, {
           method: 'POST',
@@ -148,6 +157,16 @@ export const ChapterEditorModal: React.FC<Props> = ({
           placeholder="Content"
           className="w-full rounded border p-[var(--space-2)] min-h-[120px]"
         />
+        {allowAnnouncement && !chapterId && (
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={announce}
+              onChange={(e) => setAnnounce(e.target.checked)}
+            />
+            Post announcement
+          </label>
+        )}
         <div className="flex justify-end gap-2 pt-[var(--space-2)]">
           <button onClick={onClose} className="rounded border px-[var(--space-3)] py-[var(--space-1)]">
             Cancel
