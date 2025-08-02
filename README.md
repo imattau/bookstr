@@ -127,6 +127,9 @@ All of the above steps are automated by the helper script:
 ./scripts/build_and_deploy.sh
 ```
 
+This script assumes `node_modules` is absent and installs dependencies with
+`npm ci`.
+
 ### API Server Configuration
 
 The Docker image includes a Node server that serves the static frontend and
