@@ -161,6 +161,14 @@ the listening port.
 Copy `.env.example` to `.env` and adjust the values to configure your
 environment.
 
+If you want to run the full setup with one command, execute:
+
+```bash
+./scripts/bootstrap.sh
+```
+This installs dependencies with `npm ci`, creates the `.env` file if it does
+not exist, runs the tests and builds the production bundle.
+
 ### Event History Cache
 
 Bookstr keeps an IndexedDB pointer for each record it indexes. Before requesting
