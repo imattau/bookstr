@@ -24,6 +24,11 @@ const SettingsHome: React.FC = () => (
           Offline
         </Link>
       </li>
+      <li>
+        <Link to="/settings/relays" className="text-primary-600 underline">
+          Relays
+        </Link>
+      </li>
     </ul>
   </div>
 );
