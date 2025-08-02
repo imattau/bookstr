@@ -19,6 +19,7 @@ const path = require('path');
       'react-router-dom',
       './src/nostr.tsx',
       './src/components/ToastProvider.tsx',
+      './src/components/BookPublishWizard.tsx',
     ],
   });
   const code = build.outputFiles[0].text;
@@ -32,6 +33,9 @@ const path = require('path');
       }
       if (p === './src/components/ToastProvider.tsx') {
         return { useToast: () => () => {} };
+      }
+      if (p === './src/components/BookPublishWizard.tsx') {
+        return { BookPublishWizard: () => React.createElement('div') };
       }
       return require(p);
     },

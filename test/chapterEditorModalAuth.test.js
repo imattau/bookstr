@@ -13,7 +13,14 @@ const path = require('path');
     format: 'cjs',
     platform: 'node',
     write: false,
-    external: ['react', './src/nostr.tsx', './src/components/ToastProvider.tsx'],
+    loader: { '.css': 'text' },
+    external: [
+      'react',
+      './src/nostr.tsx',
+      './src/components/ToastProvider.tsx',
+      '@uiw/react-md-editor',
+      '@uiw/react-markdown-preview',
+    ],
   });
   const code = build.outputFiles[0].text;
   const module = { exports: {} };
@@ -34,6 +41,14 @@ const path = require('path');
       if (p === './src/components/ToastProvider.tsx') {
         return { useToast: () => (msg) => { toastMsg = msg; } };
       }
+      if (p === '@uiw/react-md-editor') {
+        return { __esModule: true, default: () => React.createElement('div') };
+      }
+      if (p === '@uiw/react-markdown-preview') {
+        return { __esModule: true, default: () => React.createElement('div') };
+      }
+      if (p === '@uiw/react-md-editor/markdown-editor.css') return {};
+      if (p === '@uiw/react-markdown-preview/markdown.css') return {};
       return require(p);
     },
     module,

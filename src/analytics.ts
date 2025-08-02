@@ -7,7 +7,8 @@ interface EventRecord {
   ts: number;
 }
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
+const API_BASE =
+  (typeof process !== 'undefined' && process.env.VITE_API_BASE) || '/api';
 
 export async function logEvent(
   name: string,

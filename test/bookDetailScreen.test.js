@@ -14,7 +14,13 @@ const path = require('path');
     format: 'cjs',
     platform: 'node',
     write: false,
-    external: ['react', 'react-router-dom', '@hello-pangea/dnd', './src/nostr.tsx'],
+    external: [
+      'react',
+      'react-router-dom',
+      '@hello-pangea/dnd',
+      './src/nostr.tsx',
+      './src/components/ChapterEditorModal.tsx',
+    ],
   });
   const code = build.outputFiles[0].text;
   const module = { exports: {} };
@@ -31,6 +37,9 @@ const path = require('path');
           Draggable: ({ children }) =>
             React.createElement('div', null, children({ draggableProps: {}, dragHandleProps: {}, innerRef: () => {} })),
         };
+      }
+      if (p === './src/components/ChapterEditorModal.tsx') {
+        return { ChapterEditorModal: () => React.createElement('div') };
       }
       return require(p);
     },
