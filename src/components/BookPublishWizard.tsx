@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { marked } from 'marked';
-import { useNostr } from '../nostr';
+import { useNostr, publishAnnouncement } from '../nostr';
 import { useToast } from './ToastProvider';
 import { sanitizeHtml } from '../sanitizeHtml';
 import { reportBookPublished } from '../achievements';
@@ -24,6 +24,7 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [pow, setPow] = useState(false);
+  const [announce, setAnnounce] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const previewHtml = useMemo(
     () => sanitizeHtml(marked.parse(content)),
@@ -74,11 +75,16 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
       setTags('');
       setContent('');
       setPow(false);
+      setAnnounce(true);
+      if (announce) {
+        await publishAnnouncement(
+          ctx,
+          `📚 ${title} is live! nostr:naddr/${bookId}`,
+        );
+      }
       reportBookPublished();
       if (onPublish) onPublish(bookId);
-      toast(
-        `Book published! <a href="/book/${bookId}">View book</a>`,
-      );
+      toast(`Book published! <a href="/book/${bookId}">View book</a>`);
     } catch (err) {
       logError(err);
       toast('Failed to publish book.');
@@ -203,6 +209,14 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
               className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: previewHtml }}
           />
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={announce}
+              onChange={(e) => setAnnounce(e.target.checked)}
+            />
+            Post announcement
+          </label>
           <label className="flex items-center gap-2">
             <input
               type="checkbox"

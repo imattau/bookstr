@@ -4,6 +4,7 @@ import { BookPublishWizard } from '../../src/components/BookPublishWizard';
 
 jest.mock('../../src/nostr', () => ({
   useNostr: () => ({ publish: jest.fn() }),
+  publishAnnouncement: jest.fn(),
 }));
 
 jest.mock('../../src/components/ToastProvider', () => ({

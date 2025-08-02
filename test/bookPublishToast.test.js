@@ -28,7 +28,7 @@ const path = require('path');
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
-        return { useNostr: () => ({}) };
+        return { useNostr: () => ({}), publishAnnouncement: async () => {} };
       }
       if (p === './src/nostr/events.ts') {
         return { publishChapter: async () => { throw new Error('fail'); } };

@@ -133,6 +133,14 @@ export interface NostrContextValue {
 
 const NostrContext = createContext<NostrContextValue | undefined>(undefined);
 
+export function publishAnnouncement(
+  ctx: NostrContextValue,
+  content: string,
+  tags: string[][] = [],
+): Promise<NostrEvent> {
+  return ctx.publish({ kind: 1, content, tags });
+}
+
 export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
