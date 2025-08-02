@@ -26,6 +26,7 @@ import { Discover } from './components/Discover';
 import LibraryPage from './pages/Library';
 import ManageChaptersPage from './pages/ManageChapters';
 import { BookPublishWizard } from './components/BookPublishWizard';
+import { ListPublishWizard } from './components/ListPublishWizard';
 import { NotificationFeed } from './components/NotificationFeed';
 import ProfileSettingsPage from './pages/ProfileSettings';
 import UISettingsPage from './pages/UISettings';
@@ -112,6 +113,7 @@ const AppRoutes: React.FC = () => (
       <Route path="discover" element={<Discover />} />
       <Route path="library" element={<LibraryPage />} />
       <Route path="write" element={<BookPublishWizard />} />
+      <Route path="lists/new" element={<ListPublishWizard />} />
       <Route path="activity" element={<NotificationFeed />} />
       <Route path="profile" element={<ProfileScreen />} />
       <Route path="settings" element={<SettingsHome />} />

@@ -130,6 +130,14 @@ const LibraryPage: React.FC = () => {
           </button>
         </div>
       )}
+      <div className="flex justify-end">
+        <button
+          onClick={() => navigate('/lists/new')}
+          className="rounded border px-2 py-1"
+        >
+          New List
+        </button>
+      </div>
       {privateNotice && (
         <p className="text-sm text-text-muted">
           Some entries are private and could not be displayed.
