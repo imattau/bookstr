@@ -28,68 +28,93 @@ exports[`Discover desktop snapshot 1`] = `
     </div>
   </header>
   <div
-    class="flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]"
+    class="md:flex"
   >
-    <button
-      aria-label="All"
-      aria-pressed="true"
-      class="btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+    <aside
+      class="hidden md:block md:w-48 p-[var(--space-4)]"
     >
-      All
-    </button>
+      <ul
+        class="flex flex-col gap-[var(--space-2)]"
+      >
+        <li>
+          <button
+            aria-label="All"
+            aria-pressed="true"
+            class="btn-tap w-full text-left rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+          >
+            All
+          </button>
+        </li>
+      </ul>
+    </aside>
+    <div
+      class="flex-1"
+    >
+      <div
+        class="md:hidden flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]"
+      >
+        <button
+          aria-label="All"
+          aria-pressed="true"
+          class="btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+        >
+          All
+        </button>
+      </div>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          Trending Books
+        </h2>
+        <ul
+          class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+          role="list"
+        />
+      </section>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          New Releases
+        </h2>
+        <ul
+          class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+          role="list"
+        />
+      </section>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          Recommended for You
+        </h2>
+        <ul
+          class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+          role="list"
+        />
+      </section>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          Communities
+        </h2>
+        <ul
+          class="space-y-4"
+          role="list"
+        />
+      </section>
+    </div>
   </div>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      Trending Books
-    </h2>
-    <ul
-      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
-      role="list"
-    />
-  </section>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      New Releases
-    </h2>
-    <ul
-      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
-      role="list"
-    />
-  </section>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      Recommended for You
-    </h2>
-    <ul
-      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
-      role="list"
-    />
-  </section>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      Communities
-    </h2>
-    <ul
-      class="space-y-4"
-      role="list"
-    />
-  </section>
 </div>
 `;
 
@@ -121,67 +146,92 @@ exports[`Discover mobile snapshot 1`] = `
     </div>
   </header>
   <div
-    class="flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]"
+    class="md:flex"
   >
-    <button
-      aria-label="All"
-      aria-pressed="true"
-      class="btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+    <aside
+      class="hidden md:block md:w-48 p-[var(--space-4)]"
     >
-      All
-    </button>
+      <ul
+        class="flex flex-col gap-[var(--space-2)]"
+      >
+        <li>
+          <button
+            aria-label="All"
+            aria-pressed="true"
+            class="btn-tap w-full text-left rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+          >
+            All
+          </button>
+        </li>
+      </ul>
+    </aside>
+    <div
+      class="flex-1"
+    >
+      <div
+        class="md:hidden flex overflow-x-auto gap-[var(--space-2)] px-[var(--space-2)] pb-[var(--space-2)]"
+      >
+        <button
+          aria-label="All"
+          aria-pressed="true"
+          class="btn-tap whitespace-nowrap rounded-[var(--radius-button)] px-[var(--space-2)] py-[var(--space-1)] text-[14px] bg-[color:var(--clr-primary-600)] text-white"
+        >
+          All
+        </button>
+      </div>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          Trending Books
+        </h2>
+        <ul
+          class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+          role="list"
+        />
+      </section>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          New Releases
+        </h2>
+        <ul
+          class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+          role="list"
+        />
+      </section>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          Recommended for You
+        </h2>
+        <ul
+          class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
+          role="list"
+        />
+      </section>
+      <section
+        class="p-[var(--space-4)]"
+      >
+        <h2
+          class="mb-[var(--space-2)] font-semibold"
+        >
+          Communities
+        </h2>
+        <ul
+          class="space-y-4"
+          role="list"
+        />
+      </section>
+    </div>
   </div>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      Trending Books
-    </h2>
-    <ul
-      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
-      role="list"
-    />
-  </section>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      New Releases
-    </h2>
-    <ul
-      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
-      role="list"
-    />
-  </section>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      Recommended for You
-    </h2>
-    <ul
-      class="grid grid-cols-1 gap-[var(--space-4)] md:grid-cols-2 lg:grid-cols-4"
-      role="list"
-    />
-  </section>
-  <section
-    class="p-[var(--space-4)]"
-  >
-    <h2
-      class="mb-[var(--space-2)] font-semibold"
-    >
-      Communities
-    </h2>
-    <ul
-      class="space-y-4"
-      role="list"
-    />
-  </section>
 </div>
 `;
