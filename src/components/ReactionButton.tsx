@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { FaThumbsUp, FaStar } from 'react-icons/fa';
-import { useNostr } from '../nostr';
-import { publishVote, publishFavourite } from '../nostr/events';
-import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 import { logError } from '../lib/logger';
-import type { Event as NostrEvent } from 'nostr-tools';
+import { queueOfflineEdit } from '../nostr/offline';
+import { useReactionContext, useReactions } from '../contexts/ReactionContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface ReactionButtonProps {
   target: string;
@@ -21,26 +20,12 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
   type,
   className,
 }) => {
-  const ctx = useNostr();
+  const { data } = useReactions(target, type);
+  const { reactToContent } = useReactionContext();
   const toast = useToast();
-  const [count, setCount] = useState(0);
-  const ids = useRef(new Set<string>());
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const symbol = type === 'vote' ? '+' : '★';
-    const off = ctx.subscribe(
-      [{ kinds: [7], '#e': [target] }],
-      (evt: NostrEvent) => {
-        if (evt.content === symbol && !ids.current.has(evt.id)) {
-          ids.current.add(evt.id);
-          setCount((c) => c + 1);
-          if (evt.pubkey === ctx.pubkey) setActive(true);
-        }
-      },
-    );
-    return off;
-  }, [ctx, target, type]);
+  const queryClient = useQueryClient();
+  const count = data?.count ?? 0;
+  const active = data?.active ?? false;
 
   const handleClick = async () => {
     if (active) return;
@@ -51,17 +36,14 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
           type: 'vote',
           data: { target },
         });
-        setCount((c) => c + 1);
-        setActive(true);
+        queryClient.setQueryData(['reaction', type, target], {
+          count: count + 1,
+          active: true,
+        });
         toast('Saved offline, will sync later');
         return;
       }
-      if (type === 'vote') {
-        await publishVote(ctx, target);
-      } else {
-        await publishFavourite(ctx, target);
-      }
-      setActive(true);
+      await reactToContent(target, type);
     } catch (err) {
       logError(err);
       toast('Action failed', { type: 'error' });
@@ -79,7 +61,11 @@ export const ReactionButton: React.FC<ReactionButtonProps> = ({
     <button
       onClick={handleClick}
       aria-label={type === 'vote' ? 'Vote' : 'Favourite'}
-      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${active ? 'border-[color:var(--clr-primary-600)] bg-[color:var(--clr-primary-600)] text-white' : ''} ${className ?? ''}`}
+      className={`rounded-[var(--radius-button)] border px-[var(--space-2)] py-[var(--space-1)] ${
+        active
+          ? 'border-[color:var(--clr-primary-600)] bg-[color:var(--clr-primary-600)] text-white'
+          : ''
+      } ${className ?? ''}`}
     >
       {icon} {count > 0 ? count : ''}
     </button>

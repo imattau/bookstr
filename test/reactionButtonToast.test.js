@@ -18,6 +18,8 @@ const path = require('path');
       'react-icons/fa',
       './src/nostr.tsx','./src/nostr/events.ts',
       './src/components/ToastProvider.tsx',
+      './src/contexts/ReactionContext.tsx',
+      '@tanstack/react-query',
       'nostr-tools',
     ],
   });
@@ -38,6 +40,19 @@ const path = require('path');
         if (p === "./src/components/ToastProvider.tsx") {
           return { useToast: () => (msg) => calls.push(msg) };
         }
+      if (p === './src/contexts/ReactionContext.tsx') {
+        return {
+          useReactions: () => ({ data: { count: 0, active: false } }),
+          useReactionContext: () => ({
+            reactToContent: async () => {
+              throw new Error('fail');
+            },
+          }),
+        };
+      }
+      if (p === '@tanstack/react-query') {
+        return { useQueryClient: () => ({ setQueryData() {}, invalidateQueries() {} }) };
+      }
       if (p === 'react-icons/fa') {
         return { FaThumbsUp: () => React.createElement('div'), FaStar: () => React.createElement('div') };
       }
