@@ -29,6 +29,7 @@ import {
 import { initOfflineSync } from './nostr/offline';
 import { savePointer, getPointer } from './lib/cache';
 import { clearSearchRelaysCache } from './search';
+import { useNotificationStore } from './store/notifications';
 
 export const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
   | string
@@ -167,6 +168,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     density: s.density,
   }));
   const hydrateSettings = useSettings((s) => s.hydrate);
+  const addNotification = useNotificationStore((s) => s.add);
 
   useEffect(() => {
     const pool = poolRef.current;
@@ -355,7 +357,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     [],
   );
 
-  const applyPointers = async (filters: Filter[]): Promise<Filter[]> => {
+  const applyPointers = useCallback(async (filters: Filter[]): Promise<Filter[]> => {
     return Promise.all(
       filters.map(async (f) => {
         const d = (f as any)['#d']?.[0];
@@ -373,41 +375,61 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         return f;
       }),
     );
-  };
-
-  const list = useCallback(async (filters: Filter[]) => {
-    const final = await applyPointers(filters);
-    const evts = (await poolRef.current.list(
-      relaysRef.current,
-      final,
-    )) as NostrEvent[];
-    evts.forEach((e) => {
-      const d = e.tags.find((t) => t[0] === 'd')?.[1];
-      if (d) savePointer(d, e.id);
-    });
-    return evts;
   }, []);
 
-  const subscribe = (filters: Filter[], cb: (evt: NostrEvent) => void) => {
-    let unsub: (() => void) | null = null;
-    let stopped = false;
-    (async () => {
+  const list = useCallback(
+    async (filters: Filter[]) => {
       const final = await applyPointers(filters);
-      if (stopped) return;
-      const sub = poolRef.current.subscribeMany(relaysRef.current, final, {
-        onevent: (evt: NostrEvent) => {
-          const d = evt.tags.find((t) => t[0] === 'd')?.[1];
-          if (d) savePointer(d, evt.id);
-          cb(evt);
-        },
+      const evts = (await poolRef.current.list(
+        relaysRef.current,
+        final,
+      )) as NostrEvent[];
+      evts.forEach((e) => {
+        const d = e.tags.find((t) => t[0] === 'd')?.[1];
+        if (d) savePointer(d, e.id);
       });
-      unsub = () => (sub as any).unsub();
-    })();
-    return () => {
-      stopped = true;
-      if (unsub) unsub();
-    };
-  };
+      return evts;
+    },
+    [applyPointers],
+  );
+
+  const subscribe = useCallback(
+    (filters: Filter[], cb: (evt: NostrEvent) => void) => {
+      let unsub: (() => void) | null = null;
+      let stopped = false;
+      (async () => {
+        const final = await applyPointers(filters);
+        if (stopped) return;
+        const sub = poolRef.current.subscribeMany(relaysRef.current, final, {
+          onevent: (evt: NostrEvent) => {
+            const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+            if (d) savePointer(d, evt.id);
+            cb(evt);
+          },
+        });
+        unsub = () => (sub as any).unsub();
+      })();
+      return () => {
+        stopped = true;
+        if (unsub) unsub();
+      };
+    },
+    [applyPointers],
+  );
+
+  useEffect(() => {
+    if (!pubkey) return;
+    const now = Math.floor(Date.now() / 1000);
+    const filters: Filter[] = [
+      { kinds: [1], '#p': [pubkey], since: now },
+      { kinds: [1111], '#p': [pubkey], since: now },
+      { kinds: [9735], '#p': [pubkey], since: now },
+    ];
+    return subscribe(filters, (evt) => {
+      if (evt.pubkey === pubkey) return;
+      addNotification(evt.id);
+    });
+  }, [pubkey, subscribe, addNotification]);
 
   const saveProfile = async (data: Record<string, unknown>) => {
     await publish({ kind: 0, content: JSON.stringify(data), tags: [] });
