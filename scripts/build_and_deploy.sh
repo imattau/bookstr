@@ -4,6 +4,11 @@ set -e
 # install dependencies
 npm ci
 
+# copy env file if missing
+if [ ! -f .env ]; then
+  cp .env.example .env
+fi
+
 # run tests
 npm test
 

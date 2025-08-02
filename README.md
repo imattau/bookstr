@@ -6,7 +6,8 @@ with design tokens defined in `src/designTokens.css`.
 
 Currently the project only provides a minimal `AppShell`, a `Header`, a
 `BottomNav`, and other basic components. The layout and theming follow the
-specification but functionality is limited.
+specification but functionality is limited. The navigation now includes a
+`Home` tab that aggregates posts and announcements from people you follow.
 
 ## Features
 
@@ -20,13 +21,17 @@ specification but functionality is limited.
   support for `dark`, `earthy`, `vibrant` and `pastel` modes.
 - **Service worker** – `src/sw.ts` provides offline caching and background sync
   for a Progressive Web App.
+- **Home tab** – catch up on activity from followed authors in a unified feed.
 - **Book publishing** – the `BookPublishWizard` creates chapter events and a
-  table-of-contents so books can be read one chapter at a time.
+  table-of-contents so books can be read one chapter at a time. An
+  auto-announcement toggle lets you broadcast new releases when publishing.
 - **Reading progress indicators** – the reader toolbar displays your current
   percentage with **Previous chapter** and **Next chapter** controls, and book
   cards show a small progress bar.
 - **Background library sync** – newly followed authors have their book lists
   fetched in the background and merged into your library.
+- **Follow/relay sync** – relay URLs from people you follow can be merged into
+  your own list so it stays consistent across devices.
 - **List publishing** – create private (`kind 10003`) or public (`kind 30004`)
   book collections from `/lists/new`. Lists you own appear on your profile with
   quick links to edit them.
@@ -38,29 +43,33 @@ Open the profile settings from the library screen to configure the app:
 - **Theme** – pick one of the preset palettes via the theme selector.
 - **Yearly reading goal** – store your annual goal which updates progress in the library view.
 - **Clear Cached Books** – remove any books saved for offline reading.
-- **Relays** – open the relay settings screen to add or remove relay URLs or bulk add them from followed authors.
+- **Relays** – the dedicated relay settings page lets you add or remove relay
+  URLs and bulk add them from people you follow. Updates are saved so your
+  relay list remains in sync.
 
 ## Getting Started
 
 1. Ensure you are running **Node.js 20** or later.
-2. Install dependencies
+2. Copy `.env.example` to `.env` and edit the values for your environment. At a
+   minimum set `VITE_RELAY_URLS` and `VITE_API_BASE`.
+3. Install dependencies
    ```bash
    npm install
    ```
-3. Start a development server. If you use [Vite](https://vitejs.dev/) you can
+4. Start a development server. If you use [Vite](https://vitejs.dev/) you can
    run:
    ```bash
    npx vite
    ```
    The entry point is `src/main.tsx`.
-4. Build the PWA for production. With Vite the build command is:
+5. Build the PWA for production. With Vite the build command is:
    ```bash
    npx vite build
    ```
    The generated files in `dist/` can be served with any static server. During
    this step `vite-plugin-pwa` injects a precache manifest into `src/sw.ts` and
    outputs the compiled service worker as `dist/sw.js`.
-5. If no NIP‑07 wallet is detected, you can still log in by pasting your
+6. If no NIP‑07 wallet is detected, you can still log in by pasting your
    private key into the login screen to sign events manually.
 
 For a step-by-step guide on using the book publishing wizard, see
