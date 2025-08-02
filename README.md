@@ -158,6 +158,9 @@ The frontend reads certain configuration from Vite environment variables:
 The API server also honours `API_BASE` to match the frontend and `PORT` for
 the listening port.
 
+Copy `.env.example` to `.env` and adjust the values to configure your
+environment.
+
 ### Event History Cache
 
 Bookstr keeps an IndexedDB pointer for each record it indexes. Before requesting
