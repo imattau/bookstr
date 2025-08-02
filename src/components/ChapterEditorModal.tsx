@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { marked } from 'marked';
+import React, { useState, useEffect } from 'react';
+import MDEditor from '@uiw/react-md-editor';
+import MarkdownPreview from '@uiw/react-markdown-preview';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 import { useNostr, publishAnnouncement } from '../nostr';
 import { publishChapter, listChapters, publishToc } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 import { logError } from '../lib/logger';
-import { sanitizeHtml } from '../sanitizeHtml';
 
 interface Props {
   bookId: string;
@@ -40,11 +42,6 @@ export const ChapterEditorModal: React.FC<Props> = ({
   const [tags, setTags] = useState('');
   const [content, setContent] = useState('');
   const [announce, setAnnounce] = useState(true);
-
-  const previewHtml = useMemo(
-    () => sanitizeHtml(marked.parse(content)),
-    [content],
-  );
 
   useEffect(() => {
     if (!chapterId) return;
@@ -160,11 +157,9 @@ export const ChapterEditorModal: React.FC<Props> = ({
               placeholder="Tags comma separated"
               className="w-full rounded border p-[var(--space-2)]"
             />
-            <textarea
+            <MDEditor
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Content"
-              className="w-full rounded border p-[var(--space-2)] min-h-[120px]"
+              onChange={(val) => setContent(val || '')}
             />
             {allowAnnouncement && !chapterId && (
               <label className="flex items-center gap-2">
@@ -189,10 +184,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
             </div>
           </div>
           <div className="hidden lg:block overflow-y-auto rounded border p-[var(--space-2)]">
-            <div
-              className="prose max-w-none whitespace-pre-wrap"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
-            />
+            <MarkdownPreview source={content} />
           </div>
         </div>
       </div>
