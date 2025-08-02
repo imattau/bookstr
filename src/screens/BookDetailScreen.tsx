@@ -58,7 +58,10 @@ export const BookDetailScreen: React.FC = () => {
   const listWithExtras = async (filters: Filter[]) => {
     const main = ctx.list ? await ctx.list(filters) : [];
     if (!extraRelays.length) return main;
-    const extra = (await poolRef.current.list(extraRelays, filters)) as any[];
+    const extra = (await (poolRef.current as any).list(
+      extraRelays,
+      filters,
+    )) as any[];
     return [...main, ...extra];
   };
   const [authorPubkey, setAuthorPubkey] = useState<string | null>(null);
@@ -120,10 +123,12 @@ export const BookDetailScreen: React.FC = () => {
       [{ kinds: [41], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
       (evt) => {
         setMeta({
-          title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
-          summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
-          cover: evt.tags.find((t) => t[0] === 'image')?.[1],
-          tags: evt.tags.filter((t) => t[0] === 't').map((t) => t[1]),
+          title: evt.tags.find((t: string[]) => t[0] === 'title')?.[1] ?? 'Untitled',
+          summary: evt.tags.find((t: string[]) => t[0] === 'summary')?.[1] ?? '',
+          cover: evt.tags.find((t: string[]) => t[0] === 'image')?.[1],
+          tags: evt.tags
+            .filter((t: string[]) => t[0] === 't')
+            .map((t: string[]) => t[1]),
         });
       },
     );
@@ -135,7 +140,9 @@ export const BookDetailScreen: React.FC = () => {
     const off = subscribeWithExtras(
       [{ kinds: [30001], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
       (evt) => {
-        const ids = evt.tags.filter((t) => t[0] === 'e').map((t) => t[1]);
+        const ids = evt.tags
+          .filter((t: string[]) => t[0] === 'e')
+          .map((t: string[]) => t[1]);
         setChapterIds(ids);
         setListId(evt.id);
       },
@@ -146,7 +153,7 @@ export const BookDetailScreen: React.FC = () => {
   useEffect(() => {
     if (!chapterIds.length) return undefined;
     const off = subscribeWithExtras([{ ids: chapterIds }], async (evt) => {
-      const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+      const d = evt.tags.find((t: string[]) => t[0] === 'd')?.[1];
       let content = evt.content;
       if (d) {
         const parts = (await listWithExtras([
@@ -154,11 +161,11 @@ export const BookDetailScreen: React.FC = () => {
         ])) as any[];
         const sorted = parts.sort((a, b) => {
           const pa = parseInt(
-            a.tags.find((t) => t[0] === 'part')?.[1] ?? '1',
+            a.tags.find((t: string[]) => t[0] === 'part')?.[1] ?? '1',
             10,
           );
           const pb = parseInt(
-            b.tags.find((t) => t[0] === 'part')?.[1] ?? '1',
+            b.tags.find((t: string[]) => t[0] === 'part')?.[1] ?? '1',
             10,
           );
           return pa - pb;
@@ -169,8 +176,8 @@ export const BookDetailScreen: React.FC = () => {
         ...c,
         [evt.id]: {
           id: evt.id,
-          title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
-          summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
+          title: evt.tags.find((t: string[]) => t[0] === 'title')?.[1] ?? 'Untitled',
+          summary: evt.tags.find((t: string[]) => t[0] === 'summary')?.[1] ?? '',
           content,
         },
       }));
