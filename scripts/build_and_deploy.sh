@@ -2,7 +2,7 @@
 set -e
 
 # install dependencies
-npm install
+npm ci
 
 # run tests
 npm test
