@@ -60,19 +60,26 @@ export const ReaderScreen: React.FC = () => {
 
   if (!bookId) return null;
 
+  const navProps =
+    chapters.length > 1
+      ? {
+          onPrev: () => setIdx((i) => Math.max(0, i - 1)),
+          onNext: () => setIdx((i) => Math.min(chapters.length - 1, i + 1)),
+          hasPrev: idx > 0,
+          hasNext: idx < chapters.length - 1,
+        }
+      : {};
+
   return (
     <div className="flex h-full flex-col">
       <ReaderToolbar
         title={title}
-        percent={Math.round(percent)}
+        percent={percent}
         onBack={() => navigate(-1)}
         onToggleTheme={() => setTheme(theme === 'dark' ? 'default' : 'dark')}
         onFontSize={handleFontSize}
         onBookmark={() => {}}
-        onPrev={() => setIdx((i) => Math.max(0, i - 1))}
-        onNext={() => setIdx((i) => Math.min(chapters.length - 1, i + 1))}
-        hasPrev={idx > 0}
-        hasNext={idx < chapters.length - 1}
+        {...navProps}
       />
       <ProgressBar value={percent} aria-label="Reading progress" />
       <ReaderView
@@ -85,7 +92,15 @@ export const ReaderScreen: React.FC = () => {
         className="flex-1"
         style={{ fontSize }}
       />
-      <div className="p-[var(--space-4)]">
+      <div className="p-[var(--space-4)] flex flex-col gap-[var(--space-4)]">
+        {idx < chapters.length - 1 && percent >= 100 && (
+          <Button
+            onClick={() => setIdx((i) => Math.min(chapters.length - 1, i + 1))}
+            className="w-full px-3 py-2"
+          >
+            Next Chapter
+          </Button>
+        )}
         <Button
           onClick={() => {
             finishBook(bookId);
