@@ -64,7 +64,7 @@ export const ProfileScreen: React.FC = () => {
   const listWithExtras = async (filters: Filter[]) => {
     const main = await list(filters);
     if (!extraRelays.length) return main;
-    const extra = (await poolRef.current.list(
+    const extra = (await (poolRef.current as any).list(
       extraRelays,
       filters,
     )) as NostrEvent[];
@@ -112,11 +112,11 @@ export const ProfileScreen: React.FC = () => {
 
   useEffect(() => {
     if (!pubkey) return;
-    listWithExtras([{ kinds: [3], '#p': [pubkey] }]).then((evts) => {
-      const uniq = new Set<string>();
-      evts.forEach((e) => uniq.add(e.pubkey));
-      setFollowers(uniq.size);
-    });
+      listWithExtras([{ kinds: [3], '#p': [pubkey] }]).then((evts) => {
+        const uniq = new Set<string>();
+        evts.forEach((e: NostrEvent) => uniq.add(e.pubkey));
+        setFollowers(uniq.size);
+      });
   }, [pubkey, ctxRelays, extraRelays]);
 
   useEffect(() => {
@@ -186,14 +186,14 @@ export const ProfileScreen: React.FC = () => {
           <ul role="list" className="space-y-2 mt-2">
             {bookLists.map((evt) => {
               const title =
-                evt.tags.find((t) => t[0] === 'title')?.[1] ||
-                evt.tags.find((t) => t[0] === 'd')?.[1] ||
-                evt.tags.find((t) => t[0] === 'name')?.[1] ||
+                evt.tags.find((t: string[]) => t[0] === 'title')?.[1] ||
+                evt.tags.find((t: string[]) => t[0] === 'd')?.[1] ||
+                evt.tags.find((t: string[]) => t[0] === 'name')?.[1] ||
                 'Untitled';
-              const d = evt.tags.find((t) => t[0] === 'd')?.[1];
+              const d = evt.tags.find((t: string[]) => t[0] === 'd')?.[1];
               let count = 0;
               let tags = evt.tags as string[][];
-              if (!tags.some((t) => t[0] === 'a')) {
+              if (!tags.some((t: string[]) => t[0] === 'a')) {
                 try {
                   const parsed = JSON.parse(evt.content);
                   if (Array.isArray(parsed?.tags)) tags = parsed.tags;
@@ -201,7 +201,7 @@ export const ProfileScreen: React.FC = () => {
                   /* ignore */
                 }
               }
-              count = tags.filter((t) => t[0] === 'a').length;
+              count = tags.filter((t: string[]) => t[0] === 'a').length;
               return (
                 <li key={evt.id} className="flex items-center justify-between" role="listitem">
                   <div>
