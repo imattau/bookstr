@@ -17,6 +17,7 @@ const path = require('path');
       'react',
       'dompurify',
       'marked',
+      '@uiw/*',
       './src/nostr.tsx','./src/nostr/events.ts',
       './src/achievements.ts',
       './src/components/ToastProvider.tsx',
@@ -51,6 +52,12 @@ const path = require('path');
       }
       if (p === 'dompurify') {
         return { __esModule: true, default: { sanitize: (v) => v } };
+      }
+      if (p === '@uiw/react-md-editor') {
+        return { __esModule: true, default: () => React.createElement('div') };
+      }
+      if (p === '@uiw/react-markdown-preview') {
+        return { __esModule: true, default: () => React.createElement('div') };
       }
       return require(p);
     },
