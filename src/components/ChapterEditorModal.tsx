@@ -19,7 +19,8 @@ interface Props {
   allowAnnouncement?: boolean;
 }
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
+const API_BASE =
+  (typeof process !== 'undefined' && process.env.VITE_API_BASE) || '/api';
 
 /**
  * Modal for creating or editing a chapter's content and metadata.
