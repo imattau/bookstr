@@ -36,6 +36,52 @@ export const Library: React.FC = () => {
     { key: 'following', label: 'Following' },
   ];
 
+  const groups = tabs.map((t) => ({
+    ...t,
+    items: books.filter((item) => {
+      if (t.key === 'following') {
+        return contacts.includes(item.author);
+      }
+      return item.status === t.key;
+    }),
+  }));
+
+  const renderItem = (item: (typeof books)[number]) => (
+    <li
+      key={item.id}
+      role="listitem"
+      className="mb-[var(--space-2)] flex items-center gap-4 rounded-card bg-border p-[var(--space-3)]"
+    >
+      <img
+        src={item.cover}
+        alt={`Cover image for ${item.title}`}
+        className="h-[84px] w-[56px] rounded object-cover"
+      />
+      <div className="flex-1 space-y-1">
+        <h3 className="text-[16px] font-semibold leading-6">{item.title}</h3>
+        <p className="text-[14px] leading-5 text-text-muted">{item.author}</p>
+        <span className="inline-block rounded bg-[color:var(--clr-surface-alt)] px-[var(--space-2)] py-[2px] text-[12px] text-text-muted">
+          {item.genre}
+        </span>
+        <div className="mt-[var(--space-1)] h-1 rounded bg-border">
+          <div
+            className="h-full rounded bg-[color:var(--clr-primary-600)]"
+            style={{ width: `${item.percent}%` }}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col items-end gap-1 text-[12px] text-text-muted">
+        <button
+          onClick={() => finishBook(item.id)}
+          className="rounded-[var(--radius-button)] bg-[color:var(--clr-surface-alt)] px-[var(--space-3)] py-[var(--space-1)] text-[14px] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50"
+        >
+          Mark Finished
+        </button>
+        <span>{item.percent}%</span>
+      </div>
+    </li>
+  );
+
   return (
     <div className="min-h-screen bg-[color:var(--clr-surface)] px-[var(--space-4)] pb-[var(--space-4)] text-[color:var(--clr-text)]">
       <header
@@ -58,10 +104,20 @@ export const Library: React.FC = () => {
           </button>
         </OnboardingTooltip>
       </header>
-      <div className="flex items-end gap-6" style={{ height: 48 }}>
+      <div
+        role="tablist"
+        aria-label="Library sections"
+        className="flex items-end gap-6 lg:hidden"
+        style={{ height: 48 }}
+      >
         {tabs.map((t) => (
           <button
             key={t.key}
+            id={`tab-${t.key}`}
+            role="tab"
+            aria-selected={tab === t.key}
+            aria-controls={`panel-${t.key}`}
+            tabIndex={tab === t.key ? 0 : -1}
             onClick={() => setTab(t.key)}
             className={`pb-[var(--space-1)] text-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50 ${tab === t.key ? 'border-b-2 border-[color:var(--clr-primary-600)] text-[color:var(--clr-text)]' : 'text-text-muted'}`}
           >
@@ -90,54 +146,27 @@ export const Library: React.FC = () => {
           ))}
         </div>
       )}
-      <ul role="list" className="mt-[var(--space-4)] space-y-2">
-        {books
-          .filter((item) => {
-            if (tab === 'following') {
-              return contacts.includes(item.author);
-            }
-            return item.status === tab;
-          })
-          .map((item) => (
-            <li
-              key={item.id}
-              role="listitem"
-              className="mb-[var(--space-2)] flex items-center gap-4 rounded-card bg-border p-[var(--space-3)]"
+      <div className="mt-[var(--space-4)] grid gap-4 lg:grid-cols-4">
+        {groups.map((g) => (
+          <section
+            key={g.key}
+            id={`panel-${g.key}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${g.key}`}
+            className={`${tab === g.key ? 'block' : 'hidden'} lg:block`}
+          >
+            <h2 className="mb-[var(--space-2)] hidden text-[14px] font-semibold lg:block">
+              {g.label}
+            </h2>
+            <ul
+              role="list"
+              className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 lg:block"
             >
-              <img
-                src={item.cover}
-                alt={`Cover image for ${item.title}`}
-                className="h-[84px] w-[56px] rounded object-cover"
-              />
-              <div className="flex-1 space-y-1">
-                <h3 className="text-[16px] font-semibold leading-6">
-                  {item.title}
-                </h3>
-                <p className="text-[14px] leading-5 text-text-muted">
-                  {item.author}
-                </p>
-                <span className="inline-block rounded bg-[color:var(--clr-surface-alt)] px-[var(--space-2)] py-[2px] text-[12px] text-text-muted">
-                  {item.genre}
-                </span>
-                <div className="mt-[var(--space-1)] h-1 rounded bg-border">
-                  <div
-                    className="h-full rounded bg-[color:var(--clr-primary-600)]"
-                    style={{ width: `${item.percent}%` }}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1 text-[12px] text-text-muted">
-                <button
-                  onClick={() => finishBook(item.id)}
-                  className="rounded-[var(--radius-button)] bg-[color:var(--clr-surface-alt)] px-[var(--space-3)] py-[var(--space-1)] text-[14px] text-[color:var(--clr-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-600/50"
-                >
-                  Mark Finished
-                </button>
-                <span>{item.percent}%</span>
-              </div>
-            </li>
-          ))}
-      </ul>
+              {g.items.map((item) => renderItem(item))}
+            </ul>
+          </section>
+        ))}
+      </div>
     </div>
   );
 };

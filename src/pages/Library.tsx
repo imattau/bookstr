@@ -158,7 +158,7 @@ const LibraryPage: React.FC = () => {
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className="space-y-2"
+              className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
             >
               {items.map((b, index) => (
                 <Draggable key={b.id} draggableId={b.id} index={index}>
