@@ -25,6 +25,8 @@ specification but functionality is limited.
 - **Reading progress indicators** – the reader toolbar displays your current
   percentage with **Previous chapter** and **Next chapter** controls, and book
   cards show a small progress bar.
+- **Background library sync** – newly followed authors have their book lists
+  fetched in the background and merged into your library.
 - **List publishing** – create private (`kind 10003`) or public (`kind 30004`)
   book collections from `/lists/new`. Lists you own appear on your profile with
   quick links to edit them.

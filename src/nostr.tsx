@@ -102,6 +102,7 @@ export interface NostrContextValue {
   metadata: Record<string, unknown> | null;
   contacts: string[];
   bookmarks: string[];
+  followBooks: Record<string, string[]>;
   relays: string[];
   login: (priv: string) => void;
   loginNip07: (pubkey: string) => void;
@@ -143,9 +144,11 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [contacts, setContacts] = useState<string[]>([]);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [followBooks, setFollowBooks] = useState<Record<string, string[]>>({});
   const [relays, setRelays] = useState<string[]>(DEFAULT_RELAYS);
   const [keyError, setKeyError] = useState<boolean>(false);
   const relaysRef = useRef<string[]>(DEFAULT_RELAYS);
+  const contactsRef = useRef<string[]>([]);
   useEffect(() => {
     relaysRef.current = relays;
   }, [relays]);
@@ -570,6 +573,44 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   useEffect(() => {
+    const prev = contactsRef.current;
+    contactsRef.current = contacts;
+    const added = contacts.filter((c) => !prev.includes(c));
+    const removed = prev.filter((c) => !contacts.includes(c));
+    if (removed.length) {
+      setFollowBooks((map) => {
+        const next = { ...map };
+        for (const [id, from] of Object.entries(next)) {
+          const updated = from.filter((pk) => !removed.includes(pk));
+          if (updated.length) next[id] = updated;
+          else delete next[id];
+        }
+        return next;
+      });
+    }
+    if (added.length) {
+      (async () => {
+        for (const pk of added) {
+          try {
+            const { ids } = await getListBooks(pk);
+            setFollowBooks((map) => {
+              const next = { ...map };
+              ids.forEach((id) => {
+                const arr = next[id] ? [...next[id]] : [];
+                if (!arr.includes(pk)) arr.push(pk);
+                next[id] = arr;
+              });
+              return next;
+            });
+          } catch {
+            /* ignore */
+          }
+        }
+      })();
+    }
+  }, [contacts, getListBooks]);
+
+  useEffect(() => {
     if (!pubkey) return;
     const off = initOfflineSync({
       sendEvent,
@@ -606,6 +647,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
         metadata,
         contacts,
         bookmarks,
+        followBooks,
         relays,
         login,
         loginNip07,
