@@ -20,6 +20,8 @@ specification but functionality is limited.
   support for `dark`, `earthy`, `vibrant` and `pastel` modes.
 - **Service worker** – `src/sw.ts` provides offline caching and background sync
   for a Progressive Web App.
+- **Book publishing** – the `BookPublishWizard` creates chapter events and a
+  table-of-contents so books can be read one chapter at a time.
 
 ## Settings
 

@@ -19,6 +19,7 @@ const path = require('path');
       'react-router-dom',
       '@hello-pangea/dnd',
       '../src/nostr.tsx',
+      '../src/nostr/events.ts',
       '../src/components/ChapterEditorModal.tsx',
       'nostr-tools',
       '@noble/hashes/utils'
@@ -26,19 +27,21 @@ const path = require('path');
   });
   const code = build.outputFiles[0].text;
   const module = { exports: {} };
-  let published;
+  const published = [];
   const sandbox = {
     require: (p) => {
       if (p.includes('nostr')) {
+        if (p.includes('events')) {
+          return {
+            listChapters: async () => ({
+              toc: { tags: [['d', '1'], ['e', 'chap1']] },
+              chapters: [{ id: 'chap1', tags: [['title', 'T1'], ['summary', '']] }],
+            }),
+            publishToc: async () => ({ kind: 41 }),
+          };
+        }
         return {
-          useNostr: () => ({
-            pubkey: 'author',
-            subscribe: (_f, cb) => {
-              cb({ id: 'list', kind: 30001, tags: [['e', 'chap1']] });
-              cb({ id: 'chap1', kind: 30023, tags: [['title', 'T1']] });
-              return () => {};
-            },
-          }),
+          useNostr: () => ({ pubkey: 'author' }),
         };
       }
       if (p.includes('ChapterEditorModal')) {
@@ -64,7 +67,10 @@ const path = require('path');
     TextEncoder,
     TextDecoder,
     React,
-    fetch: async (_u, opts) => { published = JSON.parse(opts.body); return { ok: true }; },
+    fetch: async (_u, opts) => {
+      published.push(JSON.parse(opts.body));
+      return { ok: true };
+    },
   };
   vm.runInNewContext(code, sandbox, { filename: 'ManageChaptersPage.js' });
   const { ManageChaptersPage } = module.exports;
@@ -89,7 +95,8 @@ const path = require('path');
     await Promise.resolve();
   });
 
-  assert.strictEqual(published.kind, 5);
-  assert.ok(published.tags.find((t) => t[0] === 'e' && t[1] === 'chap1'));
+  const del = published.find((e) => e.kind === 5);
+  assert.ok(del);
+  assert.ok(del.tags.find((t) => t[0] === 'e' && t[1] === 'chap1'));
   console.log('All tests passed.');
 })();

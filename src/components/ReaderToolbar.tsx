@@ -8,6 +8,10 @@ export interface ReaderToolbarProps {
   onToggleTheme: () => void;
   onFontSize: (delta: 1 | -1) => void;
   onBookmark: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
   className?: string;
   'data-testid'?: string;
 }
@@ -22,6 +26,10 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   onToggleTheme,
   onFontSize,
   onBookmark,
+  onPrev,
+  onNext,
+  hasPrev = false,
+  hasNext = false,
   className,
   'data-testid': dataTestId,
 }) => (
@@ -32,6 +40,26 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
     <button onClick={onBack} aria-label="Back" className="px-[var(--space-2)]">
       Back
     </button>
+    {onPrev && (
+      <button
+        onClick={onPrev}
+        aria-label="Previous chapter"
+        className="px-[var(--space-2)]"
+        disabled={!hasPrev}
+      >
+        Prev
+      </button>
+    )}
+    {onNext && (
+      <button
+        onClick={onNext}
+        aria-label="Next chapter"
+        className="px-[var(--space-2)]"
+        disabled={!hasNext}
+      >
+        Next
+      </button>
+    )}
     <div className="flex-1 text-center truncate">{title}</div>
     <button
       onClick={() => onFontSize(1)}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNostr } from '../nostr';
-import { publishLongPost } from '../nostr/events';
+import { publishChapter, listChapters, publishToc } from '../nostr/events';
 import { queueOfflineEdit } from '../nostr/offline';
 import { useToast } from './ToastProvider';
 import { logError } from '../lib/logger';
@@ -28,7 +28,7 @@ export const ChapterEditorModal: React.FC<Props> = ({
   viaApi,
 }) => {
   const ctx = useNostr();
-  const { publish, subscribe, list, pubkey } = ctx;
+  const { subscribe, pubkey } = ctx;
   const toast = useToast();
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
@@ -57,10 +57,6 @@ export const ChapterEditorModal: React.FC<Props> = ({
       toast('Action failed', { type: 'error' });
       return;
     }
-    const baseTags: string[][] = [
-      ['book', bookId],
-      ['chapter', String(chapterNumber)],
-    ];
     const tTags = tags
       .split(',')
       .map((t) => t.trim())
@@ -70,15 +66,12 @@ export const ChapterEditorModal: React.FC<Props> = ({
       summary: summary || undefined,
       content,
       cover: cover || undefined,
-      extraTags: baseTags,
       tags: tTags,
-      bookId,
-      chapterNumber,
     };
     let evt: any;
     try {
       if (!navigator.onLine) throw new Error('offline');
-      evt = await publishLongPost(ctx, data);
+      evt = await publishChapter(ctx, bookId, chapterNumber, data);
       if (viaApi) {
         await fetch(`${API_BASE}/event`, {
           method: 'POST',
@@ -91,46 +84,32 @@ export const ChapterEditorModal: React.FC<Props> = ({
       await queueOfflineEdit({
         id: Math.random().toString(36).slice(2),
         type: 'chapter',
-        data,
+        data: { ...data, bookId, chapterNumber },
       });
       toast('Saved offline, will sync later');
       onClose();
       return;
     }
 
-    let listEvt: any = null;
-    if (pubkey) {
-      await new Promise<void>((resolve) => {
-        const off = subscribe(
-          [{ kinds: [30001], authors: [authorPubkey], '#d': [bookId], limit: 1 }],
-          (e) => {
-            listEvt = e;
-            off();
-            resolve();
-          },
-        );
-        setTimeout(() => {
-          off();
-          resolve();
-        }, 2000);
-      });
-    }
-    const ids =
-      listEvt?.tags
-        .filter((t: string[]) => t[0] === 'e')
-        .map((t: string[]) => t[1]) || [];
+    const { toc } = await listChapters(ctx, bookId);
+    const ids = toc?.tags.filter((t) => t[0] === 'e').map((t) => t[1]) || [];
+    const meta = {
+      title: toc?.tags.find((t) => t[0] === 'title')?.[1],
+      summary: toc?.tags.find((t) => t[0] === 'summary')?.[1],
+      cover: toc?.tags.find((t) => t[0] === 'image')?.[1],
+      tags: toc?.tags.filter((t) => t[0] === 't').map((t) => t[1]),
+    };
     if (ids.length < chapterNumber) {
       ids.push(evt.id);
     } else {
       ids[chapterNumber - 1] = evt.id;
     }
-    const tagsOut = [['d', bookId], ...ids.map((i: string) => ['e', i])];
-    const listEvent = await publish({ kind: 30001, content: '', tags: tagsOut });
+    const tocEvt = await publishToc(ctx, bookId, ids, meta);
     if (viaApi) {
       await fetch(`${API_BASE}/event`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(listEvent),
+        body: JSON.stringify(tocEvt),
       });
     }
     onClose();

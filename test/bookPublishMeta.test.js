@@ -24,8 +24,9 @@ const path = require('path');
   });
   const code = build.outputFiles[0].text;
   const module = { exports: {} };
-  let metaArgs;
+  let tocArgs;
   let onPublishId;
+  let chapterBookId;
   const sandbox = {
     require: (p) => {
       if (p === './src/nostr.tsx') {
@@ -33,8 +34,13 @@ const path = require('path');
       }
       if (p === './src/nostr/events.ts') {
         return {
-          publishLongPost: async () => ({ id: 'abc123' }),
-          publishBookMeta: async (...args) => { metaArgs = args; },
+          publishChapter: async (_ctx, id, num, data) => {
+            chapterBookId = id;
+            return { id: 'chap1' };
+          },
+          publishToc: async (...args) => {
+            tocArgs = args;
+          },
         };
       }
       if (p === './src/achievements.ts') {
@@ -85,7 +91,8 @@ const path = require('path');
     await Promise.resolve();
   });
 
-  assert.strictEqual(onPublishId, 'abc123');
-  assert.strictEqual(metaArgs[1], 'abc123');
+  assert.strictEqual(onPublishId, chapterBookId);
+  assert.strictEqual(tocArgs[1], chapterBookId);
+  assert.strictEqual(tocArgs[2][0], 'chap1');
   console.log('All tests passed.');
 })();

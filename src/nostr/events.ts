@@ -104,6 +104,59 @@ export async function publishBookMeta(
   return ctx.publish({ kind: 41, content: '', tags }, undefined, pow);
 }
 
+export async function publishChapter(
+  ctx: NostrContextValue,
+  bookId: string,
+  chapterNumber: number,
+  data: {
+    title: string;
+    summary?: string;
+    content: string;
+    cover?: string;
+    tags?: string[];
+  },
+  pow = 0,
+) {
+  const extraTags: string[][] = [
+    ['d', `${bookId}:ch${chapterNumber}`],
+    ['part', String(chapterNumber)],
+  ];
+  return publishLongPost(ctx, { ...data, extraTags }, pow);
+}
+
+export async function listChapters(
+  ctx: NostrContextValue,
+  bookId: string,
+) {
+  const [toc] = await ctx.list([
+    { kinds: [41], '#d': [bookId], limit: 1 },
+  ]);
+  if (!toc) return { toc: null, chapters: [] as NostrEvent[] };
+  const ids = toc.tags.filter((t) => t[0] === 'e').map((t) => t[1]);
+  if (!ids.length) return { toc, chapters: [] as NostrEvent[] };
+  const events = await ctx.list([{ ids }]);
+  const map = new Map(events.map((e) => [e.id, e]));
+  const chapters = ids
+    .map((id) => map.get(id))
+    .filter(Boolean) as NostrEvent[];
+  return { toc, chapters };
+}
+
+export async function publishToc(
+  ctx: NostrContextValue,
+  bookId: string,
+  chapterIds: string[],
+  meta?: { title?: string; summary?: string; cover?: string; tags?: string[] },
+  pow = 0,
+) {
+  const tags: string[][] = [['d', bookId], ...chapterIds.map((id) => ['e', id])];
+  if (meta?.title) tags.push(['title', meta.title]);
+  if (meta?.summary) tags.push(['summary', meta.summary]);
+  if (meta?.cover) tags.push(['image', meta.cover]);
+  meta?.tags?.forEach((t) => tags.push(['t', t]));
+  return ctx.publish({ kind: 41, content: '', tags }, undefined, pow);
+}
+
 export async function publishVote(ctx: NostrContextValue, target: string) {
   return ctx.publish({ kind: 7, content: '+', tags: [['e', target]] });
 }
