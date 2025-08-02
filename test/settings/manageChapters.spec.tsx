@@ -7,6 +7,9 @@ const esbuild = require('esbuild');
 const vm = require('vm');
 const path = require('path');
 
+let onDragEndCallback;
+const publishedLists = [];
+
 (async () => {
   const build = await esbuild.build({
     entryPoints: [path.join(__dirname, '../../src/pages/ManageChapters.tsx')],
@@ -34,10 +37,16 @@ const path = require('path');
         if (p.includes('events')) {
           return {
             listChapters: async () => ({
-              toc: { tags: [['d', '1'], ['e', 'chap1']] },
-              chapters: [{ id: 'chap1', tags: [['title', 'T1'], ['summary', '']] }],
+              toc: { tags: [['d', '1'], ['e', 'chap1'], ['e', 'chap2']] },
+              chapters: [
+                { id: 'chap1', tags: [['title', 'T1'], ['summary', '']] },
+                { id: 'chap2', tags: [['title', 'T2'], ['summary', '']] },
+              ],
             }),
-            publishToc: async () => ({ kind: 41 }),
+            publishToc: async (_ctx, _bookId, ids) => {
+              publishedLists.push(ids);
+              return { kind: 41 };
+            },
           };
         }
         return {
@@ -49,7 +58,10 @@ const path = require('path');
       }
       if (p === '@hello-pangea/dnd') {
         return {
-          DragDropContext: ({ children }) => React.createElement('div', null, children),
+          DragDropContext: ({ children, onDragEnd }) => {
+            onDragEndCallback = onDragEnd;
+            return React.createElement('div', null, children);
+          },
           Droppable: ({ children }) => React.createElement('div', null, children({ droppableProps: {}, innerRef: () => {}, placeholder: null })),
           Draggable: ({ children }) => React.createElement('div', null, children({ draggableProps: {}, dragHandleProps: {}, innerRef: () => {} })),
         };
@@ -81,13 +93,33 @@ const path = require('path');
       React.createElement(
         MemoryRouter,
         { initialEntries: ['/book/1/chapters'] },
-        React.createElement(Routes, null, React.createElement(Route, { path: '/book/:bookId/chapters', element: React.createElement(ManageChaptersPage) }))
+        React.createElement(
+          Routes,
+          null,
+          React.createElement(Route, { path: '/book/:bookId/chapters', element: React.createElement(ManageChaptersPage) })
+        )
       )
     );
     await Promise.resolve();
   });
 
   await Promise.resolve();
+
+  // simulate drag-and-drop reorder
+  await TestRenderer.act(async () => {
+    await onDragEndCallback({
+      source: { index: 0, droppableId: 'chapters' },
+      destination: { index: 1, droppableId: 'chapters' },
+      reason: 'DROP',
+      mode: 'FLUID',
+      type: 'DEFAULT',
+      draggableId: 'chap1',
+      combine: null,
+    });
+  });
+
+  assert.deepStrictEqual(publishedLists[0], ['chap2', 'chap1']);
+  assert.ok(published.find((e) => e.kind === 41));
 
   await TestRenderer.act(async () => {
     const btn = renderer.root.find((n) => n.type === 'button' && n.children.includes('Delete'));
