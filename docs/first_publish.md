@@ -17,13 +17,14 @@ Open the "Write" screen or choose **Publish Book** from the library. The wizard 
 
 On the final screen you can review the preview. Tick **Enable proof-of-work** if desired to add a small PoW to the event before clicking **Publish**. Successful publishing calls `reportBookPublished()` and unlocks the _First Book Published_ achievement.
 
-## 4. Locating the Event
+## 4. What Gets Published
 
 After publishing, the wizard returns to the first step. Two events are sent:
-the long-form `kind:30023` entry and a matching `kind:41` list event that
-references it. This list event ensures your book appears in the library and in
-`BookListScreen`. Most clients will show the events in your profile or search
-results a few seconds after publication.
+
+1. The first chapter as a `kind:30023` event with a `d` tag formatted as
+   `<bookId>:ch1` and a `part` tag of `1`.
+2. A `kind:41` table of contents that stores the book metadata and references
+   the chapter ID via `e` tags.
 
 ## 5. Large Chapters
 

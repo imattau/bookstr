@@ -38,37 +38,33 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
   const handlePublish = async () => {
     setPublishing(true);
     try {
-      const { publishLongPost, publishBookMeta } =
-        await import('../nostr/events').catch(() =>
-          // Node tests can't handle TS ESM import
-          require('../nostr/events')
-        );
-      const evt = await publishLongPost(
+      const { publishChapter, publishToc } = await import('../nostr/events').catch(() =>
+        // Node tests can't handle TS ESM import
+        require('../nostr/events')
+      );
+      const bookId = Math.random().toString(36).slice(2);
+      const tagArr = tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const chapter = await publishChapter(
         ctx,
+        bookId,
+        1,
         {
           title,
           summary,
           content,
           cover: cover || undefined,
-          tags: tags
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
+          tags: tagArr,
         },
         pow ? 20 : 0,
       );
-      await publishBookMeta(
+      await publishToc(
         ctx,
-        evt.id,
-        {
-          title,
-          summary,
-          cover: cover || undefined,
-          tags: tags
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
-        },
+        bookId,
+        [chapter.id],
+        { title, summary, cover: cover || undefined, tags: tagArr },
         pow ? 20 : 0,
       );
       setStep(0);
@@ -79,9 +75,9 @@ export const BookPublishWizard: React.FC<BookPublishWizardProps> = ({
       setContent('');
       setPow(false);
       reportBookPublished();
-      if (onPublish) onPublish(evt.id);
+      if (onPublish) onPublish(bookId);
       toast(
-        `Book published! <a href="/book/${evt.id}">View book</a>`,
+        `Book published! <a href="/book/${bookId}">View book</a>`,
       );
     } catch (err) {
       logError(err);

@@ -31,7 +31,7 @@ const path = require('path');
         return { useNostr: () => ({}) };
       }
       if (p === './src/nostr/events.ts') {
-        return { publishLongPost: async () => { throw new Error('fail'); } };
+        return { publishChapter: async () => { throw new Error('fail'); } };
       }
       if (p === './src/achievements.ts') {
         return { reportBookPublished: () => {} };

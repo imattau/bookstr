@@ -20,6 +20,7 @@ import { finalizeEvent } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 import { useNostr } from '../nostr';
 import { getPrivKey } from '../nostr/auth';
+import { listChapters, publishToc } from '../nostr/events';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
 import { Button } from '../components/ui';
 
@@ -47,45 +48,44 @@ interface Chapter {
 const ManageChaptersPage: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const ctx = useNostr();
-  const { subscribe, pubkey } = ctx;
+  const { pubkey } = ctx;
   const [chapterIds, setChapterIds] = useState<string[]>([]);
   const [chapters, setChapters] = useState<Record<string, Chapter>>({});
   const [modal, setModal] = useState<{ id?: string; number: number } | null>(null);
+  const [tocMeta, setTocMeta] = useState<{ title?: string; summary?: string; cover?: string; tags?: string[] }>({});
 
-  useEffect(() => {
+  const load = async () => {
     if (!bookId) return;
-    const off = subscribe(
-      [{ kinds: [30001], '#d': [bookId], limit: 1 }],
-      (evt) => {
-        const ids = evt.tags.filter((t) => t[0] === 'e').map((t) => t[1]);
-        setChapterIds(ids);
-      },
-    );
-    return off;
-  }, [bookId, subscribe]);
+    const { toc, chapters: chEvents } = await listChapters(ctx, bookId);
+    const ids = toc?.tags.filter((t) => t[0] === 'e').map((t) => t[1]) || [];
+    setChapterIds(ids);
+    const map: Record<string, Chapter> = {};
+    chEvents.forEach((evt) => {
+      map[evt.id] = {
+        id: evt.id,
+        title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
+        summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
+      };
+    });
+    setChapters(map);
+    if (toc) {
+      setTocMeta({
+        title: toc.tags.find((t) => t[0] === 'title')?.[1],
+        summary: toc.tags.find((t) => t[0] === 'summary')?.[1],
+        cover: toc.tags.find((t) => t[0] === 'image')?.[1],
+        tags: toc.tags.filter((t) => t[0] === 't').map((t) => t[1]),
+      });
+    }
+  };
 
   useEffect(() => {
-    if (!chapterIds.length) return;
-    const off = subscribe([{ ids: chapterIds }], (evt) => {
-      setChapters((c) => ({
-        ...c,
-        [evt.id]: {
-          id: evt.id,
-          title: evt.tags.find((t) => t[0] === 'title')?.[1] ?? 'Untitled',
-          summary: evt.tags.find((t) => t[0] === 'summary')?.[1] ?? '',
-        },
-      }));
-    });
-    return off;
-  }, [chapterIds, subscribe]);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId]);
 
   const publishList = async (ids: string[]) => {
     if (!bookId) return;
-    const evt = await signEvent({
-      kind: 30001,
-      content: '',
-      tags: [['d', bookId], ...ids.map((id) => ['e', id])],
-    });
+    const evt = await publishToc(ctx, bookId, ids, tocMeta);
     await fetch(`${API_BASE}/event`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -109,12 +109,14 @@ const ManageChaptersPage: React.FC = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(evt),
     });
-    setChapterIds((arr) => arr.filter((x) => x !== id));
+    const ids = chapterIds.filter((x) => x !== id);
+    setChapterIds(ids);
     setChapters((c) => {
       const copy = { ...c };
       delete copy[id];
       return copy;
     });
+    await publishList(ids);
   };
 
   return (
@@ -180,7 +182,10 @@ const ManageChaptersPage: React.FC = () => {
           chapterNumber={modal.number}
           chapterId={modal.id}
           authorPubkey={pubkey}
-          onClose={() => setModal(null)}
+          onClose={() => {
+            setModal(null);
+            load();
+          }}
           viaApi
         />
       )}
