@@ -28,6 +28,7 @@ import {
 } from './lib/keys';
 import { initOfflineSync } from './nostr/offline';
 import { savePointer, getPointer } from './lib/cache';
+import { clearSearchRelaysCache } from './search';
 
 export const DEFAULT_RELAYS = ((import.meta as any).env?.VITE_RELAY_URLS as
   | string
@@ -276,6 +277,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setPubkey(pub);
     setNip07(false);
     setKeyError(false);
+    clearSearchRelaysCache();
   };
 
   const loginNip07 = (pub: string) => {
@@ -285,6 +287,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     setNip07(true);
     localStorage.setItem('pubKey', pub);
     localStorage.setItem('nip07', '1');
+    clearSearchRelaysCache();
   };
 
   const logout = () => {
@@ -294,6 +297,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem('privKey');
     setPubkey(null);
     setNip07(false);
+    clearSearchRelaysCache();
   };
 
   const publish = useCallback(
@@ -503,9 +507,7 @@ export const NostrProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const getListBooks = useCallback(
-    async (
-      author: string,
-    ): Promise<{ ids: string[]; hasPrivate: boolean }> => {
+    async (author: string): Promise<{ ids: string[]; hasPrivate: boolean }> => {
       const evts = (await listBookLists(author)) as NostrEvent[];
       const ids = new Set<string>();
       let hasPrivate = false;
