@@ -21,11 +21,24 @@ const path = require('path');
 const fs = require('fs/promises');
 const express = require('express');
 const { SimplePool, verifyEvent } = require('nostr-tools');
+const webpush = require('web-push');
 const { relays, prunePolicy } = require('./config');
 const auth = require('./auth');
 const app = express();
 const pool = new SimplePool();
 const fallbackVersions = {};
+
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:example@example.com';
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    VAPID_SUBJECT,
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY,
+  );
+}
 
 const REPLACEABLE_KINDS = new Set([41, 30001, 30023, 30033]);
 
@@ -82,6 +95,27 @@ function isValidSubscription(sub) {
   );
 }
 
+async function sendNotificationWithRetry(sub, payload, retries = 1) {
+  try {
+    await webpush.sendNotification(sub, payload);
+  } catch (err) {
+    if (err && err.statusCode === 410) {
+      await removeSubscription(sub.endpoint);
+    } else if (retries > 0) {
+      await sendNotificationWithRetry(sub, payload, retries - 1);
+    } else {
+      console.error('push failed', err);
+    }
+  }
+}
+
+async function notifyAll(payload) {
+  const subs = await getSubscriptions();
+  for (const sub of subs) {
+    sendNotificationWithRetry(sub, payload, 1);
+  }
+}
+
 async function actionHandler(req, res) {
   console.log('action', req.body);
   const event = req.body;
@@ -132,6 +166,7 @@ async function actionHandler(req, res) {
       await pool.publish(nonNip27Targets, fallbackEvent);
     }
     res.json({ status: 'ok', fallbackVersion });
+    notifyAll(JSON.stringify(event));
   } catch (err) {
     console.error('publish failed', err);
     res.status(500).json({ error: 'publish failed' });
@@ -161,6 +196,7 @@ async function eventHandler(req, res) {
   try {
     await pool.publish(targets, event);
     res.json({ status: 'ok' });
+    notifyAll(JSON.stringify(event));
   } catch (err) {
     console.error('publish failed', err);
     res.status(500).json({ error: 'publish failed' });
@@ -222,4 +258,5 @@ module.exports = {
   removeSubscription,
   getSubscriptions,
   clearSubscriptions,
+  webpush,
 };
