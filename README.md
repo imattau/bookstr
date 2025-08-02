@@ -35,6 +35,48 @@ specification but functionality is limited. The navigation now includes a
 - **List publishing** – create private (`kind 10003`) or public (`kind 30004`)
   book collections from `/lists/new`. Lists you own appear on your profile with
   quick links to edit them.
+- **Book detail pages** – each book has a dedicated screen with metadata,
+  chapters and reader progress.
+- **Reviews** – readers can publish reviews that appear alongside book
+  details.
+- **Profiles** – visit an author's profile to browse their books, lists and
+  contact information.
+- **Reading lists** – maintain curated collections of books that can be shared
+  or kept private.
+- **Relay settings** – manage the relays the app connects to and merge new ones
+  from the people you follow.
+
+## Screens
+
+### Book Detail
+
+Selecting a book opens a detail page showing its cover, description, table of
+contents and your current reading progress. From here you can jump directly to
+chapters or leave a review.
+
+### Reviews
+
+Reviews are short notes attached to a book. They use standard Nostr `kind
+30023` events so other clients can index them. The detail page shows the latest
+reviews with links to the reviewers' profiles.
+
+### Profiles
+
+Profiles aggregate an author's books, reading lists and relay recommendations.
+Following a profile merges their suggested relays and lists into your own
+library.
+
+### Reading Lists
+
+Create and manage lists of books from `/lists/new`. Lists can be public
+(`kind 30004`) or private (`kind 10003`) and are displayed on your profile. Use
+lists to group related titles or plan future reading.
+
+### Relay Settings
+
+The settings screen includes a relay manager where you can add or remove relay
+URLs. Relay lists can be bulk imported from people you follow so your
+configuration stays consistent across devices.
 
 ## Settings
 
@@ -96,6 +138,21 @@ relays the author recommends.
 Long‑form posts (`kind:30023`) are deduplicated by the `d` tag per
 [NIP‑23](https://github.com/nostr-protocol/nips/blob/master/23.md) so only the
 newest version of a piece appears in feeds.
+
+## Extending Nostr Integration
+
+The Nostr logic lives under `src/nostr`. Modules in this folder manage
+connections, signing and event handling. To extend the integration, add new
+helpers there or create custom hooks that compose existing ones. Components can
+subscribe to additional kinds by importing these utilities and publishing or
+listening for the required events.
+
+### Configuring Default Relays
+
+Client defaults are controlled via the `VITE_RELAY_URLS` environment variable
+which lists the starting set of relays. The Node API server reads the same
+setting from `server/config.js` so both client and server share a baseline.
+Users can further refine their list in the **Relay Settings** screen.
 
 The build setup is now complete and consists of the following steps:
 

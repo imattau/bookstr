@@ -9,6 +9,10 @@ html {
   font-family: theme('fontFamily.sans');
 }
 
+body {
+  @apply bg-[color:var(--clr-surface)] text-[color:var(--clr-text)];
+}
+
 @keyframes skeleton-fade {
   from {
     opacity: 0;
