@@ -32,24 +32,25 @@ Open the profile settings from the library screen to configure the app:
 
 ## Getting Started
 
-1. Install dependencies
+1. Ensure you are running **Node.js 20** or later.
+2. Install dependencies
    ```bash
    npm install
    ```
-2. Start a development server. If you use [Vite](https://vitejs.dev/) you can
+3. Start a development server. If you use [Vite](https://vitejs.dev/) you can
    run:
    ```bash
    npx vite
    ```
    The entry point is `src/main.tsx`.
-3. Build the PWA for production. With Vite the build command is:
+4. Build the PWA for production. With Vite the build command is:
    ```bash
    npx vite build
    ```
    The generated files in `dist/` can be served with any static server. During
    this step `vite-plugin-pwa` injects a precache manifest into `src/sw.ts` and
    outputs the compiled service worker as `dist/sw.js`.
-4. If no NIP‑07 wallet is detected, you can still log in by pasting your
+5. If no NIP‑07 wallet is detected, you can still log in by pasting your
    private key into the login screen to sign events manually.
 
 For a step-by-step guide on using the book publishing wizard, see

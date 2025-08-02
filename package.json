@@ -18,6 +18,9 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@playwright/test": "^1.43.1",
     "@testing-library/jest-dom": "^6.4.2",
