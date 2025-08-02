@@ -175,7 +175,10 @@ export const ProfileScreen: React.FC = () => {
         )}
       </ul>
       {pubkey === loggedPubkey && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <Link to="/stats" className="rounded border px-2 py-1">
+            Stats
+          </Link>
           <Link to="/lists/new" className="rounded border px-2 py-1">
             Create List
           </Link>
