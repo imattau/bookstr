@@ -21,6 +21,7 @@ interface BookItem {
   status: string;
   title: string;
   cover?: string;
+  from?: string[];
 }
 
 const LibraryPage: React.FC = () => {
@@ -29,6 +30,40 @@ const LibraryPage: React.FC = () => {
   const [items, setItems] = useState<BookItem[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [privateNotice, setPrivateNotice] = useState(false);
+  const [follows, setFollows] = useState<string[]>([]);
+  const [followBooks, setFollowBooks] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    if (!pubkey) return;
+    list([{ kinds: [3], authors: [pubkey], limit: 1 }]).then((evts) => {
+      const f = evts[0]
+        ? evts[0].tags.filter((t) => t[0] === 'p').map((t) => t[1])
+        : [];
+      setFollows(f);
+    });
+  }, [pubkey, list]);
+
+  useEffect(() => {
+    if (follows.length === 0) {
+      setFollowBooks({});
+      return;
+    }
+    (async () => {
+      const map: Record<string, string[]> = {};
+      for (const pk of follows) {
+        try {
+          const { ids } = await getListBooks(pk);
+          ids.forEach((id) => {
+            if (!map[id]) map[id] = [];
+            map[id].push(pk);
+          });
+        } catch {
+          /* ignore */
+        }
+      }
+      setFollowBooks(map);
+    })();
+  }, [follows, getListBooks]);
 
   useEffect(() => {
     if (!pubkey) return;
@@ -45,13 +80,21 @@ const LibraryPage: React.FC = () => {
           refs.forEach((id) => {
             if (!map.has(id)) map.set(id, { id, status: 'want', title: id });
           });
+          Object.entries(followBooks).forEach(([id, from]) => {
+            const existing = map.get(id);
+            if (existing) {
+              existing.from = Array.from(new Set([...(existing.from || []), ...from]));
+            } else {
+              map.set(id, { id, status: 'want', title: id, from });
+            }
+          });
           setPrivateNotice(hasPrivate);
           setItems(Array.from(map.values()));
         })();
       },
     );
     return off;
-  }, [subscribe, pubkey, getListBooks]);
+  }, [subscribe, pubkey, getListBooks, followBooks]);
 
   useEffect(() => {
     if (!pubkey || items.length === 0) return;
@@ -174,6 +217,11 @@ const LibraryPage: React.FC = () => {
                       )}
                       <div className="flex-1">
                         <h3 className="font-semibold">{b.title}</h3>
+                        {b.from && b.from.length > 0 && (
+                          <p className="text-xs text-text-muted">
+                            from {b.from.join(', ')}
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-1">
                         <button
