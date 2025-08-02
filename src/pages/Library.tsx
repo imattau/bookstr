@@ -25,45 +25,11 @@ interface BookItem {
 }
 
 const LibraryPage: React.FC = () => {
-  const { pubkey, subscribe, list, publish, getListBooks } = useNostr();
+  const { pubkey, subscribe, list, publish, getListBooks, followBooks } = useNostr();
   const navigate = useNavigate();
   const [items, setItems] = useState<BookItem[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [privateNotice, setPrivateNotice] = useState(false);
-  const [follows, setFollows] = useState<string[]>([]);
-  const [followBooks, setFollowBooks] = useState<Record<string, string[]>>({});
-
-  useEffect(() => {
-    if (!pubkey) return;
-    list([{ kinds: [3], authors: [pubkey], limit: 1 }]).then((evts) => {
-      const f = evts[0]
-        ? evts[0].tags.filter((t) => t[0] === 'p').map((t) => t[1])
-        : [];
-      setFollows(f);
-    });
-  }, [pubkey, list]);
-
-  useEffect(() => {
-    if (follows.length === 0) {
-      setFollowBooks({});
-      return;
-    }
-    (async () => {
-      const map: Record<string, string[]> = {};
-      for (const pk of follows) {
-        try {
-          const { ids } = await getListBooks(pk);
-          ids.forEach((id) => {
-            if (!map[id]) map[id] = [];
-            map[id].push(pk);
-          });
-        } catch {
-          /* ignore */
-        }
-      }
-      setFollowBooks(map);
-    })();
-  }, [follows, getListBooks]);
 
   useEffect(() => {
     if (!pubkey) return;
