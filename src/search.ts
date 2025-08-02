@@ -75,6 +75,16 @@ async function fetchSuggestions(q: string): Promise<Suggestion[]> {
 
 let searchRelaysPromise: Promise<string[]> | null = null;
 
+/**
+ * Reset cached promise used for fetching search relays.
+ *
+ * This should be called whenever the user logs in or out so that
+ * the next search uses relays for the current account.
+ */
+export function clearSearchRelaysCache() {
+  searchRelaysPromise = null;
+}
+
 async function fetchRelaySuggestions(q: string): Promise<Suggestion[]> {
   if (!q) return [];
   const pub = localStorage.getItem('pubKey');
