@@ -21,6 +21,7 @@ const fs = require('fs/promises');
 const express = require('express');
 const { SimplePool, verifyEvent } = require('nostr-tools');
 const { relays, prunePolicy } = require('./config');
+const auth = require('./auth');
 const app = express();
 const pool = new SimplePool();
 const fallbackVersions = {};
@@ -31,6 +32,7 @@ const PORT = process.env.PORT || 3000;
 const API_BASE = process.env.API_BASE || '/api';
 
 app.use(express.json());
+app.use(API_BASE, auth);
 
 const SUBSCRIPTIONS_FILE = path.join(__dirname, 'subscriptions.json');
 
