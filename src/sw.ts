@@ -3,6 +3,8 @@
  */
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
+import mdEditorCSS from '@uiw/react-md-editor/markdown-editor.css?url';
+import mdPreviewCSS from '@uiw/react-markdown-preview/markdown.css?url';
 import {
   StaleWhileRevalidate,
   CacheFirst,
@@ -17,7 +19,13 @@ declare let self: ServiceWorkerGlobalScope;
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 
-precacheAndRoute(self.__WB_MANIFEST || []);
+precacheAndRoute(
+  [
+    ...(self.__WB_MANIFEST || []),
+    { url: mdEditorCSS, revision: null },
+    { url: mdPreviewCSS, revision: null },
+  ],
+);
 
 registerRoute(
   ({ request }) => request.destination === 'image',
