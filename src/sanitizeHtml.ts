@@ -31,5 +31,8 @@ export const SANITIZE_CONFIG: Config = {
 };
 
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, SANITIZE_CONFIG);
+  if (typeof (DOMPurify as any).sanitize !== 'function') {
+    return html;
+  }
+  return (DOMPurify as any).sanitize(html, SANITIZE_CONFIG);
 }
