@@ -8,6 +8,10 @@ export interface ReaderToolbarProps {
   onToggleTheme: () => void;
   onFontSize: (delta: 1 | -1) => void;
   onBookmark: () => void;
+  /** Toggle chapter/sidebar visibility */
+  onToggleSidebar?: () => void;
+  /** Whether the sidebar is currently visible */
+  sidebarVisible?: boolean;
   onPrev?: () => void;
   onNext?: () => void;
   hasPrev?: boolean;
@@ -26,6 +30,8 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
   onToggleTheme,
   onFontSize,
   onBookmark,
+  onToggleSidebar,
+  sidebarVisible = true,
   onPrev,
   onNext,
   hasPrev = false,
@@ -41,6 +47,15 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
       <button onClick={onBack} aria-label="Back" className="px-[var(--space-2)]">
         Back
       </button>
+      {onToggleSidebar && (
+        <button
+          onClick={onToggleSidebar}
+          aria-label={sidebarVisible ? 'Hide sidebar' : 'Show sidebar'}
+          className="hidden px-[var(--space-2)] lg:block"
+        >
+          {sidebarVisible ? 'Hide chapters' : 'Show chapters'}
+        </button>
+      )}
       {onPrev && (
         <button
           onClick={onPrev}
