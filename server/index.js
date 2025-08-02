@@ -8,8 +8,9 @@
  *   DELETE `${API_BASE}/subscribe` – remove a push subscription
  *
  * Events are forwarded using `SimplePool` from `nostr-tools`. Targets are the
- * relays listed in `server/config.js` whose retention meets `prunePolicy` and
- * support NIP‑27. Non NIP‑27 relays receive versions suffixed with `-v<nr>`.
+ * relays listed in `server/config.js` whose retention meets `prunePolicy`. The
+ * original event is sent to NIP‑27 relays; non‑NIP‑27 relays receive copies
+ * whose `d` tag is suffixed with `-v<nr>`.
  *
  * Configuration options come from `server/config.js`:
  *   - `relays`: array of relay definitions `{ url, supportsNip27, retentionDays }`
@@ -99,23 +100,37 @@ async function actionHandler(req, res) {
   const activeRelays = relays.filter(
     (r) => r.retentionDays >= prunePolicy.minimumDays,
   );
-  const targets = activeRelays
+  const nip27Targets = activeRelays
     .filter((r) => r.supportsNip27)
+    .map((r) => r.url);
+  const nonNip27Targets = activeRelays
+    .filter((r) => !r.supportsNip27)
     .map((r) => r.url);
 
   let fallbackVersion;
-  if (relays.some((r) => !r.supportsNip27) && Array.isArray(event.tags)) {
+  let fallbackEvent = event;
+  if (nonNip27Targets.length && Array.isArray(event.tags)) {
     const dTag = event.tags.find((t) => t[0] === 'd');
     if (dTag) {
       const base = dTag[1];
       fallbackVersions[base] = (fallbackVersions[base] || 0) + 1;
       fallbackVersion = fallbackVersions[base];
-      dTag[1] = `${base}-v${fallbackVersion}`;
+      fallbackEvent = {
+        ...event,
+        tags: event.tags.map((t) => [...t]),
+      };
+      const dTagClone = fallbackEvent.tags.find((t) => t[0] === 'd');
+      dTagClone[1] = `${base}-v${fallbackVersion}`;
     }
   }
 
   try {
-    await pool.publish(targets, event);
+    if (nip27Targets.length) {
+      await pool.publish(nip27Targets, event);
+    }
+    if (nonNip27Targets.length) {
+      await pool.publish(nonNip27Targets, fallbackEvent);
+    }
     res.json({ status: 'ok', fallbackVersion });
   } catch (err) {
     console.error('publish failed', err);
