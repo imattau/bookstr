@@ -8,7 +8,7 @@
  * loading and `useState` for local state.
  */
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   DragDropContext,
   Droppable,
@@ -22,6 +22,7 @@ import { useNostr } from '../nostr';
 import { getPrivKey } from '../nostr/auth';
 import { listChapters, publishToc } from '../nostr/events';
 import { ChapterEditorModal } from '../components/ChapterEditorModal';
+import { AuthoringLayout } from '../components/AuthoringLayout';
 import { Button } from '../components/ui';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
@@ -47,6 +48,7 @@ interface Chapter {
 
 const ManageChaptersPage: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
+  const navigate = useNavigate();
   const ctx = useNostr();
   const { pubkey } = ctx;
   const [chapterIds, setChapterIds] = useState<string[]>([]);
@@ -118,21 +120,47 @@ const ManageChaptersPage: React.FC = () => {
     });
     await publishList(ids);
   };
-
-  return (
+  const sidebar = (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <Button onClick={() => navigate(`/book/${bookId}`)} className="w-full">
+        ← Back to Book
+      </Button>
+      {tocMeta.cover && (
+        <img
+          src={tocMeta.cover}
+          alt={tocMeta.title ? `Cover image for ${tocMeta.title}` : 'Book cover'}
+          className="w-full rounded"
+        />
+      )}
+      {tocMeta.title && <h2 className="text-lg font-semibold">{tocMeta.title}</h2>}
+      {tocMeta.summary && <p className="text-sm">{tocMeta.summary}</p>}
+      {tocMeta.tags && tocMeta.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {tocMeta.tags.map((tag) => (
+            <span key={tag} className="rounded border px-1 text-xs">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const content = (
+    <div className="space-y-4">
+      <header className="flex justify-between items-center">
+        <h1 className="text-xl font-semibold">Chapters</h1>
         <Button variant="primary" onClick={() => setModal({ number: chapterIds.length + 1 })}>
           New Draft
         </Button>
-      </div>
+      </header>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="chapters">
           {(provided) => (
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className="space-y-2"
+              className="grid gap-2 sm:grid-cols-1 md:grid-cols-2"
             >
               {chapterIds.length === 0 && (
                 <p className="text-center text-text-muted">No chapters yet.</p>
@@ -192,6 +220,8 @@ const ManageChaptersPage: React.FC = () => {
       )}
     </div>
   );
+
+  return <AuthoringLayout sidebar={sidebar} content={content} />;
 };
 
 export default ManageChaptersPage;
