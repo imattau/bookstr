@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNostr } from '../nostr';
-import { BookCard } from '../components/BookCard';
 import { NoteCard } from '../components/NoteCard';
 import type { Event as NostrEvent } from 'nostr-tools';
 
@@ -50,11 +49,7 @@ export const HomeFeed: React.FC = () => {
     <ul role="list" className="space-y-4">
       {events.map((e) => (
         <li key={e.id} role="listitem">
-          {e.kind === 30023 ? (
-            <BookCard event={e} onDelete={handleDelete} />
-          ) : (
-            <NoteCard event={e} onDelete={handleDelete} />
-          )}
+          <NoteCard event={e} onDelete={handleDelete} />
         </li>
       ))}
     </ul>
