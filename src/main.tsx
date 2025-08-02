@@ -8,14 +8,17 @@ import { App } from './index';
 import { registerServiceWorker } from './registerSw';
 import { NostrProvider } from './nostr';
 import { WalletProvider } from './WalletConnect';
+import { ReactionProvider } from './contexts/ReactionContext';
 
 const rootEl = document.getElementById('root');
 if (rootEl) {
   createRoot(rootEl).render(
     <NostrProvider>
-      <WalletProvider>
-        <App />
-      </WalletProvider>
+      <ReactionProvider>
+        <WalletProvider>
+          <App />
+        </WalletProvider>
+      </ReactionProvider>
     </NostrProvider>,
   );
 }
