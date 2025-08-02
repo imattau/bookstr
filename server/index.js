@@ -4,8 +4,8 @@
  * Routes:
  *   POST `${API_BASE}/action`    – publish an action event to configured relays
  *   POST `${API_BASE}/event`     – publish an arbitrary event to configured relays
- *   POST `${API_BASE}/subscribe` – (placeholder) subscribe to updates
- *   DELETE `${API_BASE}/subscribe` – (placeholder) cancel subscription
+ *   POST `${API_BASE}/subscribe` – save a push subscription
+ *   DELETE `${API_BASE}/subscribe` – remove a push subscription
  *
  * Events are forwarded using `SimplePool` from `nostr-tools`. Targets are the
  * relays listed in `server/config.js` whose retention meets `prunePolicy` and
@@ -17,6 +17,7 @@
  *                                 replaceable events
  */
 const path = require('path');
+const fs = require('fs/promises');
 const express = require('express');
 const { SimplePool, verifyEvent } = require('nostr-tools');
 const { relays, prunePolicy } = require('./config');
@@ -30,6 +31,53 @@ const PORT = process.env.PORT || 3000;
 const API_BASE = process.env.API_BASE || '/api';
 
 app.use(express.json());
+
+const SUBSCRIPTIONS_FILE = path.join(__dirname, 'subscriptions.json');
+
+async function getSubscriptions() {
+  try {
+    const raw = await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw err;
+  }
+}
+
+async function saveSubscriptions(subs) {
+  await fs.writeFile(
+    SUBSCRIPTIONS_FILE,
+    JSON.stringify(subs, null, 2),
+  );
+}
+
+async function addSubscription(sub) {
+  const subs = await getSubscriptions();
+  if (!subs.find((s) => s.endpoint === sub.endpoint)) {
+    subs.push(sub);
+    await saveSubscriptions(subs);
+  }
+}
+
+async function removeSubscription(endpoint) {
+  const subs = await getSubscriptions();
+  const filtered = subs.filter((s) => s.endpoint !== endpoint);
+  await saveSubscriptions(filtered);
+}
+
+async function clearSubscriptions() {
+  await saveSubscriptions([]);
+}
+
+function isValidSubscription(sub) {
+  return (
+    sub &&
+    typeof sub.endpoint === 'string' &&
+    sub.keys &&
+    typeof sub.keys.p256dh === 'string' &&
+    typeof sub.keys.auth === 'string'
+  );
+}
 
 async function actionHandler(req, res) {
   console.log('action', req.body);
@@ -104,14 +152,34 @@ async function eventHandler(req, res) {
 
 app.post(`${API_BASE}/event`, eventHandler);
 
-app.post(`${API_BASE}/subscribe`, (req, res) => {
-  console.log('subscribe', req.body);
-  res.json({ status: 'ok' });
+app.post(`${API_BASE}/subscribe`, async (req, res) => {
+  const sub = req.body;
+  if (!isValidSubscription(sub)) {
+    res.status(400).json({ error: 'invalid subscription' });
+    return;
+  }
+  try {
+    await addSubscription(sub);
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('subscribe failed', err);
+    res.status(500).json({ error: 'subscribe failed' });
+  }
 });
 
-app.delete(`${API_BASE}/subscribe`, (req, res) => {
-  console.log('unsubscribe', req.body);
-  res.json({ status: 'ok' });
+app.delete(`${API_BASE}/subscribe`, async (req, res) => {
+  const { endpoint } = req.body || {};
+  if (typeof endpoint !== 'string') {
+    res.status(400).json({ error: 'invalid subscription' });
+    return;
+  }
+  try {
+    await removeSubscription(endpoint);
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('unsubscribe failed', err);
+    res.status(500).json({ error: 'unsubscribe failed' });
+  }
 });
 
 const distPath = path.join(__dirname, '../dist');
@@ -133,4 +201,8 @@ module.exports = {
   eventHandler,
   fallbackVersions,
   pool,
+  addSubscription,
+  removeSubscription,
+  getSubscriptions,
+  clearSubscriptions,
 };
