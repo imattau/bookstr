@@ -47,7 +47,7 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
         className="px-[var(--space-2)]"
         disabled={!hasPrev}
       >
-        Prev
+        Previous chapter
       </button>
     )}
     {onNext && (
@@ -57,7 +57,7 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
         className="px-[var(--space-2)]"
         disabled={!hasNext}
       >
-        Next
+        Next chapter
       </button>
     )}
     <div className="flex-1 text-center truncate">{title}</div>
@@ -88,6 +88,6 @@ export const ReaderToolbar: React.FC<ReaderToolbarProps> = ({
     >
       ★
     </button>
-    <span className="ml-2 text-sm text-text-muted">{percent}%</span>
+    <span className="ml-2 text-sm text-text-muted">{Math.round(percent)}%</span>
   </div>
 );

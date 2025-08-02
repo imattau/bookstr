@@ -33,3 +33,10 @@ default). When a chapter is longer, `publishLongPost` slices the text into
 numbered parts. Each part shares a unique `d` tag and stores its position with a
 `part` index. The reader collects all events with the same `d` value and
 concatenates them before rendering so the full chapter is shown to the user.
+
+## Reading Progress
+
+When you open your published book in the reader, the toolbar now shows your
+current percentage and provides **Previous chapter** and **Next chapter**
+buttons. Book cards in the library also display a small progress indicator so
+you can track your reading at a glance.

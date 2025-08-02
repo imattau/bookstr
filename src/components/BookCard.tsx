@@ -5,10 +5,12 @@ import { ReactionButton } from './ReactionButton';
 import { RepostButton } from './RepostButton';
 import { DeleteButton } from './DeleteButton';
 import { ReportButton } from './ReportButton';
+import { ProgressBar } from './ProgressBar';
 import { FaHeart } from 'react-icons/fa';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { logEvent } from '../analytics';
 import { OnboardingTooltip } from './OnboardingTooltip';
+import { useReadingStore } from '../store';
 
 interface BookCardProps {
   event: NostrEvent & { repostedBy?: string };
@@ -25,6 +27,9 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
   const ctx = useNostr();
   const [status, setStatus] = useState<'idle' | 'zapping' | 'done'>('idle');
   const { toggleBookmark, bookmarks, pubkey, subscribe } = ctx;
+  const percent = useReadingStore(
+    (s) => s.books.find((b) => b.id === event.id)?.percent ?? 0,
+  );
   const [attachments, setAttachments] = useState<
     { id: string; mime: string; url: string }[]
   >([]);
@@ -77,6 +82,9 @@ export const BookCard: React.FC<BookCardProps> = ({ event, onDelete }) => {
       )}
       <h3 className="font-semibold">{title}</h3>
       {summary && <p className="text-sm text-text-muted">{summary}</p>}
+      <div className="mt-2">
+        <ProgressBar value={percent} data-testid="book-progress" />
+      </div>
       {attachments.map((a) => (
         <a
           key={a.id}
