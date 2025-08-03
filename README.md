@@ -161,7 +161,7 @@ The build setup is now complete and consists of the following steps:
    `vite-plugin-pwa` injects the precache manifest and bundles `src/sw.ts`
    as `dist/sw.js`.
 3. The Node API server in `server/index.js` serves the compiled files and
-   handles the `/api` routes. It is included in the Docker image described
+   handles the `/api` routes. It is included in the container image described
    below.
 
 ## Development Scripts
@@ -175,7 +175,7 @@ npm run format  # format files with Prettier
 
 ## Build and Deployment
 
-The application can be built and containerised with Docker.
+The application can be built and containerised with Docker or Podman.
 
 1. Install dependencies and run the tests:
    ```bash
@@ -186,15 +186,17 @@ The application can be built and containerised with Docker.
    ```bash
    npm run build
    ```
-3. Build the Docker image which packages the API server and the compiled
+3. Build the container image which packages the API server and the compiled
    assets:
    ```bash
-   docker build -t bookstr:latest .
+   podman build -t bookstr:latest .
    ```
+   (use `docker build` if using Docker)
 4. Start the container:
    ```bash
-   docker run -p 3000:3000 bookstr:latest
+   podman run -p 3000:3000 bookstr:latest
    ```
+   (replace `podman` with `docker` if using Docker)
    The application will be available at <http://localhost:3000>.
 
 All of the above steps are automated by the helper script:
@@ -208,14 +210,15 @@ This script assumes `node_modules` is absent and installs dependencies with
 
 ### API Server Configuration
 
-The Docker image includes a Node server that serves the static frontend and
+The container image includes a Node server that serves the static frontend and
 handles `POST /api/action` and `POST /api/event` requests. The server listens on
 port `3000` by default. Set the `PORT` environment variable to run on a
 different port:
 
 ```bash
-docker run -e PORT=8080 -p 8080:8080 bookstr:latest
+podman run -e PORT=8080 -p 8080:8080 bookstr:latest
 ```
+(use `docker run` if using Docker)
 
 This starts the API server on port 8080 while still serving the compiled web
 app.
@@ -254,8 +257,11 @@ not exist, runs the tests and builds the production bundle.
 Launch the API server and Vite dev server together:
 
 ```bash
-docker-compose up
+docker compose up
 ```
+
+Podman users can run `podman compose up`. The `docker-compose.yml` file omits
+the `version` key for compatibility with both tools.
 
 The API server listens on <http://localhost:3000> while the frontend is served
 by Vite on <http://localhost:5173>. Source files are mounted so changes trigger
