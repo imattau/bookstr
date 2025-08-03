@@ -257,11 +257,18 @@ not exist, runs the tests and builds the production bundle.
 Launch the API server and Vite dev server together:
 
 ```bash
-docker compose up
+./scripts/dev-container.sh
 ```
 
-Podman users can run `podman compose up`. The `docker-compose.yml` file omits
-the `version` key for compatibility with both tools.
+The helper script defaults to **Podman**. Set `CONTAINER_CLI=docker` to use
+Docker instead:
+
+```bash
+CONTAINER_CLI=docker ./scripts/dev-container.sh
+```
+
+The `docker-compose.yml` file omits the `version` key for compatibility with
+both tools.
 
 The API server listens on <http://localhost:3000> while the frontend is served
 by Vite on <http://localhost:5173>. Source files are mounted so changes trigger
